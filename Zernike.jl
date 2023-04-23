@@ -18,11 +18,11 @@ function Z(m::Integer, n::Integer)
         return
     end
 
-    # number of terms -1 (zero-based initial index)
+    # upper bound for the sum / number of terms -1 (indexing from zero)
     k::Int = (n - μ) / 2
     # ISO / ANSI / OSA standard single mode-ordering index
-    j::Int = (n * (n + 2) + m) / 2
-    # Kronecker delta δₘ₀
+    j::Int = ((n + 2)n + m) / 2
+    # Kronecker delta δ_{m0}
     δ(m) = m == 0
     # radicand
     N²::Int = (2n + 2) / (1 + δ(m))
@@ -40,7 +40,7 @@ function Z(m::Integer, n::Integer)
             n - s;
             s;
             k - s;
-            (n+μ)/2 - s
+            k + μ - s
         ]
         τ = t |> fact
         if j > 278
@@ -51,7 +51,7 @@ function Z(m::Integer, n::Integer)
 
     γ = Integer[λ(s) for s = 0:k]
 
-    # power
+    # power / exponent
     σ = Integer[n - 2s for s = 0:k]
 
     # radial polynomial
@@ -64,9 +64,9 @@ function Z(m::Integer, n::Integer)
 
     ρ = range(0, 1, 100)
     θ = range(0, 2π, 100)
-    ρᵪ = [ρᵢ * cos(θᵢ) for θᵢ ∈ θ, ρᵢ ∈ ρ]
-    ρᵧ = [ρⱼ * sin(θⱼ) for θⱼ ∈ θ, ρⱼ ∈ ρ]
-    Zp = Z.(ρ',θ)
+    ρᵪ = [ρⱼ * cos(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
+    ρᵧ = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
+    Zp = Z.(ρ', θ)
 
     # string formatting
 
@@ -74,86 +74,64 @@ function Z(m::Integer, n::Integer)
     # but this approach is intuitive enough
     # and doesn't require importing another package
 
-    # legend:
+    unicode = ones(String, 3)
+    latex = ones(String, 3)
 
-    # for Unicode formatting (for printing):
-    # Γ = final polynomial
-    # η = prefactor
-    # Φ = polynomial terms
-    # φ = angular term
-
-    # for LaTeX formatting (for the plot title):
-    # Λ = final polynomial
-    # ϵ = prefactor
-    # Ξ = polynomial terms
-    # ψ = angular term
-
-    if isinteger(N)
-        η = ϵ = N == 1 ? "" : string(Int(N))
-    else
-        η = "√($N²)"
-        ϵ = "\\sqrt{$N²}"
-    end
-
-    if m == 0
-        φ = ""
-        ψ = ""
-    elseif m == -1
-        φ = "sin(θ)"
-        ψ = "\\sin(\\theta)"
-    elseif m == 1
-        φ = "cos(θ)"
-        ψ = "\\cos(\\theta)"
-    elseif m < -1
-        φ = "sin($(μ)θ)"
-        ψ = "\\sin($(μ)\\theta)"
-    else
-        φ = "cos($(m)θ)"
-        ψ = "\\cos($(m)\\theta)"
-    end
-
-    if k != 0
-        η *= "("
-        ϵ *= "("
-        φ = ")" * φ
-        ψ = ")" * ψ
+    # prefactor
+    if !isinteger(N)
+        unicode[1] = "√($N²)"
+        latex[1] = "\\sqrt{$N²}"
+    elseif N != 1
+        unicode[1] = latex[1] = string(Int(N))
     end
 
     superscripts = ['\u2070'; '\u00B9'; '\u00B2'; '\u00B3'; '\u2074':'\u2079']
 
-    ω = fill("", length(σ))
-    
-    for i in eachindex(σ), j in σ[i] |> digits |> reverse
-        ω[i] *= superscripts[j+1]
-    end
+    ω = ones(String, length(σ))
 
-    for (i, v) in pairs(ω)
-        if v == string(superscripts[2])
-            ω[i] = ""
+    for (i, v) in pairs(σ)
+        v < 2 && break
+        for j in v |> digits |> reverse
+            ω[i] *= superscripts[j+1]
         end
     end
 
-    Φ = ""
-    Ξ = ""
+    # polynomial terms
+    ζ(i) = σ[i] == 1 ? "" : "^{$(σ[i])}"
 
     for i = 1:k
-        Φ *= string(abs(γ[i]), "ρ", ω[i], γ[i+1] > 0 ? " + " : " \u2212 ")
-        Ξ *= string(abs(γ[i]), "\\rho", "^{$(σ[i])}", γ[i+1] > 0 ? " + " : " - ")
+        unicode[2] *= string(abs(γ[i]), "ρ", ω[i], γ[i+1] > 0 ? " + " : " \u2212 ")
+        latex[2] *= string(abs(γ[i]), "\\rho", ζ(i), γ[i+1] > 0 ? " + " : " - ")
     end
 
     if σ[end] == 0
-        Φ *= string(abs(γ[end]))
-        Ξ *= string(abs(γ[end]))
+        unicode[2] *= string(abs(γ[end]))
+        latex[2] *= string(abs(γ[end]))
     elseif γ[end] == 1
-        Φ *= string("ρ", ω[end])
-        Ξ *= string("\\rho", σ[end] == 1 ? "" : "^{$(σ[end])}")
+        unicode[2] *= string("ρ", ω[end])
+        latex[2] *= string("\\rho", ζ(lastindex(σ)))
     else
-        Φ *= string(abs(γ[end]), "ρ", ω[end])
-        Ξ *= string(abs(γ[end]), "\\rho", σ[end] == 1 ? "" : "^{$(σ[end])}")
+        unicode[2] *= string(abs(γ[end]), "ρ", ω[end])
+        latex[2] *= string(abs(γ[end]), "\\rho", ζ(lastindex(σ)))
     end
 
-    Γ = η * Φ * φ
-    Λ = ϵ * Ξ * ψ
+    # angular term
+    υ = μ == 1 ? "" : μ
+
+    if m < 0
+        unicode[3] = "sin($(υ)θ)"
+        latex[3] = "\\sin($(υ)\\theta)"
+    elseif m > 0
+        unicode[3] = "cos($(υ)θ)"
+        latex[3] = "\\cos($(υ)\\theta)"
+    end
+
+    indices = "j = $j, n = $n, m = $m"
+
+    parentheses = k != 0 ? ("(", ")") : ""
+
+    Z_Unicode = join(unicode, parentheses...)
+    Z_LaTeX = join(latex, parentheses...)
 
     # plot
 
@@ -161,7 +139,7 @@ function Z(m::Integer, n::Integer)
     textsize = 35
 
     axis3attributes = (
-        title = L"Z = %$Λ",
+        title = L"Z = %$Z_LaTeX",
         titlesize = textsize,
         xlabel = L"\rho_x",
         ylabel = L"\rho_y",
@@ -179,7 +157,7 @@ function Z(m::Integer, n::Integer)
 
     # hacky way to produce a top-down heatmap-style view without generating
     # another plot with a different set of data
-    # this toggle allows you to interactively change the perspective
+    # accomplished by adding a toggle which changes the perspective on demand
 
     zproperties = (
         :zlabelvisible,
@@ -205,10 +183,10 @@ function Z(m::Integer, n::Integer)
 
     # print and display
 
-    println("j = $j, m = $m, n = $n")
-    println("Z = ", Γ)
+    println(indices)
+    println("Z = ", Z_Unicode)
 
-    set_window_config!(title = "Zernike Polynomial", focus_on_show = true)
+    set_window_config!(title = "Zernike Polynomial: $indices", focus_on_show = true)
     display(fig)
 
     return
@@ -223,7 +201,7 @@ function Z(j::Integer)
     # radial order
     n::Integer = ceil((-3 + sqrt(9 + 8j)) / 2)
     # azimuthal frequency
-    m::Integer = 2j - n * (n + 2)
+    m::Integer = 2j - (n + 2)n
     Z(m, n)
 end
 
