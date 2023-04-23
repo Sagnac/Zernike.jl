@@ -1,6 +1,6 @@
 # Zernike.jl
-# Version 0.1.0
-# 2023-4-22
+# Version 0.1.1
+# 2023-4-23
 # https://github.com/Sagnac/Zernike
 
 # Generates Zernike Polynomials and plots them in Makie
