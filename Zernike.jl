@@ -11,17 +11,17 @@ using GLMakie # v0.7.3
 
 function Z(m::Integer, n::Integer)
 
-    μ = abs(m)
+    μ::Integer = abs(m)
 
     if n < 0 || μ > n || isodd(n - μ)
         @error "Bounds:\nn ≥ 0\n|m| ≤ n\nn - |m| even"
         return
     end
 
-    # upper bound for the sum / number of terms -1 (indexing from zero)
-    k::Int = (n - μ) / 2
+    # upper bound for the sum (number of terms -1 [indexing from zero])
+    k::Integer = (n - μ) / 2
     # ISO / ANSI / OSA standard single mode-ordering index
-    j::Int = ((n + 2)n + m) / 2
+    j::Integer = ((n + 2)n + m) / 2
     # Kronecker delta δ_{m0}
     δ(m) = m == 0
     # radicand
@@ -51,11 +51,11 @@ function Z(m::Integer, n::Integer)
 
     γ = Integer[λ(s) for s = 0:k]
 
-    # power / exponent
-    σ = Integer[n - 2s for s = 0:k]
+    # power (exponent)
+    ν = Integer[n - 2s for s = 0:k]
 
     # radial polynomial
-    R(ρ)::Float64 = sum(γ[i] * ρ ^ σ[i] for i = 1:k+1)
+    R(ρ)::Float64 = sum(γ[i] * ρ ^ ν[i] for i = 1:k+1)
 
     # azimuthal / meridional component
     M(θ) = m < 0 ? -sin(m * θ) : cos(m * θ)
@@ -87,9 +87,9 @@ function Z(m::Integer, n::Integer)
 
     superscripts = ['\u2070'; '\u00B9'; '\u00B2'; '\u00B3'; '\u2074':'\u2079']
 
-    ω = ones(String, length(σ))
+    ω = ones(String, length(ν))
 
-    for (i, v) in pairs(σ)
+    for (i, v) in pairs(ν)
         v < 2 && break
         for j in v |> digits |> reverse
             ω[i] *= superscripts[j+1]
@@ -97,22 +97,22 @@ function Z(m::Integer, n::Integer)
     end
 
     # polynomial terms
-    ζ(i) = σ[i] == 1 ? "" : "^{$(σ[i])}"
+    ζ(i) = ν[i] == 1 ? "" : "^{$(ν[i])}"
 
     for i = 1:k
         unicode[2] *= string(abs(γ[i]), "ρ", ω[i], γ[i+1] > 0 ? " + " : " \u2212 ")
         latex[2] *= string(abs(γ[i]), "\\rho", ζ(i), γ[i+1] > 0 ? " + " : " - ")
     end
 
-    if σ[end] == 0
+    if ν[end] == 0
         unicode[2] *= string(abs(γ[end]))
         latex[2] *= string(abs(γ[end]))
     elseif γ[end] == 1
         unicode[2] *= string("ρ", ω[end])
-        latex[2] *= string("\\rho", ζ(lastindex(σ)))
+        latex[2] *= string("\\rho", ν |> lastindex |> ζ)
     else
         unicode[2] *= string(abs(γ[end]), "ρ", ω[end])
-        latex[2] *= string(abs(γ[end]), "\\rho", ζ(lastindex(σ)))
+        latex[2] *= string(abs(γ[end]), "\\rho", ν |> lastindex |> ζ)
     end
 
     # angular term
@@ -131,7 +131,7 @@ function Z(m::Integer, n::Integer)
     parentheses = k != 0 ? ("(", ")") : ""
 
     Z_Unicode = join(unicode, parentheses...)
-    Z_LaTeX = join(latex, parentheses...)
+    Z_LaTeX = "Z_{$n}^{$m} = " * join(latex, parentheses...)
 
     # plot
 
@@ -139,7 +139,7 @@ function Z(m::Integer, n::Integer)
     textsize = 35
 
     axis3attributes = (
-        title = L"Z = %$Z_LaTeX",
+        title = L"%$Z_LaTeX",
         titlesize = textsize,
         xlabel = L"\rho_x",
         ylabel = L"\rho_y",
@@ -167,9 +167,9 @@ function Z(m::Integer, n::Integer)
         :zspinesvisible,
     )
 
-    Label(fig[1,2], "Pupil view";
-          tellheight = false, valign = :bottom, textsize = 0.76textsize)
-    pupil = Toggle(fig[1,3]; tellheight = false, valign = :bottom)
+    label = Label(fig, "Pupil view"; textsize = 0.76textsize)
+    pupil = Toggle(fig)
+    fig[1,2] = grid!([label pupil]; tellheight = false, valign = :bottom)
 
     on(pupil.active) do active
         for property in zproperties
