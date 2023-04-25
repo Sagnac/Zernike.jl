@@ -3,15 +3,21 @@
 # 2023-4-25
 # https://github.com/Sagnac/Zernike
 
-# Generates Zernike Polynomials and plots them in Makie
+# Generates Zernike polynomials, fits wavefront errors, and plots them in Makie
 
 # Julia v1.8.0
 
 using GLMakie # v0.7.3
 
-function Z(m::Integer, n::Integer)
+function Z(m::Integer, n::Integer; mode = "plot")
 
     μ::Integer = abs(m)
+
+    # validate
+    if mode != "plot" && mode != "fit"
+        @error "Invalid mode.\nValid modes are:\n\"plot\"\n\"fit\""
+        return
+    end
 
     if n < 0 || μ > n || isodd(n - μ)
         @error "Bounds:\nn ≥ 0\n|m| ≤ n\nn - |m| even"
@@ -61,6 +67,8 @@ function Z(m::Integer, n::Integer)
     M(θ) = m < 0 ? -sin(m * θ) : cos(m * θ)
 
     Z(ρ,θ) = N * R(ρ) * M(θ)
+
+    mode == "fit" && return (Z = Z, n = n, m = m)
 
     ρ = range(0, 1, 100)
     θ = range(0, 2π, 100)
@@ -193,16 +201,65 @@ function Z(m::Integer, n::Integer)
 
 end
 
+# Estimates wavefront error by expressing the aberrations as a linear combination
+# of weighted Zernike polynomials. The representation is approximate,
+# especially for a small set of data.
+function W(r::Vector, ϕ::Vector, OPD::Vector, jmax::Integer)
+
+    Zj = [Z(j; mode = "fit") for j = 0:jmax]
+
+    # the following is unexpectedly faster and allocates less memory than
+    # reduce(hcat, generator or comprehension) or constructing
+    # the matrix with a comprehension along two dimensions instead of broadcasting
+
+    A = hcat((Zj[j][:Z].(r, ϕ) for j = 1:jmax+1)...)
+
+    v = round.(A \ OPD; digits = 5)
+
+    a = NamedTuple[]
+
+    for (i, val) in pairs(v)
+        # wipe out negative floating point zeros
+        if iszero(val)
+            v[i] = zero(val)
+        else
+            push!(a, (j = i - 1, n = Zj[i].n, m = Zj[i].m, a = val))
+        end
+    end
+
+    return a, v
+
+end
+
 # methods
 
-Z(; m, n) = Z(m, n)
+Z(; m, n, mode = "plot") = Z(m, n; mode)
 
-function Z(j::Integer)
+function Z(j::Integer; mode = "plot")
+    if j < 0
+        @error "j must be ≥ 0"
+        return
+    end
     # radial order
     n::Integer = ceil((-3 + sqrt(9 + 8j)) / 2)
     # azimuthal frequency
     m::Integer = 2j - (n + 2)n
-    Z(m, n)
+    Z(m, n; mode)
 end
+
+W(; r, t, OPD, jmax) = W(r, t, OPD, jmax)
+
+function W(x::Vector, y::Vector, OPD::Vector; jmax::Integer)
+    r = hypot.(x, y)
+    ϕ = atan.(y, x)
+    W(r, ϕ, OPD, jmax)
+end
+
+function W(data::Matrix, jmax::Integer)
+    r, ϕ, OPD = [data[:, i] for i = 1:3]
+    W(r, ϕ, OPD, jmax)
+end
+
+W(data; jmax) = W(data, jmax)
 
 return
