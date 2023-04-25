@@ -7,7 +7,16 @@
 
 # Julia v1.8.0
 
+module Zernike
+
+export Z, W
+
 using GLMakie # v0.7.3
+
+const ρ = range(0, 1, 100)
+const θ = range(0, 2π, 100)
+const ρᵪ = [ρⱼ * cos(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
+const ρᵧ = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
 
 function Z(m::Integer, n::Integer; mode = "plot")
 
@@ -34,11 +43,6 @@ function Z(m::Integer, n::Integer; mode = "plot")
     N²::Int = (2n + 2) / (1 + δ(m))
     # normalization constant following the orthogonality relation
     N = √N²
-
-    function fact(t)
-        bound = Int ≡ Int32 ? 12 : 20
-        [i > bound ? (factorial ∘ big)(i) : factorial(i) for i in t]
-    end
 
     # coefficient
     function λ(s)
@@ -70,10 +74,6 @@ function Z(m::Integer, n::Integer; mode = "plot")
 
     mode == "fit" && return (Z = Z, n = n, m = m)
 
-    ρ = range(0, 1, 100)
-    θ = range(0, 2π, 100)
-    ρᵪ = [ρⱼ * cos(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
-    ρᵧ = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
     Zp = Z.(ρ', θ)
 
     # string formatting
@@ -141,13 +141,60 @@ function Z(m::Integer, n::Integer; mode = "plot")
     Z_Unicode = join(unicode, parentheses...)
     Z_LaTeX = "Z_{$n}^{$m} = " * join(latex, parentheses...)
 
-    # plot
+    # print and display
+
+    println(indices)
+    println("Z = ", Z_Unicode)
+
+    titles = (plot = Z_LaTeX, window = "Zernike Polynomial: $indices")
+    ZPlot(Zp; titles...)
+
+    return
+
+end
+
+# Estimates wavefront error by expressing the aberrations as a linear combination
+# of weighted Zernike polynomials. The representation is approximate,
+# especially for a small set of data.
+function W(r::Vector, ϕ::Vector, OPD::Vector, jmax::Integer)
+
+    Zj = [Z(j; mode = "fit") for j = 0:jmax]
+
+    # the following is unexpectedly faster and allocates less memory than
+    # reduce(hcat, generator or comprehension) or constructing
+    # the matrix with a comprehension along two dimensions instead of broadcasting
+
+    A = hcat((Zj[j][:Z].(r, ϕ) for j = 1:jmax+1)...)
+
+    v = round.(A \ OPD; digits = 5)
+
+    a = NamedTuple[]
+
+    for (i, val) in pairs(v)
+        # wipe out negative floating point zeros
+        if iszero(val)
+            v[i] = zero(val)
+        else
+            push!(a, (j = i - 1, n = Zj[i].n, m = Zj[i].m, a = val))
+        end
+    end
+
+    return a, v
+
+end
+
+function fact(t)
+    bound = Int ≡ Int32 ? 12 : 20
+    [i > bound ? (factorial ∘ big)(i) : factorial(i) for i in t]
+end
+
+function ZPlot(Zp; titles...)
 
     resolution = (1400, 1000)
     textsize = 35
 
     axis3attributes = (
-        title = L"%$Z_LaTeX",
+        title = L"%$(titles[:plot])",
         titlesize = textsize,
         xlabel = L"\rho_x",
         ylabel = L"\rho_y",
@@ -189,45 +236,10 @@ function Z(m::Integer, n::Integer; mode = "plot")
         axis3.xlabeloffset = active ? 50 : 40
     end
 
-    # print and display
-
-    println(indices)
-    println("Z = ", Z_Unicode)
-
-    set_window_config!(title = "Zernike Polynomial: $indices", focus_on_show = true)
+    set_window_config!(title = titles[:window], focus_on_show = true)
     display(fig)
 
     return
-
-end
-
-# Estimates wavefront error by expressing the aberrations as a linear combination
-# of weighted Zernike polynomials. The representation is approximate,
-# especially for a small set of data.
-function W(r::Vector, ϕ::Vector, OPD::Vector, jmax::Integer)
-
-    Zj = [Z(j; mode = "fit") for j = 0:jmax]
-
-    # the following is unexpectedly faster and allocates less memory than
-    # reduce(hcat, generator or comprehension) or constructing
-    # the matrix with a comprehension along two dimensions instead of broadcasting
-
-    A = hcat((Zj[j][:Z].(r, ϕ) for j = 1:jmax+1)...)
-
-    v = round.(A \ OPD; digits = 5)
-
-    a = NamedTuple[]
-
-    for (i, val) in pairs(v)
-        # wipe out negative floating point zeros
-        if iszero(val)
-            v[i] = zero(val)
-        else
-            push!(a, (j = i - 1, n = Zj[i].n, m = Zj[i].m, a = val))
-        end
-    end
-
-    return a, v
 
 end
 
@@ -262,4 +274,4 @@ end
 
 W(data; jmax) = W(data, jmax)
 
-return
+end
