@@ -195,9 +195,25 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, jmax::Integer)
 
     titles = (plot = Z_LaTeX, window = "Estimated wavefront error")
 
+    # Peak-to-valley wavefront error
+    PV = maximum(ΔW) - minimum(ΔW)
+
+    # RMS wavefront error
+    # where σ² is the variance (second central moment about the mean)
+    # the mean is the first a00 piston term
+    σ = sum(v[i]^2 for i = 2:lastindex(v)) |> sqrt
+
+    Strehl_ratio = exp(-(2π * σ)^2)
+
+    metrics = (
+        (round(PV; digits = 5), "PV ≈ λ/$(round(Int, 1 / PV))"),
+        (round(σ; digits = 5), "σ ≈ λ/$(round(Int, 1 / σ))"),
+        (Strehl_ratio = round(Strehl_ratio; digits = 5),)
+    )
+
     ZPlot(ΔW; titles...)
 
-    return a, v
+    return a, v, metrics
 
 end
 
