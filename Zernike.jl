@@ -166,6 +166,7 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, jmax::Integer)
 
     A = hcat((Zj[j][:Z].(r, ϕ) for j = 1:jmax+1)...)
 
+    # Zernike coefficients
     v = round.(A \ OPD; digits = 5)
 
     a = NamedTuple[]
@@ -178,6 +179,23 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, jmax::Integer)
             push!(a, (j = i - 1, n = Zj[i].n, m = Zj[i].m, a = val))
         end
     end
+
+    ΔW = sum(i.a * Zj[i.j+1][:Z].(ρ', θ) for i in a)
+
+    Z_LaTeX = "ΔW = "
+
+    for i = 1:length(a)-1
+        Z_LaTeX *= string(abs(round(a[i][:a]; digits = 3)),
+                   "Z_{$(a[i][:n])}^{$(a[i][:m])}",
+                   a[i+1][:a] > 0 ? " + " : " - ")
+    end
+
+    Z_LaTeX *= "$(abs(round(a[end][:a]; digits = 3)))" *
+               "Z_{$(a[end][:n])}^{$(a[end][:m])}"
+
+    titles = (plot = Z_LaTeX, window = "Estimated wavefront error")
+
+    ZPlot(ΔW; titles...)
 
     return a, v
 
