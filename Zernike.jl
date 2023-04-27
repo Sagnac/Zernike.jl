@@ -213,9 +213,9 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, jmax::Integer)
     Strehl_ratio = exp(-(2π * σ)^2)
 
     metrics = (
-        (round(PV; digits = 5), "PV ≈ λ/$(round(Int, 1 / PV))"),
-        (round(σ; digits = 5), "σ ≈ λ/$(round(Int, 1 / σ))"),
-        (Strehl_ratio = round(Strehl_ratio; digits = 5),)
+        PV = round(PV; digits = 5),
+        RMS = round(σ; digits = 5),
+        Strehl = round(Strehl_ratio; digits = 5)
     )
 
     ZPlot(ΔW; titles...)
