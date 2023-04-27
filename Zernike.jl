@@ -160,11 +160,8 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, jmax::Integer)
 
     Zᵢ = [Z(j; mode = "fit") for j = 0:jmax]
 
-    # the following is unexpectedly faster and allocates less memory than
-    # reduce(hcat, generator or comprehension) or constructing
-    # the matrix with a comprehension along two dimensions instead of broadcasting
-
-    A = hcat((Zᵢ[i][:Z].(r, ϕ) for i = 1:jmax+1)...)
+    # linear least squares
+    A = reduce(hcat, Zᵢ[i][:Z].(r, ϕ) for i = 1:jmax+1)
 
     # Zernike coefficients
     v = round.(A \ OPD; digits = 5)
