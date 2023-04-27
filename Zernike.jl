@@ -18,6 +18,8 @@ const θ = range(0, 2π, 100)
 const ρᵪ = [ρⱼ * cos(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
 const ρᵧ = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
 
+get_j(n, m)::Integer = ((n + 2)n + m) / 2
+
 function Z(m::Integer, n::Integer; mode = "plot")
 
     μ::Integer = abs(m)
@@ -36,7 +38,7 @@ function Z(m::Integer, n::Integer; mode = "plot")
     # upper bound for the sum (number of terms -1 [indexing from zero])
     k::Integer = (n - μ) / 2
     # ISO / ANSI / OSA standard single mode-ordering index
-    j::Integer = ((n + 2)n + m) / 2
+    j = get_j(n, m)
     # Kronecker delta δ_{m0}
     δ(m) = m == 0
     # radicand
@@ -156,12 +158,14 @@ end
 # Estimates wavefront error by expressing the aberrations as a linear combination
 # of weighted Zernike polynomials. The representation is approximate,
 # especially for a small set of data.
-function W(r::Vector, ϕ::Vector, OPD::Vector, jmax::Integer)
+function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer)
 
-    Zᵢ = [Z(j; mode = "fit") for j = 0:jmax]
+    j_max = get_j(n_max, n_max)
+
+    Zᵢ = [Z(j; mode = "fit") for j = 0:j_max]
 
     # linear least squares
-    A = reduce(hcat, Zᵢ[i][:Z].(r, ϕ) for i = 1:jmax+1)
+    A = reduce(hcat, Zᵢ[i][:Z].(r, ϕ) for i = 1:j_max+1)
 
     # Zernike coefficients
     v = round.(A \ OPD; digits = 5)
@@ -297,19 +301,19 @@ function Z(j::Integer; mode = "plot")
     Z(m, n; mode)
 end
 
-W(; r, t, OPD, jmax) = W(r, t, OPD, jmax)
+W(; r, t, OPD, n_max) = W(r, t, OPD, n_max)
 
-function W(x::Vector, y::Vector, OPD::Vector; jmax::Integer)
+function W(x::Vector, y::Vector, OPD::Vector; n_max::Integer)
     r = hypot.(x, y)
     ϕ = atan.(y, x)
-    W(r, ϕ, OPD, jmax)
+    W(r, ϕ, OPD, n_max)
 end
 
-function W(data::Matrix, jmax::Integer)
+function W(data::Matrix, n_max::Integer)
     r, ϕ, OPD = [data[:, i] for i = 1:3]
-    W(r, ϕ, OPD, jmax)
+    W(r, ϕ, OPD, n_max)
 end
 
-W(data; jmax) = W(data, jmax)
+W(data; n_max) = W(data, n_max)
 
 end
