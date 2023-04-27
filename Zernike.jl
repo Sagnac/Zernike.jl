@@ -15,9 +15,10 @@ using GLMakie # v0.7.3
 
 const ρ = range(0, 1, 100)
 const θ = range(0, 2π, 100)
-const ρᵪ = [ρⱼ * cos(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
-const ρᵧ = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
 const ∑ = sum
+
+include("ZernikePlot.jl")
+include("WavefrontError.jl")
 
 get_j(n, m)::Integer = ((n + 2)n + m) ÷ 2
 
@@ -161,125 +162,6 @@ function Z(m::Integer, n::Integer; mode = "plot")
 
 end
 
-# Estimates wavefront error by expressing the aberrations as a linear combination
-# of weighted Zernike polynomials. The representation is approximate,
-# especially for a small set of data.
-function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer)
-
-    j_max = get_j(n_max, n_max)
-
-    Zᵢ = [Z(j; mode = "fit") for j = 0:j_max]
-
-    # linear least squares
-    A = reduce(hcat, Zᵢ[i][:Z].(r, ϕ) for i = 1:j_max+1)
-
-    # Zernike expansion coefficients
-    v = A \ OPD
-
-    a = NamedTuple[]
-    Wᵢ = []
-
-    # create the fitted polynomials
-    for (i, aᵢ) in pairs(v)
-        push!(Wᵢ, aᵢ * Zᵢ[i][:Z].(ρ', θ))
-        aᵢ = round(aᵢ; digits = 3)
-        # store the non-trivial coefficients
-        if !iszero(aᵢ)
-            push!(a, (j = i - 1, n = Zᵢ[i].n, m = Zᵢ[i].m, a = aᵢ))
-        end
-    end
-
-    # construct the estimated wavefront error
-    ΔW = ∑(Wᵢ)
-
-    Z_LaTeX = "ΔW = "
-
-    function ζ(i)
-        aᵢ = a[i][:a]
-        (i > 1 ? abs(aᵢ) : aᵢ), "Z_{$(a[i][:n])}^{$(a[i][:m])}"
-    end
-
-    for i = 1:length(a)-1
-        Z_LaTeX *= string(ζ(i)..., a[i+1][:a] > 0 ? " + " : " - ")
-    end
-
-    Z_LaTeX *= string(ζ(lastindex(a))...)
-
-    titles = (plot = Z_LaTeX, window = "Estimated wavefront error")
-
-    # Peak-to-valley wavefront error
-    PV = maximum(ΔW) - minimum(ΔW)
-
-    # RMS wavefront error
-    # where σ² is the variance (second central moment about the mean)
-    # the mean is the first a00 piston term
-    σ = ∑(v[i]^2 for i = 2:lastindex(v)) |> sqrt
-
-    Strehl_ratio = exp(-(2π * σ)^2)
-
-    metrics = (PV = PV, RMS = σ, Strehl = Strehl_ratio)
-
-    ZPlot(ΔW; titles...)
-
-    return a, v, metrics
-
-end
-
-function ZPlot(Zp; titles...)
-
-    resolution = (1400, 1000)
-    textsize = 35
-
-    axis3attributes = (
-        title = L"%$(titles[:plot])",
-        titlesize = textsize,
-        xlabel = L"\rho_x",
-        ylabel = L"\rho_y",
-        zlabel = L"Z",
-        xlabelsize = textsize,
-        ylabelsize = textsize,
-        zlabelsize = textsize,
-        azimuth = 0.275π,
-        protrusions = 80,
-    )
-
-    fig = Figure(; resolution)
-    axis3 = Axis3(fig[1,1]; axis3attributes...)
-    surface!(axis3, ρᵪ, ρᵧ, Zp; colormap = :oslo)
-
-    # hacky way to produce a top-down heatmap-style view without generating
-    # another plot with a different set of data
-    # accomplished by adding a toggle which changes the perspective on demand
-
-    zproperties = (
-        :zlabelvisible,
-        :zgridvisible,
-        :zticksvisible,
-        :zticklabelsvisible,
-        :zspinesvisible,
-    )
-
-    label = Label(fig, "Pupil view"; textsize = 0.76textsize)
-    pupil = Toggle(fig)
-    fig[1,2] = grid!([label pupil]; tellheight = false, valign = :bottom)
-
-    on(pupil.active) do active
-        for property in zproperties
-            getfield(axis3, property)[] = !active
-        end
-        axis3.azimuth = active ? -π/2 : 0.275π
-        axis3.elevation = active ? π/2 : π/8
-        axis3.ylabeloffset = active ? 90 : 40
-        axis3.xlabeloffset = active ? 50 : 40
-    end
-
-    set_window_config!(title = titles[:window], focus_on_show = true)
-    display(fig)
-
-    return
-
-end
-
 # methods
 
 Z(; m, n, mode = "plot") = Z(m, n; mode)
@@ -295,20 +177,5 @@ function Z(j::Integer; mode = "plot")
     m::Integer = 2j - (n + 2)n
     Z(m, n; mode)
 end
-
-W(; r, t, OPD, n_max) = W(r, t, OPD, n_max)
-
-function W(x::Vector, y::Vector, OPD::Vector; n_max::Integer)
-    r = hypot.(x, y)
-    ϕ = atan.(y, x)
-    W(r, ϕ, OPD, n_max)
-end
-
-function W(data::Matrix, n_max::Integer)
-    r, ϕ, OPD = [data[:, i] for i = 1:3]
-    W(r, ϕ, OPD, n_max)
-end
-
-W(data; n_max) = W(data, n_max)
 
 end
