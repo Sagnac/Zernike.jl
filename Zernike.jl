@@ -173,21 +173,19 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer)
     # linear least squares
     A = reduce(hcat, Zᵢ[i][:Z].(r, ϕ) for i = 1:j_max+1)
 
-    # Zernike coefficients
-    v = round.(A \ OPD; digits = 5)
+    # Zernike expansion coefficients
+    v = A \ OPD
 
     a = NamedTuple[]
     Wᵢ = []
 
+    # create the fitted polynomials
     for (i, aᵢ) in pairs(v)
-        # wipe out negative floating point zeros
-        if iszero(aᵢ)
-            v[i] = zero(aᵢ)
-        else
-            # store the non-trivial coefficients
-            # and create the fitted polynomials
+        push!(Wᵢ, aᵢ * Zᵢ[i][:Z].(ρ', θ))
+        aᵢ = round(aᵢ; digits = 3)
+        # store the non-trivial coefficients
+        if !iszero(aᵢ)
             push!(a, (j = i - 1, n = Zᵢ[i].n, m = Zᵢ[i].m, a = aᵢ))
-            push!(Wᵢ, aᵢ * Zᵢ[i][:Z].(ρ', θ))
         end
     end
 
@@ -197,7 +195,7 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer)
     Z_LaTeX = "ΔW = "
 
     function ζ(i)
-        aᵢ = round(a[i][:a]; digits = 3)
+        aᵢ = a[i][:a]
         (i > 1 ? abs(aᵢ) : aᵢ), "Z_{$(a[i][:n])}^{$(a[i][:m])}"
     end
 
@@ -219,11 +217,7 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer)
 
     Strehl_ratio = exp(-(2π * σ)^2)
 
-    metrics = (
-        PV = round(PV; digits = 5),
-        RMS = round(σ; digits = 5),
-        Strehl = round(Strehl_ratio; digits = 5)
-    )
+    metrics = (PV = PV, RMS = σ, Strehl = Strehl_ratio)
 
     ZPlot(ΔW; titles...)
 
