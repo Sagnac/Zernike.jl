@@ -189,14 +189,16 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, jmax::Integer)
 
     Z_LaTeX = "ΔW = "
 
-    for i = 1:length(a)-1
-        Z_LaTeX *= string(abs(round(a[i][:a]; digits = 3)),
-                   "Z_{$(a[i][:n])}^{$(a[i][:m])}",
-                   a[i+1][:a] > 0 ? " + " : " - ")
+    function ζ(i)
+        aᵢ = round(a[i][:a]; digits = 3)
+        (i > 1 ? abs(aᵢ) : aᵢ), "Z_{$(a[i][:n])}^{$(a[i][:m])}"
     end
 
-    Z_LaTeX *= "$(abs(round(a[end][:a]; digits = 3)))" *
-               "Z_{$(a[end][:n])}^{$(a[end][:m])}"
+    for i = 1:length(a)-1
+        Z_LaTeX *= string(ζ(i)..., a[i+1][:a] > 0 ? " + " : " - ")
+    end
+
+    Z_LaTeX *= string(ζ(lastindex(a))...)
 
     titles = (plot = Z_LaTeX, window = "Estimated wavefront error")
 
