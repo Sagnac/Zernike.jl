@@ -17,8 +17,14 @@ const ρ = range(0, 1, 100)
 const θ = range(0, 2π, 100)
 const ρᵪ = [ρⱼ * cos(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
 const ρᵧ = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
+const ∑ = sum
 
 get_j(n, m)::Integer = ((n + 2)n + m) ÷ 2
+
+function fact(t)
+    bound = Int ≡ Int32 ? 12 : 20
+    [tᵢ > bound ? (factorial ∘ big)(tᵢ) : factorial(tᵢ) for tᵢ ∈ t]
+end
 
 function Z(m::Integer, n::Integer; mode = "plot")
 
@@ -67,7 +73,7 @@ function Z(m::Integer, n::Integer; mode = "plot")
     ν = Integer[n - 2s for s = 0:k]
 
     # radial polynomial
-    R(ρ)::Float64 = sum(γ[i] * ρ ^ ν[i] for i = 1:k+1)
+    R(ρ)::Float64 = ∑(γ[i] * ρ ^ ν[i] for i = 1:k+1)
 
     # azimuthal / meridional component
     M(θ) = m < 0 ? -sin(m * θ) : cos(m * θ)
@@ -91,7 +97,7 @@ function Z(m::Integer, n::Integer; mode = "plot")
     if !isinteger(N)
         unicode[1] = "√($N²)"
         latex[1] = "\\sqrt{$N²}"
-    elseif N != 1
+    elseif N ≠ 1
         unicode[1] = latex[1] = string(Int(N))
     end
 
@@ -138,7 +144,7 @@ function Z(m::Integer, n::Integer; mode = "plot")
 
     indices = "j = $j, n = $n, m = $m"
 
-    parentheses = k != 0 ? ("(", ")") : ""
+    parentheses = k ≠ 0 ? ("(", ")") : ""
 
     Z_Unicode = join(unicode, parentheses...)
     Z_LaTeX = "Z_{$n}^{$m} = " * join(latex, parentheses...)
@@ -186,7 +192,7 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer)
     end
 
     # construct the estimated wavefront error
-    ΔW = sum(Wᵢ)
+    ΔW = ∑(Wᵢ)
 
     Z_LaTeX = "ΔW = "
 
@@ -209,7 +215,7 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer)
     # RMS wavefront error
     # where σ² is the variance (second central moment about the mean)
     # the mean is the first a00 piston term
-    σ = sum(v[i]^2 for i = 2:lastindex(v)) |> sqrt
+    σ = ∑(v[i]^2 for i = 2:lastindex(v)) |> sqrt
 
     Strehl_ratio = exp(-(2π * σ)^2)
 
@@ -223,11 +229,6 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer)
 
     return a, v, metrics
 
-end
-
-function fact(t)
-    bound = Int ≡ Int32 ? 12 : 20
-    [i > bound ? (factorial ∘ big)(i) : factorial(i) for i in t]
 end
 
 function ZPlot(Zp; titles...)
@@ -295,7 +296,7 @@ function Z(j::Integer; mode = "plot")
         return
     end
     # radial order
-    n::Integer = ceil((-3 + sqrt(9 + 8j)) / 2)
+    n::Integer = ceil((-3 + √(9 + 8j)) / 2)
     # azimuthal frequency
     m::Integer = 2j - (n + 2)n
     Z(m, n; mode)
