@@ -18,7 +18,7 @@ const θ = range(0, 2π, 100)
 const ρᵪ = [ρⱼ * cos(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
 const ρᵧ = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
 
-get_j(n, m)::Integer = ((n + 2)n + m) / 2
+get_j(n, m)::Integer = ((n + 2)n + m) ÷ 2
 
 function Z(m::Integer, n::Integer; mode = "plot")
 
@@ -36,13 +36,13 @@ function Z(m::Integer, n::Integer; mode = "plot")
     end
 
     # upper bound for the sum (number of terms -1 [indexing from zero])
-    k::Integer = (n - μ) / 2
+    k::Integer = (n - μ) ÷ 2
     # ISO / ANSI / OSA standard single mode-ordering index
     j = get_j(n, m)
     # Kronecker delta δ_{m0}
     δ(m) = m == 0
     # radicand
-    N²::Int = (2n + 2) / (1 + δ(m))
+    N²::Int = (2n + 2) ÷ (1 + δ(m))
     # normalization constant following the orthogonality relation
     N = √N²
 
@@ -58,7 +58,7 @@ function Z(m::Integer, n::Integer; mode = "plot")
         if j > 278
             τ = convert(Vector{BigInt}, τ)
         end
-        (-1)^s * τ[1] / prod(τ[2:4])
+        (-1)^s * τ[1] ÷ prod(τ[2:4])
     end
 
     γ = Integer[λ(s) for s = 0:k]
