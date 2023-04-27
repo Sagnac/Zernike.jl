@@ -158,29 +158,34 @@ end
 # especially for a small set of data.
 function W(r::Vector, ϕ::Vector, OPD::Vector, jmax::Integer)
 
-    Zj = [Z(j; mode = "fit") for j = 0:jmax]
+    Zᵢ = [Z(j; mode = "fit") for j = 0:jmax]
 
     # the following is unexpectedly faster and allocates less memory than
     # reduce(hcat, generator or comprehension) or constructing
     # the matrix with a comprehension along two dimensions instead of broadcasting
 
-    A = hcat((Zj[j][:Z].(r, ϕ) for j = 1:jmax+1)...)
+    A = hcat((Zᵢ[i][:Z].(r, ϕ) for i = 1:jmax+1)...)
 
     # Zernike coefficients
     v = round.(A \ OPD; digits = 5)
 
     a = NamedTuple[]
+    Wᵢ = []
 
-    for (i, val) in pairs(v)
+    for (i, aᵢ) in pairs(v)
         # wipe out negative floating point zeros
-        if iszero(val)
-            v[i] = zero(val)
+        if iszero(aᵢ)
+            v[i] = zero(aᵢ)
         else
-            push!(a, (j = i - 1, n = Zj[i].n, m = Zj[i].m, a = val))
+            # store the non-trivial coefficients
+            # and create the fitted polynomials
+            push!(a, (j = i - 1, n = Zᵢ[i].n, m = Zᵢ[i].m, a = aᵢ))
+            push!(Wᵢ, aᵢ * Zᵢ[i][:Z].(ρ', θ))
         end
     end
 
-    ΔW = sum(i.a * Zj[i.j+1][:Z].(ρ', θ) for i in a)
+    # construct the estimated wavefront error
+    ΔW = sum(Wᵢ)
 
     Z_LaTeX = "ΔW = "
 
