@@ -3,6 +3,11 @@
 # especially for a small set of data.
 function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer)
 
+    if !allequal(length.((r, ϕ, OPD)))
+        @error "Vectors must be of equal length."
+        return
+    end
+
     j_max = get_j(n_max, n_max)
 
     Zᵢ = [Z(j; mode = "fit") for j = 0:j_max]
