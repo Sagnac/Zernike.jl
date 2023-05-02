@@ -4,17 +4,17 @@ const ρᵧ = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
 function ZPlot(Zp; titles...)
 
     resolution = (1400, 1000)
-    textsize = 35
+    fontsize = 35
 
     axis3attributes = (
         title = L"%$(titles[:plot])",
-        titlesize = textsize,
+        titlesize = fontsize,
         xlabel = L"\rho_x",
         ylabel = L"\rho_y",
         zlabel = L"Z",
-        xlabelsize = textsize,
-        ylabelsize = textsize,
-        zlabelsize = textsize,
+        xlabelsize = fontsize,
+        ylabelsize = fontsize,
+        zlabelsize = fontsize,
         azimuth = 0.275π,
         protrusions = 80,
     )
@@ -35,7 +35,7 @@ function ZPlot(Zp; titles...)
         :zspinesvisible,
     )
 
-    label = Label(fig, "Pupil view"; textsize = 0.76textsize)
+    label = Label(fig, "Pupil view"; fontsize = 0.76fontsize)
     pupil = Toggle(fig)
     fig[1,2] = grid!([label pupil]; tellheight = false, valign = :bottom)
 
