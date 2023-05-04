@@ -19,20 +19,20 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer)
     v = A \ OPD
 
     a = NamedTuple[]
-    Wᵢ = []
 
-    # create the fitted polynomials
+    # store the non-trivial coefficients
     for (i, aᵢ) in pairs(v)
-        push!(Wᵢ, aᵢ * Zᵢ[i][:Z].(ρ', θ))
         aᵢ = round(aᵢ; digits = 3)
-        # store the non-trivial coefficients
         if !iszero(aᵢ)
             push!(a, (j = i - 1, n = Zᵢ[i].n, m = Zᵢ[i].m, a = aᵢ))
         end
     end
 
+    # create the fitted polynomial
+    ΔW(ρ, θ) = ∑(v[i] * Zᵢ[i][:Z](ρ, θ) for i = 1:j_max+1)
+
     # construct the estimated wavefront error
-    ΔW = ∑(Wᵢ)
+    ΔWp = ΔW.(ρ', θ)
 
     Z_LaTeX = "ΔW = "
 
@@ -50,7 +50,7 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer)
     titles = (plot = Z_LaTeX, window = "Estimated wavefront error")
 
     # Peak-to-valley wavefront error
-    PV = maximum(ΔW) - minimum(ΔW)
+    PV = maximum(ΔWp) - minimum(ΔWp)
 
     # RMS wavefront error
     # where σ² is the variance (second central moment about the mean)
@@ -61,7 +61,7 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer)
 
     metrics = (PV = PV, RMS = σ, Strehl = Strehl_ratio)
 
-    fig = ZPlot(ΔW; titles...)
+    fig = ZPlot(ΔWp; titles...)
 
     return fig, a, v, metrics
 
