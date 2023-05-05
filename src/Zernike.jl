@@ -41,13 +41,11 @@ function Z(m::Integer, n::Integer; mode = "plot", coeffs = false, latex = false)
 
     # validate
     if mode != "plot" && mode != "fit"
-        @error "Invalid mode.\nValid modes are:\n\"plot\"\n\"fit\""
-        return
+        error("Invalid mode.\nValid modes are:\n\"plot\"\n\"fit\"\n")
     end
 
     if n < 0 || μ > n || isodd(n - μ)
-        @error "Bounds:\nn ≥ 0\n|m| ≤ n\nn - |m| even"
-        return
+        error("Bounds:\nn ≥ 0\n|m| ≤ n\nn - |m| even\n")
     end
 
     # upper bound for the sum (number of terms -1 [indexing from zero])
@@ -207,8 +205,7 @@ Z(; m, n, kwargs...) = Z(m, n; kwargs...)
 
 function Z(j::Integer; kwargs...)
     if j < 0
-        @error "j must be ≥ 0"
-        return
+        error("j must be ≥ 0\n")
     end
     # radial order
     n::Integer = ceil((-3 + √(9 + 8j)) / 2)

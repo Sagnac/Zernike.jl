@@ -4,8 +4,7 @@
 function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer)
 
     if !allequal(length.((r, ϕ, OPD)))
-        @error "Vectors must be of equal length."
-        return
+        error("Vectors must be of equal length.\n")
     end
 
     j_max = get_j(n_max, n_max)
