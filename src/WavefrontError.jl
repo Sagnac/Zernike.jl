@@ -34,18 +34,28 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer)
     # construct the estimated wavefront error
     ΔWp = ΔW.(ρ', θ)
 
-    Z_LaTeX = "ΔW = "
+    Z_LaTeX = "ΔW ≈ "
 
     function ζ(i)
         aᵢ = a[i][:a]
         (i > 1 ? abs(aᵢ) : aᵢ), "Z_{$(a[i][:n])}^{$(a[i][:m])}"
     end
 
-    for i = 1:length(a)-1
-        Z_LaTeX *= string(ζ(i)..., a[i+1][:a] > 0 ? " + " : " - ")
+    function η(index, a)
+        for i = 1:length(a)-1
+            Z_LaTeX *= string(ζ(index[i])..., a[i+1][:a] > 0 ? " + " : " - ")
+        end
     end
 
-    Z_LaTeX *= string(ζ(lastindex(a))...)
+    if length(a) > 8
+        sorted_indices = sortperm(abs.([aᵢ[:a] for aᵢ ∈ a]); rev = true)
+        subset_a = getindex(a, sorted_indices[1:4])
+        η(sorted_indices, subset_a)
+        Z_LaTeX *= string(ζ(sorted_indices[4])...) * "..."
+    else
+        η(keys(a), a)
+        Z_LaTeX *= string(ζ(lastindex(a))...)
+    end
 
     titles = (plot = Z_LaTeX, window = "Estimated wavefront error")
 
