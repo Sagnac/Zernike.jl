@@ -61,9 +61,9 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer)
 
     metrics = (PV = PV, RMS = σ, Strehl = Strehl_ratio)
 
-    ZPlot(ΔW; titles...)
+    fig = ZPlot(ΔW; titles...)
 
-    return a, v, metrics
+    return fig, a, v, metrics
 
 end
 

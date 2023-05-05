@@ -3,7 +3,7 @@ const ρᵧ = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
 
 function ZPlot(Zp; titles...)
 
-    resolution = (1400, 1000)
+    resolution = (1688, 1000)
     fontsize = 35
 
     axis3attributes = (
@@ -52,6 +52,6 @@ function ZPlot(Zp; titles...)
     set_window_config!(title = titles[:window], focus_on_show = true)
     display(fig)
 
-    return
+    return fig
 
 end
