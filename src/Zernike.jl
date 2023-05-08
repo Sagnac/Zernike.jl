@@ -25,15 +25,12 @@ include("RadialCoefficients.jl")
 get_j(n, m)::Integer = ((n + 2)n + m) ÷ 2
 
 #=
-
-This is used in computing the polynomial coefficients using the original formula.
-
+# This is used in computing the polynomial coefficients using the original formula.
 function fact(t)
     bound = Int ≡ Int32 ? 12 : 20
     [tᵢ > bound ? (factorial ∘ big)(tᵢ) : factorial(tᵢ) for tᵢ ∈ t]
 end
-
-=#
+# =#
 
 function Z(m::Integer, n::Integer; mode = "plot", coeffs = false, latex = false)
 
@@ -60,9 +57,7 @@ function Z(m::Integer, n::Integer; mode = "plot", coeffs = false, latex = false)
     N = √N²
 
     #=
-
-    This is the naive approach which implements the original explicit formula.
-
+    # This is the naive approach which implements the original explicit formula.
     function λ(s)
         t::Vector{Integer} = [
             n - s;
@@ -77,9 +72,8 @@ function Z(m::Integer, n::Integer; mode = "plot", coeffs = false, latex = false)
         (-1)^s * τ[1] ÷ prod(τ[2:4])
     end
 
-    γ = Integer[λ(s) for s = 0:k]
-
-    =#
+    γ = Float64[λ(s) for s = 0:k]
+    # =#
 
     # power (exponent)
     ν = Int[n - 2s for s = 0:k]
