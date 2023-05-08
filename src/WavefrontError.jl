@@ -9,10 +9,18 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer; closure = false)
 
     j_max = get_j(n_max, n_max)
 
-    Zᵢ = [Z(j; fit = true) for j = 0:j_max]
+    Zᵢ = Function[]
+
+    inds = @NamedTuple{n::Int, m::Int}[]
+
+    for j = 0:j_max
+        Zⱼ, mn = Z(j; fit = true)
+        push!(Zᵢ, Zⱼ)
+        push!(inds, mn)
+    end
 
     # linear least squares
-    A = reduce(hcat, Zᵢ[i][:Z].(r, ϕ) for i = 1:j_max+1)
+    A = reduce(hcat, Zᵢ[i].(r, ϕ) for i = 1:j_max+1)
 
     # Zernike expansion coefficients
     v = A \ OPD
@@ -23,12 +31,12 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer; closure = false)
     for (i, aᵢ) in pairs(v)
         aᵢ = round(aᵢ; digits = 3)
         if !iszero(aᵢ)
-            push!(a, (j = i - 1, n = Zᵢ[i].n, m = Zᵢ[i].m, a = aᵢ))
+            push!(a, (j = i - 1, n = inds[i][:n], m = inds[i][:m], a = aᵢ))
         end
     end
 
     # create the fitted polynomial
-    ΔW(ρ, θ) = ∑(v[i] * Zᵢ[i][:Z](ρ, θ) for i = 1:j_max+1)
+    ΔW(ρ, θ) = ∑(v[i] * Zᵢ[i](ρ, θ) for i = 1:j_max+1)
 
     # construct the estimated wavefront error
     ΔWp = ΔW.(ρ', θ)
