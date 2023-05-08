@@ -35,14 +35,11 @@ end
 
 # =#
 
-function Z(m::Integer, n::Integer; mode = "plot", coeffs = false, latex = false)
+function Z(m::Integer, n::Integer; fit = false, coeffs = false, latex = false)
 
     μ::Integer = abs(m)
 
     # validate
-    if mode != "plot" && mode != "fit"
-        error("Invalid mode.\nValid modes are:\n\"plot\"\n\"fit\"\n")
-    end
 
     if n < 0 || μ > n || isodd(n - μ)
         error("Bounds:\nn ≥ 0\n|m| ≤ n\nn - |m| even\n")
@@ -98,7 +95,7 @@ function Z(m::Integer, n::Integer; mode = "plot", coeffs = false, latex = false)
 
     Z(ρ,θ) = N * R(ρ) * M(θ)
 
-    mode == "fit" && return (Z = Z, n = n, m = m)
+    fit && return (Z = Z, n = n, m = m)
 
     Zp = Z.(ρ', θ)
 

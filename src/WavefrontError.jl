@@ -9,7 +9,7 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer; closure = false)
 
     j_max = get_j(n_max, n_max)
 
-    Zᵢ = [Z(j; mode = "fit") for j = 0:j_max]
+    Zᵢ = [Z(j; fit = true) for j = 0:j_max]
 
     # linear least squares
     A = reduce(hcat, Zᵢ[i][:Z].(r, ϕ) for i = 1:j_max+1)
