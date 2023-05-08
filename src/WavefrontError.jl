@@ -17,7 +17,7 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer; closure = false)
     # Zernike expansion coefficients
     v = A \ OPD
 
-    a = NamedTuple[]
+    a = @NamedTuple{j::Int, n::Int, m::Int, a::Float64}[]
 
     # store the non-trivial coefficients
     for (i, aᵢ) in pairs(v)

@@ -82,7 +82,7 @@ function Z(m::Integer, n::Integer; mode = "plot", coeffs = false, latex = false)
     =#
 
     # power (exponent)
-    ν = Integer[n - 2s for s = 0:k]
+    ν = Int[n - 2s for s = 0:k]
 
     # polynomial coefficients
 
