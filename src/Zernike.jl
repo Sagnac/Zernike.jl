@@ -89,7 +89,7 @@ function Z(m::Integer, n::Integer; fit = false, coeffs = false, latex = false)
 
     Z(ρ,θ) = N * R(ρ) * M(θ)
 
-    fit && return (Z = Z, n = n, m = m)
+    fit && return Z, (n = n, m = m)
 
     Zp = Z.(ρ', θ)
 
