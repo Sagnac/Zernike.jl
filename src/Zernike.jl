@@ -22,7 +22,7 @@ include("ZernikePlot.jl")
 include("WavefrontError.jl")
 include("RadialCoefficients.jl")
 
-get_j(n, m) = ((n + 2)n + m) ÷ 2
+get_j(n, m)::Integer = ((n + 2)n + m) ÷ 2
 
 #=
 
@@ -51,13 +51,13 @@ function Z(m::Integer, n::Integer; mode = "plot", coeffs = false, latex = false)
     # upper bound for the sum (number of terms -1 [indexing from zero])
     k::Integer = (n - μ) ÷ 2
     # ISO / ANSI / OSA standard single mode-ordering index
-    j::Integer = get_j(n, m)
+    j = get_j(n, m)
     # Kronecker delta δ_{m0}
     δ(m) = m == 0
     # radicand
     N²::Int = (2n + 2) ÷ (1 + δ(m))
     # normalization constant following the orthogonality relation
-    N::Float64 = √N²
+    N = √N²
 
     #=
 
@@ -94,13 +94,9 @@ function Z(m::Integer, n::Integer; mode = "plot", coeffs = false, latex = false)
     R(ρ)::Float64 = ∑(γ[i] * ρ ^ ν[i] for i = 1:k+1)
 
     # azimuthal / meridional component
-    M(θ)::Float64 = m < 0 ? -sin(m * θ) : cos(m * θ)
+    M(θ) = m < 0 ? -sin(m * θ) : cos(m * θ)
 
-    Z(ρ,θ) = let N = N, R = R, M = M
-
-                 N * R(ρ) * M(θ)
-
-             end
+    Z(ρ,θ) = N * R(ρ) * M(θ)
 
     mode == "fit" && return (Z = Z, n = n, m = m)
 

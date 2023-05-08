@@ -7,15 +7,15 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer; closure = false)
         error("Vectors must be of equal length.\n")
     end
 
-    j_max::Integer = get_j(n_max, n_max)
+    j_max = get_j(n_max, n_max)
 
-    Zᵢ::Vector{NamedTuple} = [Z(j; mode = "fit") for j = 0:j_max]
+    Zᵢ = [Z(j; mode = "fit") for j = 0:j_max]
 
     # linear least squares
     A = reduce(hcat, Zᵢ[i][:Z].(r, ϕ) for i = 1:j_max+1)
 
     # Zernike expansion coefficients
-    v::Vector{Float64} = A \ OPD
+    v = A \ OPD
 
     a = NamedTuple[]
 
@@ -28,11 +28,7 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer; closure = false)
     end
 
     # create the fitted polynomial
-    ΔW(ρ, θ) = let v = v, Zᵢ = Zᵢ, j_max = j_max
-
-                   ∑(v[i] * Zᵢ[i][:Z](ρ, θ) for i = 1:j_max+1)
-
-               end
+    ΔW(ρ, θ) = ∑(v[i] * Zᵢ[i][:Z](ρ, θ) for i = 1:j_max+1)
 
     # construct the estimated wavefront error
     ΔWp = ΔW.(ρ', θ)
