@@ -35,7 +35,7 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer; closure = false)
 
     # string formatting
 
-    Z_LaTeX = "ΔW ≈ "
+    W_LaTeX = "ΔW ≈ "
 
     function ζ(i, sub_index = 0)
         aᵢ = a[i][:a]
@@ -44,7 +44,7 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer; closure = false)
 
     function η(index, a)
         for i = 1:length(a)-1
-            Z_LaTeX *= string(ζ(index[i], i)..., a[i+1][:a] > 0 ? " + " : " - ")
+            W_LaTeX *= string(ζ(index[i], i)..., a[i+1][:a] > 0 ? " + " : " - ")
         end
     end
 
@@ -53,13 +53,13 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer; closure = false)
         sorted_indices = [i for i ∈ sorted_indices if a[i][:j] ∉ 0:2]
         subset_a = getindex(a, sorted_indices[1:4])
         η(sorted_indices, subset_a)
-        Z_LaTeX *= string(ζ(sorted_indices[4])...) * "..."
+        W_LaTeX *= string(ζ(sorted_indices[4])...) * "..."
     else
         η(keys(a), a)
-        Z_LaTeX *= string(ζ(lastindex(a))...)
+        W_LaTeX *= string(ζ(lastindex(a))...)
     end
 
-    titles = (plot = Z_LaTeX, window = "Estimated wavefront error")
+    titles = (plot = W_LaTeX, window = "Estimated wavefront error")
 
     # Peak-to-valley wavefront error
     PV = maximum(ΔWp) - minimum(ΔWp)
