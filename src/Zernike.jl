@@ -1,17 +1,14 @@
 # Zernike.jl
-# Version 0.5.0
-# 2023-4-29
+# Version 0.6.0
+# 2023-5-8
 # https://github.com/Sagnac/Zernike
 
-# Generates Zernike polynomials, fits wavefront errors, and plots them in Makie
-
-# Julia v1.8.0
+# Generates Zernike polynomials, models wavefront errors, and plots them in Makie.
 
 module Zernike
 
 export Z, W
 
-using GLMakie # v0.7.3
 using Printf
 
 const ρ = range(0, 1, 100)
