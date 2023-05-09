@@ -1,9 +1,6 @@
 using GLMakie
 
-const ρᵪ = [ρⱼ * cos(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
-const ρᵧ = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
-
-function ZPlot(Zp; titles...)
+function ZPlot(ρ, θ, Zp; titles...)
 
     resolution = (1688, 1000)
     fontsize = 35
@@ -20,6 +17,9 @@ function ZPlot(Zp; titles...)
         azimuth = 0.275π,
         protrusions = 80,
     )
+
+    ρᵪ = [ρⱼ * cos(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
+    ρᵧ = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
 
     fig = Figure(; resolution)
     axis3 = Axis3(fig[1,1]; axis3attributes...)

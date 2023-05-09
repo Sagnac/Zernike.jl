@@ -11,13 +11,21 @@ export Z, W
 
 using Printf
 
-const ρ = range(0, 1, 100)
-const θ = range(0, 2π, 100)
 const ∑ = sum
 
 include("ZernikePlot.jl")
 include("WavefrontError.jl")
 include("RadialCoefficients.jl")
+
+function polar(m, n)
+    ϵ₁ = 100 * (ceil(Int, π * n) + 1)
+    ϵ₁ = clamp(ϵ₁, ϵ₁, 1000)
+    ϵ₂ = 100 * (2m + 1)
+    ϵ₂ = clamp(ϵ₂, ϵ₂, 1000)
+    ρ = range(0, 1, ϵ₁)
+    θ = range(0, 2π, ϵ₂)
+    return ρ, θ
+end
 
 get_j(n, m)::Integer = ((n + 2)n + m) ÷ 2
 
@@ -88,6 +96,8 @@ function Z(m::Integer, n::Integer; fit = false, coeffs = false, latex = false)
 
     fit && return Z, (n = n, m = m)
 
+    ρ, θ = polar(m, n)
+
     Zp = Z.(ρ', θ)
 
     indices = "j = $j, n = $n, m = $m"
@@ -99,7 +109,7 @@ function Z(m::Integer, n::Integer; fit = false, coeffs = false, latex = false)
     println(indices)
 
     if !latex && coeffs || n > 54
-        fig = ZPlot(Zp; plot = Zmn, window = window_title)
+        fig = ZPlot(ρ, θ, Zp; plot = Zmn, window = window_title)
         return fig, γ
     end
 
@@ -173,7 +183,7 @@ function Z(m::Integer, n::Integer; fit = false, coeffs = false, latex = false)
     n < 55 && println("Z = ", Z_Unicode)
 
     titles = (plot = j < 153 ? Z_LaTeX : Zmn, window = window_title)
-    fig = ZPlot(Zp; titles...)
+    fig = ZPlot(ρ, θ, Zp; titles...)
 
     if coeffs && latex
         return fig, γ, Z_LaTeX

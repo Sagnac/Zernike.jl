@@ -38,6 +38,8 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer; closure = false)
     # create the fitted polynomial
     ΔW(ρ, θ) = ∑(v[i] * Zᵢ[i](ρ, θ) for i = 1:j_max+1)
 
+    ρ, θ = polar(n_max, n_max)
+
     # construct the estimated wavefront error
     ΔWp = ΔW.(ρ', θ)
 
@@ -81,7 +83,7 @@ function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer; closure = false)
 
     metrics = (PV = PV, RMS = σ, Strehl = Strehl_ratio)
 
-    fig = ZPlot(ΔWp; titles...)
+    fig = ZPlot(ρ, θ, ΔWp; titles...)
 
     if !closure
         return a, v, metrics, fig
