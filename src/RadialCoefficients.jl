@@ -12,11 +12,9 @@ import ShiftedArrays: circshift as shift
 
 function Φ(n_max::Integer, m_max::Integer)
 
-    i_max = if isodd(n_max)
-                ((n_max + 1) ÷ 2)^2 + (m_max + 1) ÷ 2
-            else
-                (n_max + 2)n_max ÷ 4 + m_max ÷ 2 + 1
-            end
+    n_mod_2 = isodd(n_max)
+
+    i_max = ((n_max + 2)n_max + n_mod_2) ÷ 4 + (m_max + !n_mod_2 + 1) ÷ 2
 
     λ = [zeros(Float64, n_max + 1) for i = 1:i_max]
 
