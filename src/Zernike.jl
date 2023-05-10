@@ -23,10 +23,11 @@ struct Coeffs end
 struct Latex end
 struct Fit end
 
-function polar(m, n)
-    ϵ₁ = 100 * (ceil(Int, π * n) + 1)
+function polar(m, n; scale::Integer = 100)
+    scale = clamp(scale, 1, 100)
+    ϵ₁ = scale * (ceil(Int, π * n) + 1)
     ϵ₁ = clamp(ϵ₁, ϵ₁, 1000)
-    ϵ₂ = 100 * (2m + 1)
+    ϵ₂ = scale * (2m + 1)
     ϵ₂ = clamp(ϵ₂, ϵ₂, 1000)
     ρ = range(0, 1, ϵ₁)
     θ = range(0, 2π, ϵ₂)
@@ -106,13 +107,13 @@ function Zf(m::Integer, n::Integer)
 end
 
 # synthesis function
-function Ψ(m::Integer, n::Integer)
+function Ψ(m::Integer, n::Integer; scale::Integer = 100)
 
     Z, (; j, n, m), Z_vars = Zf(m, n)
 
     @unpack γ = Z_vars
 
-    ρ, θ = polar(m, n)
+    ρ, θ = polar(m, n; scale)
 
     Zp = Z.(ρ', θ)
 
@@ -206,25 +207,25 @@ function format_strings(Z_vars::Dict)
 end
 
 # main interface function
-function Z(m::Integer, n::Integer)
-    fig, = Ψ(m, n)
+function Z(m::Integer, n::Integer; options...)
+    fig, = Ψ(m, n; options...)
     return fig
 end
 
 # methods
 
-function Z(m::Integer, n::Integer, ::Coeffs)
-    fig, γ = Ψ(m, n)
+function Z(m::Integer, n::Integer, ::Coeffs; options...)
+    fig, γ = Ψ(m, n; options...)
     return fig, γ
 end
 
-function Z(m::Integer, n::Integer, ::Latex)
-    fig, _, Z_LaTeX = Ψ(m, n)
+function Z(m::Integer, n::Integer, ::Latex; options...)
+    fig, _, Z_LaTeX = Ψ(m, n; options...)
     return fig, Z_LaTeX
 end
 
-function Z(m::Integer, n::Integer, ::Coeffs, ::Latex)
-    return Ψ(m, n)
+function Z(m::Integer, n::Integer, ::Coeffs, ::Latex; options...)
+    return Ψ(m, n; options...)
 end
 
 function Z(m::Integer, n::Integer, ::Fit)
@@ -232,7 +233,7 @@ function Z(m::Integer, n::Integer, ::Fit)
     return Z, j_n_m
 end
 
-Z(options...; m, n) = Z(m, n, options...)
+Z(opts...; m, n, options...) = Z(m, n, opts...; options...)
 
 function Z(j::Integer, options...)
     if j < 0

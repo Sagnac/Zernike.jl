@@ -1,7 +1,7 @@
 # Estimates wavefront error by expressing the aberrations as a linear combination
 # of weighted Zernike polynomials. The representation is approximate,
 # especially for a small set of data.
-function Wf(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer)
+function Wf(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer; precision = 3)
 
     if !allequal(length.((r, ϕ, OPD)))
         error("Vectors must be of equal length.\n")
@@ -29,14 +29,14 @@ function Wf(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer)
 
     # store the non-trivial coefficients
     for (i, aᵢ) in pairs(v)
-        aᵢ = round(aᵢ; digits = 3)
+        aᵢ = ifelse(precision == "full", aᵢ, round(aᵢ; digits = precision))
         if !iszero(aᵢ)
             push!(a, (; inds[i]..., a = aᵢ))
         end
     end
 
     # create the fitted polynomial
-    ΔW(ρ, θ)::Float64 = ∑(v[i] * Zᵢ[i](ρ, θ) for i = 1:j_max+1)
+    ΔW(ρ, θ)::Float64 = ∑(aᵢ[:a] * Zᵢ[aᵢ.j+1](ρ, θ) for aᵢ ∈ a)
 
     return a, v, ΔW
 
@@ -64,7 +64,8 @@ function format_strings(a::Vector)
 
     function ζ(i, sub_index = 0)
         aᵢ = a[i][:a]
-        (sub_index ≠ 1 ? abs(aᵢ) : aᵢ), "Z_{$(a[i][:n])}^{$(a[i][:m])}"
+        t = @sprintf "%.3f" (sub_index ≠ 1 ? abs(aᵢ) : aᵢ)
+        t, "Z_{$(a[i][:n])}^{$(a[i][:m])}"
     end
 
     function η(index, a)
@@ -88,11 +89,25 @@ function format_strings(a::Vector)
 
 end
 
-function W(r::T, ϕ::T, OPD::T, n_max::Integer) where T <: Vector
+function W(r::T, ϕ::T, OPD::T, n_max::Integer; options...) where T <: Vector
 
-    a, v, ΔW = Wf(r, ϕ, OPD, n_max)
+    if haskey(options, :precision) &&
+       (options[:precision] == "full" || options[:precision] isa Integer)
+        precision = options[:precision]
+    else
+        precision = 3
+    end
 
-    ρ, θ = polar(n_max, n_max)
+    a, v, ΔW = Wf(r, ϕ, OPD, n_max; precision)
+
+    if haskey(options, :scale) &&
+       (options[:scale] isa Integer && options[:scale] ∈ 1:100)
+       scale = options[:scale]
+    else
+       scale = ceil(Int, 100 / √ length(a))
+    end
+
+    ρ, θ = polar(n_max, n_max; scale)
 
     # construct the estimated wavefront error
     ΔWp = ΔW.(ρ', θ)
@@ -109,17 +124,17 @@ end
 
 # methods
 
-W(; r, t, OPD, n_max) = W(r, t, OPD, n_max)
+W(; r, t, OPD, n_max, options...) = W(r, t, OPD, n_max; options...)
 
-function W(x::Vector, y::Vector, OPD::Vector; n_max::Integer)
+function W(x::Vector, y::Vector, OPD::Vector; n_max::Integer, options...)
     r = hypot.(x, y)
     ϕ = atan.(y, x)
-    W(r, ϕ, OPD, n_max; kwargs...)
+    W(r, ϕ, OPD, n_max; options...)
 end
 
-function W(data::Matrix, n_max::Integer)
+function W(data::Matrix, n_max::Integer; options...)
     r, ϕ, OPD = [data[:, i] for i = 1:3]
-    W(r, ϕ, OPD, n_max)
+    W(r, ϕ, OPD, n_max; options...)
 end
 
-W(data; n_max) = W(data, n_max)
+W(data; n_max, options...) = W(data, n_max; options...)
