@@ -7,15 +7,21 @@
 
 module Zernike
 
-export Z, W
+export Z, W, Coeffs, Latex, Fit
 
 using Printf
+import Base: @locals
+import UnPack: @unpack
 
 const ∑ = sum
 
 include("ZernikePlot.jl")
 include("WavefrontError.jl")
 include("RadialCoefficients.jl")
+
+struct Coeffs end
+struct Latex end
+struct Fit end
 
 function polar(m, n)
     ϵ₁ = 100 * (ceil(Int, π * n) + 1)
@@ -37,12 +43,11 @@ function fact(t)
 end
 # =#
 
-function Z(m::Integer, n::Integer; fit = false, coeffs = false, latex = false)
+function Zf(m::Integer, n::Integer)
 
     μ::Integer = abs(m)
 
     # validate
-
     if n < 0 || μ > n || isodd(n - μ)
         error("Bounds:\nn ≥ 0\n|m| ≤ n\nn - |m| even\n")
     end
@@ -86,38 +91,54 @@ function Z(m::Integer, n::Integer; fit = false, coeffs = false, latex = false)
 
     γ = Float64[λ[νᵢ+1] for νᵢ in ν]
 
+    Z_vars = @locals
+
     # radial polynomial
     R(ρ)::Float64 = ∑(γ[i] * ρ ^ ν[i] for i = 1:k+1)
 
     # azimuthal / meridional component
     M(θ) = m < 0 ? -sin(m * θ) : cos(m * θ)
 
-    Z(ρ,θ) = N * R(ρ) * M(θ)
+    Z(ρ,θ)::Float64 = N * R(ρ) * M(θ)
 
-    fit && return Z, (n = n, m = m)
+    return Z, (j = j, n = n, m = m), Z_vars
+
+end
+
+# synthesis function
+function Ψ(m::Integer, n::Integer)
+
+    Z, (; j, n, m), Z_vars = Zf(m, n)
+
+    @unpack γ = Z_vars
 
     ρ, θ = polar(m, n)
 
     Zp = Z.(ρ', θ)
 
+    Zmn, Z_Unicode, Z_LaTeX = format_strings(Z_vars)
+
     indices = "j = $j, n = $n, m = $m"
-
-    Zmn = "Z_{$n}^{$m}"
-
     window_title = "Zernike Polynomial: $indices"
-
     println(indices)
 
-    if !latex && coeffs || n > 54
-        fig = ZPlot(ρ, θ, Zp; plot = Zmn, window = window_title)
-        return fig, γ
+    if n > 54
+        @info "Pass Coeffs() as the third argument to return the coefficients."
+    else
+        println("Z = ", Z_Unicode)
     end
 
-    # string formatting
+    titles = (plot = j < 153 ? Z_LaTeX : Zmn, window = window_title)
 
-    # there's probably an easier and more straightforward way to do this
-    # but this approach is intuitive enough
-    # and doesn't require importing another package
+    fig = ZPlot(ρ, θ, Zp; titles...)
+
+    return fig, γ, Z_LaTeX
+
+end
+
+function format_strings(Z_vars::Dict)
+
+    @unpack m, n, j, μ, k, N², N, λ, γ, ν = Z_vars
 
     γₛ = [@sprintf "%d" γₛ for γₛ ∈ abs.(γ)]
 
@@ -175,33 +196,45 @@ function Z(m::Integer, n::Integer; fit = false, coeffs = false, latex = false)
 
     parentheses = k ≠ 0 ? ("(", ")") : ""
 
+    Zmn = "Z_{$n}^{$m}"
+
     Z_Unicode = join(UNICODE, parentheses...)
     Z_LaTeX = Zmn * " = " * join(LaTeX, parentheses...)
 
-    # print and display
+    return Zmn, Z_Unicode, Z_LaTeX
 
-    n < 55 && println("Z = ", Z_Unicode)
+end
 
-    titles = (plot = j < 153 ? Z_LaTeX : Zmn, window = window_title)
-    fig = ZPlot(ρ, θ, Zp; titles...)
-
-    if coeffs && latex
-        return fig, γ, Z_LaTeX
-    elseif coeffs
-        return fig, γ
-    elseif latex
-        return fig, Z_LaTeX
-    else
-        return fig
-    end
-
+# main interface function
+function Z(m::Integer, n::Integer)
+    fig, = Ψ(m, n)
+    return fig
 end
 
 # methods
 
-Z(; m, n, kwargs...) = Z(m, n; kwargs...)
+function Z(m::Integer, n::Integer, ::Coeffs)
+    fig, γ = Ψ(m, n)
+    return fig, γ
+end
 
-function Z(j::Integer; kwargs...)
+function Z(m::Integer, n::Integer, ::Latex)
+    fig, _, Z_LaTeX = Ψ(m, n)
+    return fig, Z_LaTeX
+end
+
+function Z(m::Integer, n::Integer, ::Coeffs, ::Latex)
+    return Ψ(m, n)
+end
+
+function Z(m::Integer, n::Integer, ::Fit)
+    Z, j_n_m = Zf(m, n)
+    return Z, j_n_m
+end
+
+Z(options...; m, n) = Z(m, n, options...)
+
+function Z(j::Integer, options...)
     if j < 0
         error("j must be ≥ 0\n")
     end
@@ -209,7 +242,7 @@ function Z(j::Integer; kwargs...)
     n::Integer = ceil((-3 + √(9 + 8j)) / 2)
     # azimuthal frequency
     m::Integer = 2j - (n + 2)n
-    Z(m, n; kwargs...)
+    Z(m, n, options...)
 end
 
 end
