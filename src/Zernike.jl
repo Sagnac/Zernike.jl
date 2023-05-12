@@ -14,14 +14,25 @@ import UnPack: @unpack
 
 const ∑ = sum
 
+struct Coeffs end
+struct Latex end
+struct Fit end
+
+struct Polynomial
+    N::Float64
+    R::Function
+    M::Function
+end
+
 include("ZernikePlot.jl")
 include("WavefrontError.jl")
 include("RadialCoefficients.jl")
 include("FormatStrings.jl")
 
-struct Coeffs end
-struct Latex end
-struct Fit end
+function (Z::Polynomial)(ρ, θ)::Float64
+    (; N, R, M) = Z
+    N * R(ρ) * M(θ)
+end
 
 function polar(m, n; scale::Integer = 100)
     scale = clamp(scale, 1, 100)
@@ -44,6 +55,8 @@ function fact(t)
 end
 # =#
 
+# computation and construction function
+# binds the indices and produces a specific polynomial function
 function Zf(m::Integer, n::Integer)
 
     μ::Integer = abs(m)
@@ -87,7 +100,6 @@ function Zf(m::Integer, n::Integer)
     ν = Int[n - 2s for s = 0:k]
 
     # polynomial coefficients
-
     λ = Φ(n, μ)
 
     γ = Float64[λ[νᵢ+1] for νᵢ in ν]
@@ -100,7 +112,7 @@ function Zf(m::Integer, n::Integer)
     # azimuthal / meridional component
     M(θ) = m < 0 ? -sin(m * θ) : cos(m * θ)
 
-    Z(ρ,θ)::Float64 = N * R(ρ) * M(θ)
+    Z = Polynomial(N, R, M)
 
     return Z, (j = j, n = n, m = m), Z_vars
 

@@ -1,3 +1,13 @@
+struct WavefrontError
+    a::Vector{Float64}
+    Z::Vector{Polynomial}
+end
+
+function (ΔW::WavefrontError)(ρ, θ)::Float64
+    (; a, Z) = ΔW
+    ∑(aᵢ * Z[i](ρ, θ) for (i, aᵢ) ∈ pairs(a))
+end
+
 # Estimates wavefront error by expressing the aberrations as a linear combination
 # of weighted Zernike polynomials. The representation is approximate,
 # especially for a small set of data.
@@ -9,7 +19,7 @@ function Wf(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer; precision = 3)
 
     j_max = get_j(n_max, n_max)
 
-    Zᵢ = Function[]
+    Zᵢ = Polynomial[]
 
     inds = @NamedTuple{j::Int, n::Int, m::Int}[]
 
@@ -27,22 +37,28 @@ function Wf(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer; precision = 3)
 
     a = @NamedTuple{j::Int, n::Int, m::Int, a::Float64}[]
 
+    av = Float64[]
+
+    Zₐ = Polynomial[]
+
     # store the non-trivial coefficients
     for (i, aᵢ) in pairs(v)
         aᵢ = ifelse(precision == "full", aᵢ, round(aᵢ; digits = precision))
         if !iszero(aᵢ)
             push!(a, (; inds[i]..., a = aᵢ))
+            push!(av, aᵢ)
+            push!(Zₐ, Zᵢ[i])
         end
     end
 
     # create the fitted polynomial
-    ΔW(ρ, θ)::Float64 = ∑(aᵢ[:a] * Zᵢ[aᵢ.j+1](ρ, θ) for aᵢ ∈ a)
+    ΔW = WavefrontError(av, Zₐ)
 
-    return a, v, ΔW
+    return ΔW, a, v
 
 end
 
-function metrics(ΔWp, v)
+function metrics(v, ΔWp)
 
     # Peak-to-valley wavefront error
     PV = maximum(ΔWp) - minimum(ΔWp)
@@ -67,7 +83,7 @@ function W(r::T, ϕ::T, OPD::T, n_max::Integer; options...) where T <: Vector
         precision = 3
     end
 
-    a, v, ΔW = Wf(r, ϕ, OPD, n_max; precision)
+    ΔW, a, v = Wf(r, ϕ, OPD, n_max; precision)
 
     if haskey(options, :scale) &&
        (options[:scale] isa Integer && options[:scale] ∈ 1:100)
@@ -87,7 +103,7 @@ function W(r::T, ϕ::T, OPD::T, n_max::Integer; options...) where T <: Vector
 
     fig = ZPlot(ρ, θ, ΔWp; titles...)
         
-    return a, v, metrics(ΔWp, v), fig
+    return a, v, metrics(v, ΔWp), fig
 
 end
 
