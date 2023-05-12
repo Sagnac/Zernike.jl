@@ -45,6 +45,11 @@ function polar(m, n; scale::Integer = 100)
     return ρ, θ
 end
 
+# radial order
+get_n(j)::Integer = ceil((-3 + √(9 + 8j)) / 2)
+# azimuthal frequency
+get_m(j, n)::Integer = 2j - (n + 2)n
+# ANSI / OSA index
 get_j(n, m)::Integer = ((n + 2)n + m) ÷ 2
 
 #=
@@ -182,10 +187,8 @@ function Z(j::Integer, options...)
     if j < 0
         error("j must be ≥ 0\n")
     end
-    # radial order
-    n::Integer = ceil((-3 + √(9 + 8j)) / 2)
-    # azimuthal frequency
-    m::Integer = 2j - (n + 2)n
+    n = get_n(j)
+    m = get_m(j, n)
     Z(m, n, options...)
 end
 
