@@ -18,16 +18,36 @@ struct Coeffs end
 struct Latex end
 struct Fit end
 
+struct RadialPolynomial
+    γ::Vector{Float64}
+    ν::Vector{Int}
+    k::Int
+end
+
+struct Sinusoid
+    m::Int
+end
+
 struct Polynomial
     N::Float64
-    R::Function
-    M::Function
+    R::RadialPolynomial
+    M::Sinusoid
 end
 
 include("ZernikePlot.jl")
 include("WavefrontError.jl")
 include("RadialCoefficients.jl")
 include("FormatStrings.jl")
+
+function (R::RadialPolynomial)(ρ)::Float64
+    (; γ, ν, k) = R
+    ∑(γ[i] * ρ ^ ν[i] for i = 1:k+1)
+end
+
+function (M::Sinusoid)(θ)::Float64
+    (; m) = M
+    m < 0 ? -sin(m * θ) : cos(m * θ)
+end
 
 function (Z::Polynomial)(ρ, θ)::Float64
     (; N, R, M) = Z
@@ -112,11 +132,12 @@ function Zf(m::Integer, n::Integer)
     Z_vars = @locals
 
     # radial polynomial
-    R(ρ)::Float64 = ∑(γ[i] * ρ ^ ν[i] for i = 1:k+1)
+    R = RadialPolynomial(γ, ν, k)
 
     # azimuthal / meridional component
-    M(θ) = m < 0 ? -sin(m * θ) : cos(m * θ)
+    M = Sinusoid(m)
 
+    # Zernike polynomial
     Z = Polynomial(N, R, M)
 
     return Z, (j = j, n = n, m = m), Z_vars
