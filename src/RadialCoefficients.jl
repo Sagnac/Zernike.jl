@@ -10,7 +10,7 @@ https://opg.optica.org/ol/abstract.cfm?uri=ol-38-14-2487
 
 import ShiftedArrays: circshift as shift
 
-function Φ(n_max::Integer, m_max::Integer)
+function Φ(n_max::Int, m_max::Int)
 
     n_mod_2 = isodd(n_max)
 

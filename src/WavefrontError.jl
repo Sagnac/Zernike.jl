@@ -11,7 +11,7 @@ end
 # Estimates wavefront error by expressing the aberrations as a linear combination
 # of weighted Zernike polynomials. The representation is approximate,
 # especially for a small set of data.
-function Wf(r::Vector, ϕ::Vector, OPD::Vector, n_max::Integer; precision = 3)
+function Wf(r::Vector, ϕ::Vector, OPD::Vector, n_max::Int; precision = 3)
 
     if !allequal(length.((r, ϕ, OPD)))
         error("Vectors must be of equal length.\n")
@@ -74,10 +74,10 @@ function metrics(v, ΔWp)
 
 end
 
-function W(r::T, ϕ::T, OPD::T, n_max::Integer; options...) where T <: Vector
+function W(r::T, ϕ::T, OPD::T, n_max::Int; options...) where T <: Vector
 
     if haskey(options, :precision) &&
-       (options[:precision] == "full" || options[:precision] isa Integer)
+       (options[:precision] == "full" || options[:precision] isa Int)
         precision = options[:precision]
     else
         precision = 3
@@ -86,7 +86,7 @@ function W(r::T, ϕ::T, OPD::T, n_max::Integer; options...) where T <: Vector
     ΔW, a, v = Wf(r, ϕ, OPD, n_max; precision)
 
     if haskey(options, :scale) &&
-       (options[:scale] isa Integer && options[:scale] ∈ 1:100)
+       (options[:scale] isa Int && options[:scale] ∈ 1:100)
        scale = options[:scale]
     else
        scale = ceil(Int, 100 / √ length(a))
@@ -111,13 +111,13 @@ end
 
 W(; r, t, OPD, n_max, options...) = W(r, t, OPD, n_max; options...)
 
-function W(x::Vector, y::Vector, OPD::Vector; n_max::Integer, options...)
+function W(x::Vector, y::Vector, OPD::Vector; n_max::Int, options...)
     r = hypot.(x, y)
     ϕ = atan.(y, x)
     W(r, ϕ, OPD, n_max; options...)
 end
 
-function W(data::Matrix, n_max::Integer; options...)
+function W(data::Matrix, n_max::Int; options...)
     r, ϕ, OPD = [data[:, i] for i = 1:3]
     W(r, ϕ, OPD, n_max; options...)
 end

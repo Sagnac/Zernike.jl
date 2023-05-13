@@ -54,7 +54,7 @@ function (Z::Polynomial)(ρ, θ)::Float64
     N * R(ρ) * M(θ)
 end
 
-function polar(m, n; scale::Integer = 100)
+function polar(m, n; scale::Int = 100)
     scale = clamp(scale, 1, 100)
     ϵ₁ = scale * (ceil(Int, π * n) + 1)
     ϵ₁ = clamp(ϵ₁, ϵ₁, 1000)
@@ -66,11 +66,11 @@ function polar(m, n; scale::Integer = 100)
 end
 
 # radial order
-get_n(j)::Integer = ceil((-3 + √(9 + 8j)) / 2)
+get_n(j)::Int = ceil((-3 + √(9 + 8j)) / 2)
 # azimuthal frequency
-get_m(j, n)::Integer = 2j - (n + 2)n
+get_m(j, n)::Int = 2j - (n + 2)n
 # ANSI / OSA index
-get_j(n, m)::Integer = ((n + 2)n + m) ÷ 2
+get_j(n, m)::Int = ((n + 2)n + m) ÷ 2
 
 #=
 # This is used in computing the polynomial coefficients using the original formula.
@@ -82,9 +82,9 @@ end
 
 # computation and construction function
 # binds the indices and produces a specific polynomial function
-function Zf(m::Integer, n::Integer)
+function Zf(m::Int, n::Int)
 
-    μ::Integer = abs(m)
+    μ = abs(m)
 
     # validate
     if n < 0 || μ > n || isodd(n - μ)
@@ -92,20 +92,20 @@ function Zf(m::Integer, n::Integer)
     end
 
     # upper bound for the sum (number of terms -1 [indexing from zero])
-    k::Integer = (n - μ) ÷ 2
+    k = (n - μ) ÷ 2
     # ISO / ANSI / OSA standard single mode-ordering index
     j = get_j(n, m)
     # Kronecker delta δ_{m0}
     δ(m) = m == 0
     # radicand
-    N²::Int = (2n + 2) ÷ (1 + δ(m))
+    N² = (2n + 2) ÷ (1 + δ(m))
     # normalization constant following the orthogonality relation
     N = √N²
 
     #=
     # This is the naive approach which implements the original explicit formula.
     function λ(s)
-        t::Vector{Integer} = [
+        t::Vector{Int} = [
             n - s;
             s;
             k - s;
@@ -145,7 +145,7 @@ function Zf(m::Integer, n::Integer)
 end
 
 # synthesis function
-function Ψ(m::Integer, n::Integer; scale::Integer = 100)
+function Ψ(m::Int, n::Int; scale::Int = 100)
 
     Z, (; j, n, m), Z_vars = Zf(m, n)
 
@@ -176,35 +176,35 @@ function Ψ(m::Integer, n::Integer; scale::Integer = 100)
 end
 
 # main interface function
-function Z(m::Integer, n::Integer; options...)
+function Z(m::Int, n::Int; options...)
     fig, = Ψ(m, n; options...)
     return fig
 end
 
 # methods
 
-function Z(m::Integer, n::Integer, ::Coeffs; options...)
+function Z(m::Int, n::Int, ::Coeffs; options...)
     fig, γ = Ψ(m, n; options...)
     return fig, γ
 end
 
-function Z(m::Integer, n::Integer, ::Latex; options...)
+function Z(m::Int, n::Int, ::Latex; options...)
     fig, _, Z_LaTeX = Ψ(m, n; options...)
     return fig, Z_LaTeX
 end
 
-function Z(m::Integer, n::Integer, ::Coeffs, ::Latex; options...)
+function Z(m::Int, n::Int, ::Coeffs, ::Latex; options...)
     return Ψ(m, n; options...)
 end
 
-function Z(m::Integer, n::Integer, ::Fit)
+function Z(m::Int, n::Int, ::Fit)
     Z, j_n_m = Zf(m, n)
     return Z, j_n_m
 end
 
 Z(opts...; m, n, options...) = Z(m, n, opts...; options...)
 
-function Z(j::Integer, options...)
+function Z(j::Int, options...)
     if j < 0
         error("j must be ≥ 0\n")
     end
