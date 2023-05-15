@@ -7,7 +7,7 @@
 
 module Zernike
 
-export Z, W, Coeffs, Latex, Fit
+export Z, W, S, Coeffs, Latex, Fit
 
 import Base: @locals
 import UnPack: @unpack
@@ -39,6 +39,7 @@ include("ZernikePlot.jl")
 include("WavefrontError.jl")
 include("RadialCoefficients.jl")
 include("FormatStrings.jl")
+include("ScaleAperture.jl")
 
 function (R::RadialPolynomial)(ρ)::Float64
     (; γ, ν, k) = R
@@ -70,8 +71,14 @@ end
 get_n(j)::Int = ceil((-3 + √(9 + 8j)) / 2)
 # azimuthal frequency
 get_m(j, n)::Int = 2j - (n + 2)n
-# ANSI / OSA index
+# ISO / ANSI / OSA standard single mode-ordering index
 get_j(n, m)::Int = ((n + 2)n + m) ÷ 2
+
+function radicand(m, n)
+    # Kronecker delta δ_{m0}
+    δ(m) = m == 0
+    (2n + 2) ÷ (1 + δ(m))
+end
 
 #=
 # This is used in computing the polynomial coefficients using the original formula.
@@ -94,12 +101,11 @@ function Zf(m::Int, n::Int)
 
     # upper bound for the sum (number of terms -1 [indexing from zero])
     k = (n - μ) ÷ 2
-    # ISO / ANSI / OSA standard single mode-ordering index
+
     j = get_j(n, m)
-    # Kronecker delta δ_{m0}
-    δ(m) = m == 0
-    # radicand
-    N² = (2n + 2) ÷ (1 + δ(m))
+
+    N² = radicand(m, n)
+
     # normalization constant following the orthogonality relation
     N = √N²
 
