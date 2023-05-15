@@ -101,6 +101,10 @@ end
 
 # methods
 
+function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Int, ::Fit; options...)
+    return Wf(r, ϕ, OPD, n_max; options...)[1]
+end
+
 W(; r, t, OPD, n_max, options...) = W(r, t, OPD, n_max; options...)
 
 function W(x::Vector, y::Vector, OPD::Vector; n_max::Int, options...)
