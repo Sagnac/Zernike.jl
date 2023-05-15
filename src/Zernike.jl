@@ -29,6 +29,7 @@ struct Sinusoid
 end
 
 struct Polynomial
+    inds::NamedTuple{(:j, :n, :m), Tuple{Int64, Int64, Int64}}
     N::Float64
     R::RadialPolynomial
     M::Sinusoid
@@ -131,6 +132,8 @@ function Zf(m::Int, n::Int)
 
     Z_vars = @locals
 
+    inds = (j = j, n = n, m = m)
+
     # radial polynomial
     R = RadialPolynomial(γ, ν, k)
 
@@ -138,16 +141,16 @@ function Zf(m::Int, n::Int)
     M = Sinusoid(m)
 
     # Zernike polynomial
-    Z = Polynomial(N, R, M)
+    Z = Polynomial(inds, N, R, M)
 
-    return Z, (j = j, n = n, m = m), Z_vars
+    return Z, Z_vars
 
 end
 
 # synthesis function
 function Ψ(m::Int, n::Int; scale::Int = 100)
 
-    Z, (; j, n, m), Z_vars = Zf(m, n)
+    Z, Z_vars = Zf(m, n)
 
     @unpack γ = Z_vars
 
@@ -157,7 +160,7 @@ function Ψ(m::Int, n::Int; scale::Int = 100)
 
     Zmn, Z_Unicode, Z_LaTeX = format_strings(Z_vars)
 
-    indices = "j = $j, n = $n, m = $m"
+    indices = replace(Z.inds |> string, '(':')' => "")
     window_title = "Zernike Polynomial: $indices"
     println(indices)
 
@@ -167,7 +170,7 @@ function Ψ(m::Int, n::Int; scale::Int = 100)
         println("Z = ", Z_Unicode)
     end
 
-    titles = (plot = j < 153 ? Z_LaTeX : Zmn, window = window_title)
+    titles = (plot = Z.inds.j < 153 ? Z_LaTeX : Zmn, window = window_title)
 
     fig = ZPlot(ρ, θ, Zp; titles...)
 
@@ -198,8 +201,7 @@ function Z(m::Int, n::Int, ::Coeffs, ::Latex; options...)
 end
 
 function Z(m::Int, n::Int, ::Fit)
-    Z, j_n_m = Zf(m, n)
-    return Z, j_n_m
+    return Zf(m, n)[1]
 end
 
 Z(opts...; m, n, options...) = Z(m, n, opts...; options...)

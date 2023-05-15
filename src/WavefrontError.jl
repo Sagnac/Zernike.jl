@@ -19,15 +19,7 @@ function Wf(r::Vector, ϕ::Vector, OPD::Vector, n_max::Int; precision = 3)
 
     j_max = get_j(n_max, n_max)
 
-    Zᵢ = Polynomial[]
-
-    inds = @NamedTuple{j::Int, n::Int, m::Int}[]
-
-    for j = 0:j_max
-        Zⱼ, j_n_m = Z(j, Fit())
-        push!(Zᵢ, Zⱼ)
-        push!(inds, j_n_m)
-    end
+    Zᵢ = Polynomial[Z(j, Fit()) for j = 0:j_max]
 
     # linear least squares
     A = reduce(hcat, Zᵢ[i].(r, ϕ) for i = 1:j_max+1)
@@ -45,7 +37,7 @@ function Wf(r::Vector, ϕ::Vector, OPD::Vector, n_max::Int; precision = 3)
     for (i, aᵢ) in pairs(v)
         aᵢ = ifelse(precision == "full", aᵢ, round(aᵢ; digits = precision))
         if !iszero(aᵢ)
-            push!(a, (; inds[i]..., a = aᵢ))
+            push!(a, (; Zᵢ[i].inds..., a = aᵢ))
             push!(av, aᵢ)
             push!(Zₐ, Zᵢ[i])
         end
