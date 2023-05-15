@@ -1,3 +1,7 @@
+# Estimates wavefront error by expressing the aberrations as a linear combination
+# of weighted Zernike polynomials. The representation is approximate,
+# especially for a small set of data.
+
 struct WavefrontError
     a::Vector{Float64}
     Z::Vector{Polynomial}
@@ -8,9 +12,7 @@ function (ΔW::WavefrontError)(ρ, θ)::Float64
     ∑(aᵢ * Z[i](ρ, θ) for (i, aᵢ) ∈ pairs(a))
 end
 
-# Estimates wavefront error by expressing the aberrations as a linear combination
-# of weighted Zernike polynomials. The representation is approximate,
-# especially for a small set of data.
+# construction function
 function Wf(r::Vector, ϕ::Vector, OPD::Vector, n_max::Int; precision = 3)
 
     if !allequal(length.((r, ϕ, OPD)))
@@ -27,16 +29,30 @@ function Wf(r::Vector, ϕ::Vector, OPD::Vector, n_max::Int; precision = 3)
     # Zernike expansion coefficients
     v::Vector{Float64} = A \ OPD
 
+    ΔW, a = Ξ(v, Zᵢ; precision)
+
+    return ΔW, a, v
+
+end
+
+# filtering function
+function Ξ(v, Zᵢ; precision)
+
     a = @NamedTuple{j::Int, n::Int, m::Int, a::Float64}[]
 
     av = Float64[]
 
     Zₐ = Polynomial[]
 
+    clipped = !isassigned(Zᵢ, 1)
+
     # store the non-trivial coefficients
     for (i, aᵢ) in pairs(v)
         aᵢ = ifelse(precision == "full", aᵢ, round(aᵢ; digits = precision))
         if !iszero(aᵢ)
+            if clipped
+                Zᵢ[i] = Z(i-1, Fit())
+            end
             push!(a, (; Zᵢ[i].inds..., a = aᵢ))
             push!(av, aᵢ)
             push!(Zₐ, Zᵢ[i])
@@ -46,7 +62,25 @@ function Wf(r::Vector, ϕ::Vector, OPD::Vector, n_max::Int; precision = 3)
     # create the fitted polynomial
     ΔW = WavefrontError(av, Zₐ)
 
-    return ΔW, a, v
+    return ΔW, a
+
+end
+
+# synthesis function
+function Λ(ΔW, a, v, n_max; scale)
+
+    ρ, θ = polar(n_max, n_max; scale)
+
+    # construct the estimated wavefront error
+    ΔWp = ΔW.(ρ', θ)
+
+    W_LaTeX = format_strings(a)
+
+    titles = (plot = W_LaTeX, window = "Estimated wavefront error")
+
+    fig = ZPlot(ρ, θ, ΔWp; titles...)
+
+    return a, v, metrics(v, ΔWp), fig
 
 end
 
@@ -66,6 +100,7 @@ function metrics(v, ΔWp)
 
 end
 
+# main interface function
 function W(r::T, ϕ::T, OPD::T, n_max::Int; options...) where T <: Vector
 
     if haskey(options, :precision) &&
@@ -84,18 +119,7 @@ function W(r::T, ϕ::T, OPD::T, n_max::Int; options...) where T <: Vector
        scale = ceil(Int, 100 / √ length(a))
     end
 
-    ρ, θ = polar(n_max, n_max; scale)
-
-    # construct the estimated wavefront error
-    ΔWp = ΔW.(ρ', θ)
-
-    W_LaTeX = format_strings(a)
-
-    titles = (plot = W_LaTeX, window = "Estimated wavefront error")
-
-    fig = ZPlot(ρ, θ, ΔWp; titles...)
-        
-    return a, v, metrics(v, ΔWp), fig
+    Λ(ΔW, a, v, n_max; scale)
 
 end
 

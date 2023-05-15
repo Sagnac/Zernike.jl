@@ -8,12 +8,12 @@ https://www.jeos.org/index.php/jeos_rp/article/view/07012
 
 =#
 
-function S(ε, v)
+function S(ε, v; precision = 3, scale = 101)
 
     j_max::Int = length(v) - 1
     n_max::Int = get_n(j_max)
 
-    b = Vector{Float64}(undef, j_max + 1)
+    v2 = Vector{Float64}(undef, j_max + 1)
 
     n = 0
     m = 0
@@ -42,7 +42,7 @@ function S(ε, v)
 
         end
 
-        b[i] = ∑(V) / Nmn
+        v2[i] = ∑(V) / Nmn
 
         m += 2
 
@@ -53,6 +53,14 @@ function S(ε, v)
 
     end
 
-    return b
+    Zᵢ = Vector{Polynomial}(undef, j_max + 1)
+
+    ΔW, b = Ξ(v2, Zᵢ; precision)
+
+    if scale ∉ 1:100
+        scale = ceil(Int, 100 / √ length(b))
+    end
+
+    Λ(ΔW, b, v2, n_max; scale)
 
 end
