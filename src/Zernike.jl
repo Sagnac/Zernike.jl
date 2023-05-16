@@ -185,40 +185,50 @@ function Ψ(m::Int, n::Int; scale::Int = 100)
 end
 
 # main interface function
-function Z(m::Int, n::Int; options...)
-    fig, = Ψ(m, n; options...)
+function Z(m::Int, n::Int; scale::Int = 100)
+    fig, = Ψ(m, n; scale)
     return fig
 end
 
 # methods
 
-function Z(m::Int, n::Int, ::Coeffs; options...)
-    fig, γ = Ψ(m, n; options...)
+function Z(m::Int, n::Int, ::Coeffs; scale::Int = 100)
+    fig, γ = Ψ(m, n; scale)
     return fig, γ
 end
 
-function Z(m::Int, n::Int, ::Latex; options...)
-    fig, _, Z_LaTeX = Ψ(m, n; options...)
+function Z(m::Int, n::Int, ::Latex; scale::Int = 100)
+    fig, _, Z_LaTeX = Ψ(m, n; scale)
     return fig, Z_LaTeX
 end
 
-function Z(m::Int, n::Int, ::Coeffs, ::Latex; options...)
-    return Ψ(m, n; options...)
+function Z(m::Int, n::Int, ::Coeffs, ::Latex; scale::Int = 100)
+    return Ψ(m, n; scale)
 end
 
 function Z(m::Int, n::Int, ::Fit)
     return Zf(m, n)[1]
 end
 
-Z(opts...; m, n, options...) = Z(m, n, opts...; options...)
+function Z(opts...; m, n, options...)
+    if !isempty(opts) && opts[1] isa Fit
+        Zf(m, n)[1]
+    else
+        Z(m, n, opts...; options...)
+    end
+end
 
-function Z(j::Int, options...)
+function Z(j::Int, opts...; options...)
     if j < 0
         error("j must be ≥ 0\n")
     end
     n = get_n(j)
     m = get_m(j, n)
-    Z(m, n, options...)
+    if !isempty(opts) && opts[1] isa Fit
+        Zf(m, n)[1]
+    else
+        Z(m, n, opts...; options...)
+    end
 end
 
 end
