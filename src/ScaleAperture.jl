@@ -8,7 +8,7 @@ https://www.jeos.org/index.php/jeos_rp/article/view/07012
 
 =#
 
-function S(ε, v; precision = 3, scale = 101)
+function Π(ε, v; precision = 3, scale = 101)
 
     j_max::Int = length(v) - 1
     n_max::Int = get_n(j_max)
@@ -61,6 +61,15 @@ function S(ε, v; precision = 3, scale = 101)
         scale = ceil(Int, 100 / √ length(b))
     end
 
-    Λ(ΔW, b, v2, n_max; scale)
+    Λ(ΔW, b, v2, n_max; scale)..., ΔW
 
+end
+
+function S(ε, v; precision = 3, scale = 101)
+    return Π(ε, v; precision, scale)[1:4]
+end
+
+function S(ε, v, ::Fit; precision = 3)
+    ΔW = Π(ε, v; precision)[5]
+    return ΔW
 end
