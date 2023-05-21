@@ -13,9 +13,9 @@ function (ΔW::WavefrontError)(ρ, θ)::Float64
 end
 
 # construction function
-function Wf(r::Vector, ϕ::Vector, OPD::Vector, n_max::Int; precision = 3)
+function Wf(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int; precision = 3)
 
-    if !allequal(length.((r, ϕ, OPD)))
+    if !allequal(length.((ρ, θ, OPD)))
         error("Vectors must be of equal length.\n")
     end
 
@@ -24,7 +24,7 @@ function Wf(r::Vector, ϕ::Vector, OPD::Vector, n_max::Int; precision = 3)
     Zᵢ = Polynomial[Z(j, Fit()) for j = 0:j_max]
 
     # linear least squares
-    A = reduce(hcat, Zᵢ[i].(r, ϕ) for i = 1:j_max+1)
+    A = reduce(hcat, Zᵢ[i].(ρ, θ) for i = 1:j_max+1)
 
     # Zernike expansion coefficients
     v::Vector{Float64} = A \ OPD
@@ -101,7 +101,7 @@ function metrics(v, ΔWp)
 end
 
 # main interface function
-function W(r::T, ϕ::T, OPD::T, n_max::Int; options...) where T <: Vector
+function W(ρ::T, θ::T, OPD::T, n_max::Int; options...) where T <: Vector
 
     if haskey(options, :precision) &&
        (options[:precision] == "full" || options[:precision] isa Int)
@@ -110,7 +110,7 @@ function W(r::T, ϕ::T, OPD::T, n_max::Int; options...) where T <: Vector
         precision = 3
     end
 
-    ΔW, a, v = Wf(r, ϕ, OPD, n_max; precision)
+    ΔW, a, v = Wf(ρ, θ, OPD, n_max; precision)
 
     if haskey(options, :scale) &&
        (options[:scale] isa Int && options[:scale] ∈ 1:100)
@@ -125,21 +125,21 @@ end
 
 # methods
 
-function W(r::Vector, ϕ::Vector, OPD::Vector, n_max::Int, ::Fit; options...)
-    return Wf(r, ϕ, OPD, n_max; options...)[1]
+function W(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int, ::Fit; options...)
+    return Wf(ρ, θ, OPD, n_max; options...)[1]
 end
 
 W(; r, t, OPD, n_max, options...) = W(r, t, OPD, n_max; options...)
 
 function W(x::Vector, y::Vector, OPD::Vector; n_max::Int, options...)
-    r = hypot.(x, y)
-    ϕ = atan.(y, x)
-    W(r, ϕ, OPD, n_max; options...)
+    ρ = hypot.(x, y)
+    θ = atan.(y, x)
+    W(ρ, θ, OPD, n_max; options...)
 end
 
 function W(data::Matrix, n_max::Int; options...)
-    r, ϕ, OPD = [data[:, i] for i = 1:3]
-    W(r, ϕ, OPD, n_max; options...)
+    ρ, θ, OPD = [data[:, i] for i = 1:3]
+    W(ρ, θ, OPD, n_max; options...)
 end
 
 W(data; n_max, options...) = W(data, n_max; options...)
