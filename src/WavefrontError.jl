@@ -138,8 +138,7 @@ function W(x::Vector, y::Vector, OPD::Vector; n_max::Int, options...)
 end
 
 function W(data::Matrix, n_max::Int; options...)
-    ρ, θ, OPD = [data[:, i] for i = 1:3]
-    W(ρ, θ, OPD, n_max; options...)
+    W((data[:, i] for i = 1:3)..., n_max; options...)
 end
 
 W(data; n_max, options...) = W(data, n_max; options...)
