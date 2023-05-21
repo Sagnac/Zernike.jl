@@ -8,7 +8,9 @@ https://www.jeos.org/index.php/jeos_rp/article/view/07012
 
 =#
 
-function Π(ε, v; precision = 3)
+function Π(ε::T, v::Vector{T}; precision = 3) where T <: Float64
+
+    !(0.0 ≤ ε ≤ 1.0) && error("Bounds: 0.0 ≤ ε ≤ 1.0\n")
 
     j_max::Int = length(v) - 1
     n_max::Int = get_n(j_max)
@@ -61,7 +63,7 @@ function Π(ε, v; precision = 3)
 
 end
 
-function S(ε, v; precision = 3, scale = 101)
+function S(ε::Float64, v::Vector{Float64}; precision = 3, scale::Int = 101)
     ΔW, b, v2, n_max = Π(ε, v; precision)
     if scale ∉ 1:100
         scale = ceil(Int, 100 / √ length(b))
@@ -69,6 +71,6 @@ function S(ε, v; precision = 3, scale = 101)
     Λ(ΔW, b, v2, n_max; scale)
 end
 
-function S(ε, v, ::Fit; precision = 3)
+function S(ε::Float64, v::Vector{Float64}, ::Fit; precision = 3)
     Π(ε, v; precision)[1]
 end
