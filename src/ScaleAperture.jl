@@ -8,7 +8,7 @@ https://www.jeos.org/index.php/jeos_rp/article/view/07012
 
 =#
 
-function Π(ε::T, v::Vector{T}; precision = 3) where T <: Float64
+function Π(ε::T, v::Vector{T}; precision) where T <: Float64
 
     !(0.0 ≤ ε ≤ 1.0) && error("Bounds: 0.0 ≤ ε ≤ 1.0\n")
 

@@ -38,6 +38,10 @@ end
 # filtering function
 function Ξ(v, Zᵢ; precision)
 
+    if precision ≠ "full" && !isa(precision, Int)
+        precision = 3
+    end
+
     a = @NamedTuple{j::Int, n::Int, m::Int, a::Float64}[]
 
     av = Float64[]
@@ -48,7 +52,7 @@ function Ξ(v, Zᵢ; precision)
 
     # store the non-trivial coefficients
     for (i, aᵢ) in pairs(v)
-        aᵢ = ifelse(precision == "full", aᵢ, round(aᵢ; digits = precision))
+        aᵢ = precision == "full" ? aᵢ : round(aᵢ; digits = precision)
         if !iszero(aᵢ)
             if clipped
                 Zᵢ[i] = Z(i-1, Fit())
@@ -105,12 +109,7 @@ end
 # main interface function
 function W(ρ::T, θ::T, OPD::T, n_max::Int; options...) where T <: Vector
 
-    if haskey(options, :precision) &&
-       (options[:precision] == "full" || options[:precision] isa Int)
-        precision = options[:precision]
-    else
-        precision = 3
-    end
+    precision = haskey(options, :precision) ? options[:precision] : 3
 
     scale = haskey(options, :scale) ? options[:scale] : 101
 
