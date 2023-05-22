@@ -180,7 +180,7 @@ function Ψ(m::Int, n::Int; scale::Int = 100)
 
     fig = ZPlot(ρ, θ, Zp; titles...)
 
-    return fig, γ, Z_LaTeX
+    return fig, γ::Vector{Float64}, Z_LaTeX
 
 end
 

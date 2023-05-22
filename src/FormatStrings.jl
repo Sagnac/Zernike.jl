@@ -75,7 +75,7 @@ end
 
 function format_strings(a::Vector)
 
-    W_LaTeX = "ΔW ≈ "
+    W_LaTeX::String = "ΔW ≈ "
 
     function ζ(i, sub_index = 0)
         aᵢ = a[i][:a]
