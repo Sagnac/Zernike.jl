@@ -13,7 +13,7 @@ function (ΔW::WavefrontError)(ρ, θ)::Float64
 end
 
 # construction function
-function Wf(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int; precision = 3)
+function Wf(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int; precision)
 
     if !allequal(length.((ρ, θ, OPD)))
         error("Vectors must be of equal length.\n")
@@ -107,11 +107,7 @@ function metrics(v, ΔWp)
 end
 
 # main interface function
-function W(ρ::T, θ::T, OPD::T, n_max::Int; options...) where T <: Vector
-
-    precision = haskey(options, :precision) ? options[:precision] : 3
-
-    scale = haskey(options, :scale) ? options[:scale] : 101
+function W(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int; precision = 3, scale = 101)
 
     Λ(Wf(ρ, θ, OPD, n_max; precision)..., n_max; scale)
 
@@ -119,8 +115,8 @@ end
 
 # methods
 
-function W(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int, ::Fit; options...)
-    return Wf(ρ, θ, OPD, n_max; options...)[1]
+function W(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int, ::Fit; precision = 3)
+    return Wf(ρ, θ, OPD, n_max; precision)[1]
 end
 
 W(; r, t, OPD, n_max, options...) = W(r, t, OPD, n_max; options...)
