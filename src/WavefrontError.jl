@@ -67,7 +67,9 @@ function Ξ(v, Zᵢ; precision)
 end
 
 # synthesis function
-function Λ(ΔW, a, v, n_max; scale)
+function Λ(ΔW, a, v, n_max; scale::Int)
+
+    scale = scale ∈ 1:100 ? scale : ceil(Int, 100 / √ length(a))
 
     ρ, θ = polar(n_max, n_max; scale)
 
@@ -110,16 +112,9 @@ function W(ρ::T, θ::T, OPD::T, n_max::Int; options...) where T <: Vector
         precision = 3
     end
 
-    ΔW, a, v = Wf(ρ, θ, OPD, n_max; precision)
+    scale = haskey(options, :scale) ? options[:scale] : 101
 
-    if haskey(options, :scale) &&
-       (options[:scale] isa Int && options[:scale] ∈ 1:100)
-       scale = options[:scale]
-    else
-       scale = ceil(Int, 100 / √ length(a))
-    end
-
-    Λ(ΔW, a, v, n_max; scale)
+    Λ(Wf(ρ, θ, OPD, n_max; precision)..., n_max; scale)
 
 end
 

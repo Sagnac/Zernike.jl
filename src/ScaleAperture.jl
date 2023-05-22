@@ -64,11 +64,7 @@ function Π(ε::T, v::Vector{T}; precision = 3) where T <: Float64
 end
 
 function S(ε::Float64, v::Vector{Float64}; precision = 3, scale::Int = 101)
-    ΔW, b, v2, n_max = Π(ε, v; precision)
-    if scale ∉ 1:100
-        scale = ceil(Int, 100 / √ length(b))
-    end
-    Λ(ΔW, b, v2, n_max; scale)
+    Λ(Π(ε, v; precision)...; scale)
 end
 
 function S(ε::Float64, v::Vector{Float64}, ::Fit; precision = 3)
