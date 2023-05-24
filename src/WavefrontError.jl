@@ -21,7 +21,7 @@ function Wf(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int; precision)
 
     j_max = get_j(n_max, n_max)
 
-    Zᵢ = Polynomial[Z(j, Fit()) for j = 0:j_max]
+    Zᵢ = Polynomial[Z(j, Model()) for j = 0:j_max]
 
     # linear least squares
     A = reduce(hcat, Zᵢ[i].(ρ, θ) for i = 1:j_max+1)
@@ -55,7 +55,7 @@ function Ξ(v, Zᵢ; precision)
         aᵢ = precision == "full" ? aᵢ : round(aᵢ; digits = precision)
         if !iszero(aᵢ)
             if clipped
-                Zᵢ[i] = Z(i-1, Fit())
+                Zᵢ[i] = Z(i-1, Model())
             end
             push!(a, (; Zᵢ[i].inds..., a = aᵢ))
             push!(av, aᵢ)
@@ -115,7 +115,7 @@ end
 
 # methods
 
-function W(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int, ::Fit; precision = 3)
+function W(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int, ::Model; precision = 3)
     return Wf(ρ, θ, OPD, n_max; precision)[1]
 end
 

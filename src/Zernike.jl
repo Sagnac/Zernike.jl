@@ -7,7 +7,7 @@
 
 module Zernike
 
-export Z, W, S, Coeffs, Latex, Fit
+export Z, W, S, Coeffs, Latex, Model
 
 import Base: @locals
 import UnPack: @unpack
@@ -16,7 +16,7 @@ const ∑ = sum
 
 struct Coeffs end
 struct Latex end
-struct Fit end
+struct Model end
 
 struct RadialPolynomial
     γ::Vector{Float64}
@@ -206,12 +206,12 @@ function Z(m::Int, n::Int, ::Coeffs, ::Latex; scale::Int = 100)
     return Ψ(m, n; scale)
 end
 
-function Z(m::Int, n::Int, ::Fit)
+function Z(m::Int, n::Int, ::Model)
     return Zf(m, n)[1]
 end
 
 function Z(opts...; m, n, options...)
-    if !isempty(opts) && opts[1] isa Fit
+    if !isempty(opts) && opts[1] isa Model
         Zf(m, n)[1]
     else
         Z(m, n, opts...; options...)
@@ -224,7 +224,7 @@ function Z(j::Int, opts...; options...)
     end
     n = get_n(j)
     m = get_m(j, n)
-    if !isempty(opts) && opts[1] isa Fit
+    if !isempty(opts) && opts[1] isa Model
         Zf(m, n)[1]
     else
         Z(m, n, opts...; options...)

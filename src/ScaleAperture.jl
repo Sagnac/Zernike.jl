@@ -26,7 +26,7 @@ function Π(ε::T, v::Vector{T}; precision) where T <: Float64
 
         a = v[i]
         Nmn = √radicand(m, n)
-        R0 = Z(n, n, Fit()).R(ε)
+        R0 = Z(n, n, Model()).R(ε)
         push!(V, a * Nmn * R0)
 
         ii = i
@@ -37,8 +37,8 @@ function Π(ε::T, v::Vector{T}; precision) where T <: Float64
 
             a = v[ii]
             N = √radicand(m, n′)
-            R1 = Z(n, n′, Fit()).R(ε)
-            R2 = Z(n+2, n′, Fit()).R(ε)
+            R1 = Z(n, n′, Model()).R(ε)
+            R2 = Z(n+2, n′, Model()).R(ε)
 
             push!(V, a * N * (R1 - R2))
 
@@ -67,6 +67,6 @@ function S(ε::Float64, v::Vector{Float64}; precision = 3, scale::Int = 101)
     Λ(Π(ε, v; precision)...; scale)
 end
 
-function S(ε::Float64, v::Vector{Float64}, ::Fit; precision = 3)
+function S(ε::Float64, v::Vector{Float64}, ::Model; precision = 3)
     Π(ε, v; precision)[1]
 end
