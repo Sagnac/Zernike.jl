@@ -10,7 +10,7 @@ module Zernike
 export Z, W, S, Model
 
 using GLMakie
-import Base: @locals, show, iterate
+import Base: @locals, show, getindex, iterate
 import UnPack: @unpack
 
 const ∑ = sum
@@ -201,20 +201,13 @@ end
 
 # overload show to clean up the output
 show(io::IO, Z::T) where {T <: Polynomial} = print(io, "$T", Z.inds, " --> Z(ρ, θ)")
-show(io::IO, Z::Output) = nothing
+show(::IO, ::Output) = nothing
 
-# hook into iterate in order to allow non-property destructuring of the output
-function iterate(Z::Output, i = 1)
-    if i == 1
-        (Z.fig, 2)
-    elseif i == 2
-        (Z.coeffs, 3)
-    elseif i == 3
-        (Z.latex, 4)
-    else
-        nothing
-    end
-end
+# extend getindex to allow indexing the output
+getindex(Z::T, i) where {T <: Output} = getfield(Z, fieldnames(T)[i])
+
+# hook into iterate to allow non-property destructuring of the output
+iterate(Z::Output, i = 1) = (Z[i], i + 1)
 
 # methods
 function Z(m::Int, n::Int, ::Model)

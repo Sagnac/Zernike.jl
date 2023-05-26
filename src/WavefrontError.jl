@@ -140,20 +140,11 @@ function show(io::IO, W::T) where {T <: WavefrontOutput}
     show(IOContext(io, :compact => true), "text/plain", W.metrics)
 end
 
+# extend getindex to allow indexing the output
+getindex(W::T, i) where {T <: WavefrontOutput} = getfield(W, fieldnames(T)[i])
+
 # hook into iterate to allow non-property destructuring of the output
-function iterate(W::WavefrontOutput, i = 1)
-    if i == 1
-        (W.a, 2)
-    elseif i == 2
-        (W.v, 3)
-    elseif i == 3
-        (W.metrics, 4)
-    elseif i == 4
-        (W.fig, 5)
-    else
-        nothing
-    end
-end
+iterate(W::WavefrontOutput, i = 1) = (W[i], i + 1)
 
 # methods
 function W(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int, ::Model; precision = 3)
