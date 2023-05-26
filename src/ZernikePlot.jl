@@ -1,5 +1,3 @@
-using GLMakie
-
 function ZPlot(ρ, θ, Zp; titles...)
 
     resolution = (1688, 1000)

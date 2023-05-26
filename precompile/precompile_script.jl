@@ -7,7 +7,7 @@ using Zernike
 
 OPD = 2sinc.(5ρ)
 
-fig, coeffs, latex = Z(0, 4, Coeffs(), Latex())
+fig, coeffs, latex = Z(0, 4)
 
 wait(fig.scene.current_screens[])
 
@@ -15,6 +15,6 @@ a, v, metrics, fig = W(ρ, θ, OPD, 8)
 
 wait(fig.scene.current_screens[])
 
-a, v, metrics, fig = S(0.2, v)
+b, v2, metrics, fig = S(0.2, v)
 
 wait(fig.scene.current_screens[])

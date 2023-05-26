@@ -7,15 +7,14 @@
 
 module Zernike
 
-export Z, W, S, Coeffs, Latex, Model
+export Z, W, S, Model
 
-import Base: @locals
+using GLMakie
+import Base: @locals, show, iterate
 import UnPack: @unpack
 
 const ∑ = sum
 
-struct Coeffs end
-struct Latex end
 struct Model end
 
 struct RadialPolynomial
@@ -33,6 +32,12 @@ struct Polynomial
     N::Float64
     R::RadialPolynomial
     M::Sinusoid
+end
+
+struct Output
+    fig::Makie.Figure
+    coeffs::Vector{Float64}
+    latex::String
 end
 
 include("ZernikePlot.jl")
@@ -73,6 +78,15 @@ get_n(j)::Int = ceil((-3 + √(9 + 8j)) / 2)
 get_m(j, n)::Int = 2j - (n + 2)n
 # ISO / ANSI / OSA standard single mode-ordering index
 get_j(n, m)::Int = ((n + 2)n + m) ÷ 2
+
+function get_mn(j)
+    if j < 0
+        error("j must be ≥ 0\n")
+    end
+    n = get_n(j)
+    m = get_m(j, n)
+    return m, n
+end
 
 function radicand(m, n)
     # Kronecker delta δ_{m0}
@@ -153,8 +167,8 @@ function Zf(m::Int, n::Int)
 
 end
 
-# synthesis function
-function Ψ(m::Int, n::Int; scale::Int = 100)
+# main interface function
+function Z(m::Int, n::Int; scale::Int = 100)
 
     Z, Z_vars = Zf(m, n)
 
@@ -171,64 +185,52 @@ function Ψ(m::Int, n::Int; scale::Int = 100)
     println(indices)
 
     if n > 54
-        @info "Pass Coeffs() as the third argument to return the coefficients."
+        println()
+        @info "Coefficients are stored in the coeffs field of the current output."
     else
-        println("Z = ", Z_Unicode)
+        print("Z = ", Z_Unicode)
     end
 
     titles = (plot = Z.inds.j < 153 ? Z_LaTeX : Zmn, window = window_title)
 
     fig = ZPlot(ρ, θ, Zp; titles...)
 
-    return fig, γ::Vector{Float64}, Z_LaTeX
+    Output(fig, γ, Z_LaTeX)
 
 end
 
-# main interface function
-function Z(m::Int, n::Int; scale::Int = 100)
-    fig, = Ψ(m, n; scale)
-    return fig
+# overload show to clean up the output
+show(io::IO, Z::T) where {T <: Polynomial} = print(io, "$T", Z.inds, " --> Z(ρ, θ)")
+show(io::IO, Z::Output) = nothing
+
+# hook into iterate in order to allow non-property destructuring of the output
+function iterate(Z::Output, i = 1)
+    if i == 1
+        (Z.fig, 2)
+    elseif i == 2
+        (Z.coeffs, 3)
+    elseif i == 3
+        (Z.latex, 4)
+    else
+        nothing
+    end
 end
 
 # methods
-
-function Z(m::Int, n::Int, ::Coeffs; scale::Int = 100)
-    fig, γ = Ψ(m, n; scale)
-    return fig, γ
-end
-
-function Z(m::Int, n::Int, ::Latex; scale::Int = 100)
-    fig, _, Z_LaTeX = Ψ(m, n; scale)
-    return fig, Z_LaTeX
-end
-
-function Z(m::Int, n::Int, ::Coeffs, ::Latex; scale::Int = 100)
-    return Ψ(m, n; scale)
-end
-
 function Z(m::Int, n::Int, ::Model)
-    return Zf(m, n)[1]
+    Zf(m, n)[1]
 end
 
-function Z(opts...; m, n, options...)
-    if !isempty(opts) && opts[1] isa Model
-        Zf(m, n)[1]
-    else
-        Z(m, n, opts...; options...)
-    end
+function Z(; m, n, scale::Int = 100)
+    Z(m, n; scale)
 end
 
-function Z(j::Int, opts...; options...)
-    if j < 0
-        error("j must be ≥ 0\n")
-    end
-    n = get_n(j)
-    m = get_m(j, n)
-    if !isempty(opts) && opts[1] isa Model
-        Zf(m, n)[1]
-    else
-        Z(m, n, opts...; options...)
-    end
+function Z(j::Int; scale::Int = 100)
+    Z(get_mn(j)...; scale)
+end
+
+function Z(j::Int, ::Model)
+    Zf(get_mn(j)...)[1]
 end
 
 end

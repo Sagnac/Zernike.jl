@@ -57,7 +57,7 @@ function Π(ε::T, v::Vector{T}; precision) where T <: Float64
 
     Zᵢ = Vector{Polynomial}(undef, j_max + 1)
 
-    ΔW, b = Ξ(v2, Zᵢ; precision)
+    ΔW, b = Ψ(v2, Zᵢ, n_max; precision)
 
     return ΔW, b, v2, n_max
 

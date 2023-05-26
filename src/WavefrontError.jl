@@ -3,8 +3,17 @@
 # especially for a small set of data.
 
 struct WavefrontError
+    i::Vector{NamedTuple{(:j, :n, :m, :a), Tuple{Int, Int, Int, Float64}}}
+    n_max::Int
     a::Vector{Float64}
     Z::Vector{Polynomial}
+end
+
+struct WavefrontOutput
+    a::Vector{NamedTuple{(:j, :n, :m, :a), Tuple{Int, Int, Int, Float64}}}
+    v::Vector{Float64}
+    metrics::NamedTuple{(:PV, :RMS, :Strehl), Tuple{Float64, Float64, Float64}}
+    fig::Makie.Figure
 end
 
 function (ΔW::WavefrontError)(ρ, θ)::Float64
@@ -29,14 +38,14 @@ function Wf(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int; precision)
     # Zernike expansion coefficients
     v::Vector{Float64} = A \ OPD
 
-    ΔW, a = Ξ(v, Zᵢ; precision)
+    ΔW, a = Ψ(v, Zᵢ, n_max; precision)
 
     return ΔW, a, v
 
 end
 
 # filtering function
-function Ξ(v, Zᵢ; precision)
+function Ψ(v, Zᵢ, n_max; precision)
 
     if precision ≠ "full" && !isa(precision, Int)
         precision = 3
@@ -64,7 +73,7 @@ function Ξ(v, Zᵢ; precision)
     end
 
     # create the fitted polynomial
-    ΔW = WavefrontError(av, Zₐ)
+    ΔW = WavefrontError(a, n_max, av, Zₐ)
 
     return ΔW, a
 
@@ -86,7 +95,7 @@ function Λ(ΔW, a, v, n_max; scale::Int)
 
     fig = ZPlot(ρ, θ, ΔWp; titles...)
 
-    return a, v, metrics(v, ΔWp), fig
+    WavefrontOutput(a, v, metrics(v, ΔWp), fig)
 
 end
 
@@ -113,8 +122,40 @@ function W(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int; precision = 3, scale
 
 end
 
-# methods
+# overload show to clean up the output
+function show(io::IO, W::T) where {T <: WavefrontError}
+    strip3 = map(-, displaysize(io), (3, 0))
+    println(io, "$T(n_max = $(W.n_max))")
+    println(io, "   ∑aᵢZᵢ(ρ, θ):")
+    show(IOContext(io, :limit => true, :displaysize => strip3), "text/plain", W.i)
+    print(io, "\n   --> ΔW(ρ, θ)")
+end
 
+function show(io::IO, W::T) where {T <: WavefrontOutput}
+    strip3 = map(-, displaysize(io), (3, 0))
+    println(io, "$T(a, v, metrics, fig)")
+    println(io, "Summary:")
+    show(IOContext(io, :limit => true, :displaysize => strip3), "text/plain", W.a)
+    println(io)
+    show(IOContext(io, :compact => true), "text/plain", W.metrics)
+end
+
+# hook into iterate to allow non-property destructuring of the output
+function iterate(W::WavefrontOutput, i = 1)
+    if i == 1
+        (W.a, 2)
+    elseif i == 2
+        (W.v, 3)
+    elseif i == 3
+        (W.metrics, 4)
+    elseif i == 4
+        (W.fig, 5)
+    else
+        nothing
+    end
+end
+
+# methods
 function W(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int, ::Model; precision = 3)
     return Wf(ρ, θ, OPD, n_max; precision)[1]
 end
