@@ -77,7 +77,7 @@ get_n(j)::Int = ceil((-3 + √(9 + 8j)) / 2)
 # azimuthal frequency
 get_m(j, n)::Int = 2j - (n + 2)n
 # ISO / ANSI / OSA standard single mode-ordering index
-get_j(n, m)::Int = ((n + 2)n + m) ÷ 2
+get_j(m, n)::Int = ((n + 2)n + m) ÷ 2
 
 function get_mn(j)
     if j < 0
@@ -116,7 +116,7 @@ function Zf(m::Int, n::Int)
     # upper bound for the sum (number of terms -1 [indexing from zero])
     k = (n - μ) ÷ 2
 
-    j = get_j(n, m)
+    j = get_j(m, n)
 
     N² = radicand(m, n)
 
@@ -146,7 +146,7 @@ function Zf(m::Int, n::Int)
     ν = Int[n - 2s for s = 0:k]
 
     # polynomial coefficients
-    λ = Φ(n, μ)
+    λ = Φ(μ, n)
 
     γ = Float64[λ[νᵢ+1] for νᵢ in ν]
 

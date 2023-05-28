@@ -10,7 +10,20 @@ https://opg.optica.org/ol/abstract.cfm?uri=ol-38-14-2487
 
 import ShiftedArrays: circshift as shift
 
-function Φ(n_max::Int, m_max::Int)
+function Φ(m_max::Int, n_max::Int)
+
+    if m_max < 0 || n_max < 0 || m_max > n_max || isodd(n_max - m_max)
+        error(
+            """
+            In method: Φ(n_max, m_max)
+            Bounds:
+            m_max ≥ 0
+            n_max ≥ 0
+            m_max ≤ n_max
+            n_max - m_max even
+            """
+        )
+    end
 
     n_mod_2 = isodd(n_max)
 
