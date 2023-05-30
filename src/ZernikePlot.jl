@@ -1,7 +1,11 @@
+import GLMakie: GLFW.GetPrimaryMonitor, MonitorProperties
+
 function ZPlot(ρ, θ, Zp; titles...)
 
-    resolution = (1688, 1000)
-    fontsize = 35
+    monitor_properties = MonitorProperties(GetPrimaryMonitor())
+    (; height) = monitor_properties.videomode
+    resolution = (0.85height, height/2)
+    fontsize = 0.13 * monitor_properties.dpi[1]
 
     axis3attributes = (
         title = L"%$(titles[:plot])",
