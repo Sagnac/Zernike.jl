@@ -21,8 +21,8 @@ function (ΔW::WavefrontError)(ρ, θ)::Float64
     ∑(aᵢ * Z[i](ρ, θ) for (i, aᵢ) ∈ pairs(a))
 end
 
-# construction function
-function Wf(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int; precision)
+# fitting function (construction function 1)
+function Wf(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int)
 
     if !allequal(length.((ρ, θ, OPD)))
         error("Vectors must be of equal length.\n")
@@ -38,13 +38,11 @@ function Wf(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int; precision)
     # Zernike expansion coefficients
     v::Vector{Float64} = A \ OPD
 
-    ΔW, a = Ψ(v, Zᵢ, n_max; precision)
-
-    return ΔW, a, v
+    return v, Zᵢ, n_max
 
 end
 
-# filtering function
+# filtering function (construction function 2)
 function Ψ(v, Zᵢ, n_max; precision)
 
     if precision ≠ "full" && !isa(precision, Int)
@@ -118,7 +116,11 @@ end
 # main interface function
 function W(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int; precision = 3, scale = 101)
 
-    Λ(Wf(ρ, θ, OPD, n_max; precision)..., n_max; scale)
+    v, Zᵢ = Wf(ρ, θ, OPD, n_max)
+
+    ΔW, a = Ψ(v, Zᵢ, n_max; precision)
+
+    Λ(ΔW, a, v, n_max; scale)
 
 end
 
@@ -148,7 +150,7 @@ iterate(W::WavefrontOutput, i = 1) = (W[i], i + 1)
 
 # methods
 function W(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int, ::Model; precision = 3)
-    return Wf(ρ, θ, OPD, n_max; precision)[1]
+    return Ψ(Wf(ρ, θ, OPD, n_max)...; precision)[1]
 end
 
 W(; r, t, OPD, n_max, options...) = W(r, t, OPD, n_max; options...)
