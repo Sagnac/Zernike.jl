@@ -208,7 +208,7 @@ show(::IO, ::Output) = nothing
 getindex(Z::T, i) where {T <: Output} = getfield(Z, fieldnames(T)[i])
 
 # hook into iterate to allow non-property destructuring of the output
-iterate(Z::Output, i = 1) = (Z[i], i + 1)
+iterate(Z::Output, i = 1) = (i > 3 ? nothing : (Z[i], i + 1))
 
 # methods
 function Z(m::Int, n::Int, ::Model)

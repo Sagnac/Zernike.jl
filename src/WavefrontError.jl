@@ -142,7 +142,7 @@ end
 getindex(W::T, i) where {T <: WavefrontOutput} = getfield(W, fieldnames(T)[i])
 
 # hook into iterate to allow non-property destructuring of the output
-iterate(W::WavefrontOutput, i = 1) = (W[i], i + 1)
+iterate(W::WavefrontOutput, i = 1) = (i > 4 ? nothing : (W[i], i + 1))
 
 # methods
 function W(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int, ::Model; precision = 3)
