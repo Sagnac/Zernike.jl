@@ -1,7 +1,3 @@
-# Estimates wavefront error by expressing the aberrations as a linear combination
-# of weighted Zernike polynomials. The representation is approximate,
-# especially for a small set of data.
-
 struct WavefrontError
     i::Vector{NamedTuple{(:j, :n, :m, :a), Tuple{Int, Int, Int, Float64}}}
     n_max::Int

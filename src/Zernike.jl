@@ -45,6 +45,7 @@ include("WavefrontError.jl")
 include("RadialCoefficients.jl")
 include("FormatStrings.jl")
 include("ScaleAperture.jl")
+include("Docstrings.jl")
 
 function (R::RadialPolynomial)(ρ)::Float64
     (; γ, ν, k) = R
