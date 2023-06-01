@@ -63,6 +63,7 @@ function (Z::Polynomial)(ρ, θ)::Float64
 end
 
 function polar(m, n; scale::Int = 100)
+    m = abs(m)
     scale = clamp(scale, 1, 100)
     ϵ₁ = scale * (ceil(Int, π * n) + 1)
     ϵ₁ = clamp(ϵ₁, ϵ₁, 1000)
