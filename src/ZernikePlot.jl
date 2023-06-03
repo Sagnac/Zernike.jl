@@ -8,7 +8,7 @@ function ZPlot(ρ, θ, Zp; titles...)
     fontsize = 0.13 * monitor_properties.dpi[1]
 
     axis3attributes = (
-        title = L"%$(titles[:plot])",
+        title = titles[:plot],
         titlesize = fontsize,
         xlabel = L"\rho_x",
         ylabel = L"\rho_y",

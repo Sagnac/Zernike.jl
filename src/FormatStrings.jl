@@ -71,15 +71,15 @@ function format_strings(Z::Polynomial)
     Zmn = "Z_{$n}^{$m}"
 
     Z_Unicode = join(UNICODE, parentheses...)
-    Z_LaTeX = Zmn * " = " * join(LaTeX, parentheses...)
+    Z_LaTeX = latexstring(Zmn, " = ", join(LaTeX, parentheses...))
 
-    return Zmn, Z_Unicode, Z_LaTeX
+    return latexstring(Zmn), Z_LaTeX, Z_Unicode
 
 end
 
 function format_strings(a::Vector)
 
-    W_LaTeX::String = "ΔW ≈ "
+    W_LaTeX = "ΔW ≈ "
 
     function ζ(i, sub_index = 0)
         aᵢ = a[i][:a]
@@ -104,6 +104,6 @@ function format_strings(a::Vector)
         W_LaTeX *= string(ζ(lastindex(a))...)
     end
 
-    return W_LaTeX
+    return latexstring(W_LaTeX)
 
 end

@@ -10,6 +10,7 @@ module Zernike
 export Z, W, S, Model
 
 using GLMakie
+import GLMakie: Makie.latexstring, Makie.LaTeXString
 import Base: show, getindex, iterate
 
 const ∑ = sum
@@ -36,7 +37,7 @@ end
 struct Output
     fig::Makie.Figure
     coeffs::Vector{Float64}
-    latex::String
+    latex::LaTeXString
 end
 
 include("ZernikePlot.jl")
@@ -177,7 +178,7 @@ function Z(m::Int, n::Int; scale::Int = 100)
 
     Zp = Z.(ρ', θ)
 
-    Zmn, Z_Unicode, Z_LaTeX = format_strings(Z)
+    Zmn, Z_LaTeX, Z_Unicode = format_strings(Z)
 
     indices = replace(Z.inds |> string, '(':')' => "")
     window_title = "Zernike Polynomial: $indices"
