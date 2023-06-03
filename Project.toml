@@ -1,10 +1,9 @@
 name = "Zernike"
 uuid = "e14b762e-e195-443f-a1b1-09f2ab0cc6c8"
 authors = ["Sagnac"]
-version = "1.0.1"
+version = "1.1.0"
 
 [deps]
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 ShiftedArrays = "1277b4bf-5013-50f5-be3d-901d8477a67a"
-UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
