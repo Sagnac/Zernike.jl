@@ -10,8 +10,7 @@ module Zernike
 export Z, W, S, Model
 
 using GLMakie
-import Base: @locals, show, getindex, iterate
-import UnPack: @unpack
+import Base: show, getindex, iterate
 
 const ∑ = sum
 
@@ -152,8 +151,6 @@ function Zf(m::Int, n::Int)
 
     γ = Float64[λ[νᵢ+1] for νᵢ in ν]
 
-    Z_vars = @locals
-
     inds = (j = j, n = n, m = m)
 
     # radial polynomial
@@ -165,22 +162,22 @@ function Zf(m::Int, n::Int)
     # Zernike polynomial
     Z = Polynomial(inds, N, R, M)
 
-    return Z, Z_vars
+    return Z
 
 end
 
 # main interface function
 function Z(m::Int, n::Int; scale::Int = 100)
 
-    Z, Z_vars = Zf(m, n)
+    Z = Zf(m, n)
 
-    @unpack γ = Z_vars
+    (; γ) = Z.R
 
     ρ, θ = polar(m, n; scale)
 
     Zp = Z.(ρ', θ)
 
-    Zmn, Z_Unicode, Z_LaTeX = format_strings(Z_vars)
+    Zmn, Z_Unicode, Z_LaTeX = format_strings(Z)
 
     indices = replace(Z.inds |> string, '(':')' => "")
     window_title = "Zernike Polynomial: $indices"
@@ -213,7 +210,7 @@ iterate(Z::Output, i = 1) = (i > 3 ? nothing : (Z[i], i + 1))
 
 # methods
 function Z(m::Int, n::Int, ::Model)
-    Zf(m, n)[1]
+    Zf(m, n)
 end
 
 function Z(; m, n, scale::Int = 100)
@@ -225,7 +222,7 @@ function Z(j::Int; scale::Int = 100)
 end
 
 function Z(j::Int, ::Model)
-    Zf(get_mn(j)...)[1]
+    Zf(get_mn(j)...)
 end
 
 end

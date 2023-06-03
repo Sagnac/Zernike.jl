@@ -4,9 +4,12 @@ using Printf
 # but this approach is intuitive enough
 # and doesn't require importing another package
 
-function format_strings(Z_vars::Dict)
+function format_strings(Z::Polynomial)
 
-    @unpack m, n, j, μ, k, N², N, λ, γ, ν = Z_vars
+    (; j, n, m) = Z.inds
+    N = Z.N
+    (; γ, ν, k) = Z.R
+    μ = abs(m)
 
     γₛ = [@sprintf "%d" γₛ for γₛ ∈ abs.(γ)]
 
@@ -15,6 +18,7 @@ function format_strings(Z_vars::Dict)
 
     # prefactor
     if !isinteger(N)
+        N² = radicand(m, n)
         UNICODE[1] = "√($N²)"
         LaTeX[1] = "\\sqrt{$N²}"
     elseif N ≠ 1

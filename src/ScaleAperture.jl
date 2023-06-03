@@ -26,7 +26,7 @@ function Π(ε::T, v::Vector{T}) where T <: Float64
 
         a = v[i]
         Nmn = √radicand(m, n)
-        R0 = Z(n, n, Model()).R(ε)
+        R0 = Zf(n, n).R(ε)
         push!(V, a * Nmn * R0)
 
         ii = i
@@ -37,8 +37,8 @@ function Π(ε::T, v::Vector{T}) where T <: Float64
 
             a = v[ii]
             N = √radicand(m, n′)
-            R1 = Z(n, n′, Model()).R(ε)
-            R2 = Z(n+2, n′, Model()).R(ε)
+            R1 = Zf(n, n′).R(ε)
+            R2 = Zf(n+2, n′).R(ε)
 
             push!(V, a * N * (R1 - R2))
 
