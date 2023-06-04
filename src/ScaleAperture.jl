@@ -22,12 +22,10 @@ function Π(ε::T, v::Vector{T}) where T <: Float64
 
     @inbounds for i in eachindex(v)
 
-        V = Float64[]
-
         a = v[i]
         Nmn = √radicand(m, n)
         R0 = Zf(n, n).R(ε)
-        push!(V, a * Nmn * R0)
+        v2[i] = a * Nmn * R0
 
         ii = i
 
@@ -40,11 +38,11 @@ function Π(ε::T, v::Vector{T}) where T <: Float64
             R1 = Zf(n, n′).R(ε)
             R2 = Zf(n+2, n′).R(ε)
 
-            push!(V, a * N * (R1 - R2))
+            v2[i] += a * N * (R1 - R2)
 
         end
 
-        v2[i] = ∑(V) / Nmn
+        v2[i] /= Nmn
 
         m += 2
 
