@@ -25,6 +25,12 @@ function Φ(m_max::Int, n_max::Int)
         )
     end
 
+    if m_max == n_max
+        λ = zeros(Float64, n_max + 1)
+        λ[end] = 1.0
+        return λ
+    end
+
     n_mod_2 = isodd(n_max)
 
     i_max = ((n_max + 2)n_max + n_mod_2) ÷ 4 + (m_max + !n_mod_2 + 1) ÷ 2
