@@ -97,10 +97,21 @@ function radicand(m, n)
 end
 
 #=
-# This is used in computing the polynomial coefficients using the original formula.
-function fact(t)
-    bound = Int ≡ Int32 ? 12 : 20
-    [tᵢ > bound ? (factorial ∘ big)(tᵢ) : factorial(tᵢ) for tᵢ ∈ t]
+# This is the naive approach which implements the original explicit formula
+# for computing the polynomial coefficients.
+function fact(t::Float64)
+    prod(2.0:t)
+end
+
+function λ(μ, n, s, k)
+    t::Vector{Float64} = [
+        n - s;
+        s;
+        k - s;
+        k + μ - s
+    ]
+    τ = t .|> fact
+    (-1)^s * τ[1] ÷ prod(τ[2:4])
 end
 # =#
 
@@ -125,25 +136,6 @@ function Zf(m::Int, n::Int)
     # normalization constant following the orthogonality relation
     N = √N²
 
-    #=
-    # This is the naive approach which implements the original explicit formula.
-    function λ(s)
-        t::Vector{Int} = [
-            n - s;
-            s;
-            k - s;
-            k + μ - s
-        ]
-        τ = t |> fact
-        if j > 278
-            τ = convert(Vector{BigInt}, τ)
-        end
-        (-1)^s * τ[1] ÷ prod(τ[2:4])
-    end
-
-    γ = Float64[λ(s) for s = 0:k]
-    # =#
-
     # power (exponent)
     ν = Int[n - 2s for s = 0:k]
 
@@ -151,6 +143,8 @@ function Zf(m::Int, n::Int)
     λ = Φ(μ, n)
 
     γ = Float64[λ[νᵢ+1] for νᵢ in ν]
+
+    # γ = Float64[λ(μ, n, s, k) for s = 0:k]
 
     inds = (j = j, n = n, m = m)
 
