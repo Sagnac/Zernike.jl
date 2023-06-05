@@ -10,12 +10,18 @@ https://opg.optica.org/ol/abstract.cfm?uri=ol-38-14-2487
 
 import ShiftedArrays: circshift as shift
 
+function get_i(m_max, n_max)
+    n_mod_2 = isodd(n_max)
+    i_max = ((n_max + 2)n_max + n_mod_2) ÷ 4 + (m_max + !n_mod_2 + 1) ÷ 2
+    return i_max
+end
+
 function Φ(m_max::Int, n_max::Int)
 
     if m_max < 0 || n_max < 0 || m_max > n_max || isodd(n_max - m_max)
         error(
             """
-            In method: Φ(n_max, m_max)
+            In method: Φ(m_max, n_max)
             Bounds:
             m_max ≥ 0
             n_max ≥ 0
@@ -26,16 +32,12 @@ function Φ(m_max::Int, n_max::Int)
     end
 
     if m_max == n_max
-        λ = zeros(Float64, n_max + 1)
-        λ[end] = 1.0
-        return λ
+        λᵢ = zeros(Float64, n_max + 1)
+        λᵢ[end] = 1.0
+        return λᵢ
     end
 
-    n_mod_2 = isodd(n_max)
-
-    i_max = ((n_max + 2)n_max + n_mod_2) ÷ 4 + (m_max + !n_mod_2 + 1) ÷ 2
-
-    λ = [zeros(Float64, n_max + 1) for i = 1:i_max]
+    λ::Vector{Vector{Float64}} = []
 
     i = 0
     n_even = true
@@ -47,14 +49,17 @@ function Φ(m_max::Int, n_max::Int)
             i += 1
 
             if m == n
-                λ[i][n+1] = 1.0
+                λᵢ = zeros(Float64, n_max + 1)
+                λᵢ[n+1] = 1.0
                 n_even = !n_even
             elseif m == 0
-                λ[i] = 2shift(λ[i-n÷2], 1) - λ[i-n]
+                λᵢ = 2shift(λ[i-n÷2], 1) - λ[i-n]
             else
                 Δ = (n + 1 + n_even) ÷ 2
-                λ[i] = shift(λ[i-Δ] + λ[i-Δ+1], 1) - λ[i-n]
+                λᵢ = shift(λ[i-Δ] + λ[i-Δ+1], 1) - λ[i-n]
             end
+
+            push!(λ, λᵢ)
 
         end
 
