@@ -1,7 +1,7 @@
 name = "Zernike"
 uuid = "e14b762e-e195-443f-a1b1-09f2ab0cc6c8"
 authors = ["Sagnac"]
-version = "1.2.2"
+version = "1.2.3"
 
 [deps]
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
