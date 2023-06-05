@@ -40,7 +40,7 @@ function Φ(m_max::Int, n_max::Int)
     i = 0
     n_even = true
 
-    @inbounds for n = 0:n_max
+    for n = 0:n_max
 
         for m = !n_even:2:ifelse(n ≠ n_max, n, m_max)
 

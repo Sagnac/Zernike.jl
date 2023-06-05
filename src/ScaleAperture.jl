@@ -20,7 +20,7 @@ function Π(ε::T, v::Vector{T}) where T <: Float64
     n = 0
     m = 0
 
-    @inbounds for i in eachindex(v)
+    for i in eachindex(v)
 
         a = v[i]
         Nmn = √radicand(m, n)
