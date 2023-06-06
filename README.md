@@ -36,7 +36,7 @@ Returns three values contained within a Zernike.Output type, with fields:
 
 1. `fig`: the Makie figure;
 2. `coeffs`: vector of radial polynomial coefficients;
-3. `latex`: LaTeX formatted string of the Zernike polynomial.
+3. `latex`: LaTeX string of the Zernike polynomial.
 
 The coefficients belong to terms with exponent `n - 2(i - 1)` where `i` is the vector's index.
 
@@ -51,7 +51,7 @@ Estimates wavefront error by expressing optical aberrations as a linear combinat
 `ρ`, `θ`, and `OPD` must be vectors of equal length; at each specific index the values are elements of an ordered triple over the exit pupil.
 
 * `ρ`: normalized radial exit pupil variable `{0 ≤ ρ ≤ 1}`;
-* `θ`: angular exit pupil variable defined counter-clockwise from the horizontal x-axis `{0 ≤ θ ≤ 2π}`;
+* `θ`: angular exit pupil variable in radians `(mod 2π)`, defined positive counter-clockwise from the horizontal x-axis;
 * `OPD`: measured optical path difference in waves;
 * `n_max`: maximum radial degree to fit to.
 
