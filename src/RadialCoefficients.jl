@@ -37,7 +37,7 @@ function Φ(m_max::Int, n_max::Int)
         return λᵢ
     end
 
-    λ::Vector{Vector{Float64}} = []
+    λ = Vector{Float64}[]
 
     i = 0
     n_even = true
