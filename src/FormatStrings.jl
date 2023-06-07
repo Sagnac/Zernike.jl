@@ -94,8 +94,8 @@ function format_strings(a::Vector)
     end
 
     if length(a) > 8
-        sorted_indices = sortperm(abs.([aᵢ[:a] for aᵢ ∈ a]); rev = true)
-        sorted_indices = [i for i ∈ sorted_indices if a[i][:j] ∉ 0:2]
+        sorted_indices = sortperm(a; by = aᵢ -> abs(aᵢ[:a]), rev = true)
+        filter!(i -> a[i][:j] ∉ 0:2, sorted_indices)
         subset_a = getindex(a, sorted_indices[1:4])
         η(sorted_indices, subset_a)
         W_LaTeX *= string(ζ(sorted_indices[4])...) * "..."
