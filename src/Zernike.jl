@@ -7,7 +7,7 @@
 
 module Zernike
 
-export Z, W, S, Model
+export Z, W, S, Model, transform
 
 using GLMakie
 import GLMakie: Makie.latexstring, Makie.LaTeXString
@@ -46,6 +46,7 @@ include("RadialCoefficients.jl")
 include("FormatStrings.jl")
 include("ScaleAperture.jl")
 include("Docstrings.jl")
+include("TransformAperture.jl")
 
 function (R::RadialPolynomial)(ρ)::Float64
     (; γ, ν, k) = R
