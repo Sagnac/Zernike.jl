@@ -127,9 +127,8 @@ function Zf(m::Int, n::Int)
     # upper bound for the sum (number of terms -1 [indexing from zero])
     k = (n - μ) ÷ 2
     j = get_j(m, n)
-    N² = radicand(m, n)
     # normalization constant following the orthogonality relation
-    N = √N²
+    N = √radicand(m, n)
     # power (exponent)
     ν = Int[n - 2s for s = 0:k]
     # polynomial coefficients
