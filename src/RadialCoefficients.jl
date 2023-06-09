@@ -17,7 +17,6 @@ function get_i(m_max, n_max)
 end
 
 function Φ(m_max::Int, n_max::Int)
-
     if m_max < 0 || n_max < 0 || m_max > n_max || isodd(n_max - m_max)
         error(
             """
@@ -30,22 +29,16 @@ function Φ(m_max::Int, n_max::Int)
             """
         )
     end
-
     if m_max == n_max
         λᵢ = zeros(Float64, n_max + 1)
         λᵢ[end] = 1.0
         return λᵢ
     end
-
     λ = Vector{Float64}[]
-
     i = 1
     n_even = true
-
     for n = 0:n_max
-
         for m = !n_even:2:ifelse(n ≠ n_max, n, m_max)
-
             if m == n
                 λᵢ = zeros(Float64, n_max + 1)
                 λᵢ[n+1] = 1.0
@@ -56,15 +49,9 @@ function Φ(m_max::Int, n_max::Int)
                 Δ = (n + 1 + n_even) ÷ 2
                 λᵢ = shift(λ[i-Δ] + λ[i-Δ+1], 1) - λ[i-n]
             end
-
             push!(λ, λᵢ)
-
             i += 1
-
         end
-
     end
-
     return λ[end]
-
 end

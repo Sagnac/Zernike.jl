@@ -1,12 +1,10 @@
 import GLMakie: GLFW.GetPrimaryMonitor, MonitorProperties
 
 function ZPlot(ρ, θ, Zp; titles...)
-
     monitor_properties = MonitorProperties(GetPrimaryMonitor())
     (; height) = monitor_properties.videomode
     resolution = (0.85height, height/2)
     fontsize = 0.13 * monitor_properties.dpi[1]
-
     axis3attributes = (
         title = titles[:plot],
         titlesize = fontsize,
@@ -19,18 +17,14 @@ function ZPlot(ρ, θ, Zp; titles...)
         azimuth = 0.275π,
         protrusions = 80,
     )
-
     ρᵪ = [ρⱼ * cos(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
     ρᵧ = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
-
     fig = Figure(; resolution)
     axis3 = Axis3(fig[1,1]; axis3attributes...)
     surface!(axis3, ρᵪ, ρᵧ, Zp; colormap = :oslo)
-
     # hacky way to produce a top-down heatmap-style view without generating
     # another plot with a different set of data
     # accomplished by adding a toggle which changes the perspective on demand
-
     zproperties = (
         :zlabelvisible,
         :zgridvisible,
@@ -38,11 +32,9 @@ function ZPlot(ρ, θ, Zp; titles...)
         :zticklabelsvisible,
         :zspinesvisible,
     )
-
     label = Label(fig, "Pupil view"; fontsize = 0.76fontsize)
     pupil = Toggle(fig)
     fig[1,2] = grid!([label pupil]; tellheight = false, valign = :bottom)
-
     on(pupil.active) do active
         for property in zproperties
             getfield(axis3, property)[] = !active
@@ -52,10 +44,7 @@ function ZPlot(ρ, θ, Zp; titles...)
         axis3.ylabeloffset = active ? 90 : 40
         axis3.xlabeloffset = active ? 50 : 40
     end
-
     set_window_config!(title = titles[:window], focus_on_show = true)
     display(fig)
-
     return fig
-
 end

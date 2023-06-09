@@ -119,79 +119,52 @@ end
 # computation and construction function
 # binds the indices and produces a specific polynomial function
 function Zf(m::Int, n::Int)
-
     μ = abs(m)
-
     # validate
     if n < 0 || μ > n || isodd(n - μ)
         error("Bounds:\nn ≥ 0\n|m| ≤ n\nn - |m| even\n")
     end
-
     # upper bound for the sum (number of terms -1 [indexing from zero])
     k = (n - μ) ÷ 2
-
     j = get_j(m, n)
-
     N² = radicand(m, n)
-
     # normalization constant following the orthogonality relation
     N = √N²
-
     # power (exponent)
     ν = Int[n - 2s for s = 0:k]
-
     # polynomial coefficients
     λ = Φ(μ, n)
-
     γ = Float64[λ[νᵢ+1] for νᵢ in ν]
-
     # γ = Float64[λ(μ, n, s, k) for s = 0:k]
-
     inds = (j = j, n = n, m = m)
-
     # radial polynomial
     R = RadialPolynomial(γ, ν, k)
-
     # azimuthal / meridional component
     M = Sinusoid(m)
-
     # Zernike polynomial
     Z = Polynomial(inds, N, R, M)
-
     return Z
-
 end
 
 # main interface function
 function Z(m::Int, n::Int; scale::Int = 100)
-
     Z = Zf(m, n)
-
     (; γ) = Z.R
-
     ρ, θ = polar(m, n; scale)
-
     Zp = Z.(ρ', θ)
-
     Zmn, Z_LaTeX, Z_Unicode = format_strings(Z)
-
     indices = replace(Z.inds |> string, '(':')' => "")
     window_title = "Zernike Polynomial: $indices"
     println(indices)
-
     if n > 54
         println()
         @info "Coefficients are stored in the coeffs field of the current output."
     else
         print("Z = ", Z_Unicode)
     end
-
     titles = (plot = Z.inds.j < 153 ? Z_LaTeX : Zmn, window = window_title)
-
     fig = ZPlot(ρ, θ, Zp; titles...)
-
     Output(fig, γ, Z_LaTeX)
-
 end
 
 # overload show to clean up the output

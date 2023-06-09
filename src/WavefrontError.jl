@@ -19,40 +19,27 @@ end
 
 # fitting function (construction function 1)
 function Wf(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int)
-
     if !allequal(length.((ρ, θ, OPD)))
         error("Vectors must be of equal length.\n")
     end
-
     j_max = get_j(n_max, n_max)
-
     Zᵢ = Polynomial[Z(j, Model()) for j = 0:j_max]
-
     # linear least squares
     A = reduce(hcat, Zᵢ[i].(ρ, θ) for i = 1:j_max+1)
-
     # Zernike expansion coefficients
     v::Vector{Float64} = A \ OPD
-
     return v, Zᵢ, n_max
-
 end
 
 # filtering function (construction function 2)
 function Ψ(v, Zᵢ, n_max; precision)
-
     if precision ≠ "full" && !isa(precision, Int)
         precision = 3
     end
-
     a = @NamedTuple{j::Int, n::Int, m::Int, a::Float64}[]
-
     av = Float64[]
-
     Zₐ = Polynomial[]
-
     clipped = !isassigned(Zᵢ, 1)
-
     # store the non-trivial coefficients
     for (i, aᵢ) in pairs(v)
         aᵢ = precision == "full" ? aᵢ : round(aᵢ; digits = precision)
@@ -65,59 +52,39 @@ function Ψ(v, Zᵢ, n_max; precision)
             push!(Zₐ, Zᵢ[i])
         end
     end
-
     # create the fitted polynomial
     ΔW = WavefrontError(a, n_max, av, Zₐ)
-
     return ΔW, a
-
 end
 
 # synthesis function
 function Λ(ΔW, a, v, n_max; scale::Int)
-
     scale = scale ∈ 1:100 ? scale : ceil(Int, 100 / √ length(a))
-
     ρ, θ = polar(n_max, n_max; scale)
-
     # construct the estimated wavefront error
     ΔWp = ΔW.(ρ', θ)
-
     W_LaTeX = format_strings(a)
-
     titles = (plot = W_LaTeX, window = "Estimated wavefront error")
-
     fig = ZPlot(ρ, θ, ΔWp; titles...)
-
     WavefrontOutput(a, v, metrics(v, ΔWp), fig)
-
 end
 
 function metrics(v, ΔWp)
-
     # Peak-to-valley wavefront error
     PV = maximum(ΔWp) - minimum(ΔWp)
-
     # RMS wavefront error
     # where σ² is the variance (second central moment about the mean)
     # the mean is the first a00 piston term
     σ = ∑(v[i]^2 for i = 2:lastindex(v)) |> sqrt
-
     Strehl_ratio = exp(-(2π * σ)^2)
-
     return (PV = PV, RMS = σ, Strehl = Strehl_ratio)
-
 end
 
 # main interface function
 function W(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int; precision = 3, scale = 101)
-
     v, Zᵢ = Wf(ρ, θ, OPD, n_max)
-
     ΔW, a = Ψ(v, Zᵢ, n_max; precision)
-
     Λ(ΔW, a, v, n_max; scale)
-
 end
 
 # overload show to clean up the output
