@@ -1,10 +1,11 @@
-function transform(v::Vector{Float64})
-    j_max = length(v) - 1
-    n_max = get_n(j_max)
+function transform(ε::Float64, v::Vector{Float64})
+    len = length(v)
+    n_max = get_n(len - 1)
     order = Tuple{Int, Int, Int}[]
     remap = Dict{Tuple{Int, Int}, Int}()
-    N = zeros(Float64, j_max + 1, j_max + 1)
-    R = zeros(Float64, j_max + 1, j_max + 1)
+    N = zeros(Float64, len, len)
+    R = copy(N)
+    η = copy(N)
     i = 1
     for m = -n_max:n_max
         μ = abs(m)
@@ -18,10 +19,15 @@ function transform(v::Vector{Float64})
             for s = 0:k
                 setindex!(R, λ[n-2s+1], remap[(m, n-2s)], i)
             end
+            η[i,i] = ε ^ n
             i += 1
         end
     end
-    return N, R
+    c = to_complex(v, order)
+    C = (R * N) \ (η * R * N)
+    c′ = C * c
+    v2 = to_real(c′, order)
+    return v2
 end
 
 function to_complex(v::Vector{Float64}, order::Vector{Tuple{Int, Int, Int}})
