@@ -44,11 +44,11 @@ function Π(ε::T, v::Vector{T}) where T <: Float64
 
         v2[i] /= Nmn
 
-        m += 2
-
-        if m > n
+        if m == n
             n += 1
             m = -n
+        else
+            m += 2
         end
 
     end
