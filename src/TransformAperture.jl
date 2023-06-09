@@ -34,9 +34,9 @@ function to_complex(v::Vector{Float64}, order::Vector{Tuple{Int, Int, Int}})
     c = Vector{Complex{Float64}}(undef, length(v)) 
     for (i, j) in pairs(order)
         if j[3] < 0
-            c[i] = (v[j[2]] + im * v[j[1]]) / √2
+            c[i] = complex(v[j[2]], v[j[1]]) / √2
         elseif j[3] > 0
-            c[i] = (v[j[1]] - im * v[j[2]]) / √2
+            c[i] = complex(v[j[1]], -v[j[2]]) / √2
         else
             c[i] = v[j[1]]
         end
