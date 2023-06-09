@@ -9,7 +9,7 @@ function format_strings(Z::Polynomial)
     N = Z.N
     (; γ, ν, k) = Z.R
     μ = abs(m)
-    γₛ = [@sprintf "%d" γₛ for γₛ ∈ abs.(γ)]
+    γₛ = [@sprintf "%d" abs(γᵢ) for γᵢ ∈ γ]
     UNICODE = ones(String, 3)
     LaTeX = ones(String, 3)
     # prefactor
