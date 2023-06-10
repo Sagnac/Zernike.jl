@@ -1,14 +1,17 @@
 const b = binomial
 const ℯ = cis # ℯ(x) = exp(im*x)
 
-function transform(ε::T, δ::T, ϕ::T, v::Vector{T}) where T <: Float64
+function transform(ε::T, δ::Complex{T}, ϕ::T, v::Vector{T}) where T <: Float64
     len = length(v)
     n_max = get_n(len - 1)
+    τ = abs(δ)
+    σ = angle(δ)
     order = Tuple{Int, Int, Int}[]
     mapping = remap(n_max)
     N = zeros(Float64, len, len)
     R = copy(N)
     ηₛ = copy(N)
+    ηᵣ = zeros(ComplexF64, len, len)
     ηₜ = zeros(Complex{Float64}, len, len)
     i = 1
     for m = -n_max:n_max
@@ -23,12 +26,13 @@ function transform(ε::T, δ::T, ϕ::T, v::Vector{T}) where T <: Float64
                 setindex!(R, λ[n-2s+1], mapping[(m, n-2s)], i)
             end
             ηₛ[i,i] = ε ^ n
+            ηᵣ[i,i] = ℯ(m * ϕ)
             k2 = (n + m) ÷ 2
             k3 = (n - m) ÷ 2
             for p = 0:k2, q = 0:k3
                 n′ = n - p - q
                 m′ = m - p + q
-                z = b(k2,p) * b(k3,q) * ε^n′ * δ^(p+q) * ℯ((p-q)ϕ)
+                z = b(k2,p) * b(k3,q) * ε^n′ * τ^(p+q) * ℯ((p-q)σ)
                 setindex!(ηₜ, z, mapping[(m′, n′)], i)
             end
             i += 1
