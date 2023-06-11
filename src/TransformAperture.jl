@@ -37,7 +37,7 @@ function transform(ε::T, δ::Complex{T}, ϕ::T, v::Vector{T}) where T <: Float6
         end
     end
     if !iszero(δ)
-        ηₜ = translate(ε, δ, n_max, remap)
+        ηₜ = translate(ε, δ, remap)
         if !iszero(ϕ)
             η = ηᵣ * ηₜ
         else
@@ -55,9 +55,10 @@ function transform(ε::T, δ::Complex{T}, ϕ::T, v::Vector{T}) where T <: Float6
     return v2
 end
 
-function translate(ε::Float64, δ::ComplexF64, n_max::Int, remap::Dict)
+function translate(ε::Float64, δ::ComplexF64, remap::Dict)
     ρₜ, θₜ = abs(δ), angle(δ)
     len = length(remap)
+    n_max = get_n(len - 1)
     ηₜ = zeros(ComplexF64, len, len)
     i = 0
     for m = -n_max:n_max, n = abs(m):2:n_max

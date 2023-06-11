@@ -37,18 +37,18 @@ function Π(ε::T, v::Vector{T}) where T <: Float64
             m += 2
         end
     end
-    return v2, j_max, n_max
+    return v2, n_max
 end
 
 function S(ε::Float64, v::Vector{Float64}; precision = 3, scale::Int = 101)
-    v2, j_max, n_max = Π(ε, v)
-    Zᵢ = Vector{Polynomial}(undef, j_max + 1)
+    v2, n_max = Π(ε, v)
+    Zᵢ = Vector{Polynomial}(undef, length(v))
     ΔW, b = Ψ(v2, Zᵢ, n_max; precision)
     Λ(ΔW, b, v2, n_max; scale)
 end
 
 function S(ε::Float64, v::Vector{Float64}, ::Model; precision = 3)
-    v2, j_max, n_max = Π(ε, v)
-    Zᵢ = Vector{Polynomial}(undef, j_max + 1)
+    v2, n_max = Π(ε, v)
+    Zᵢ = Vector{Polynomial}(undef, length(v))
     Ψ(v2, Zᵢ, n_max; precision)[1]
 end
