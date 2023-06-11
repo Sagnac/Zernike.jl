@@ -4,19 +4,23 @@ const ℯ = cis # ℯ(x) = exp(im*x)
 function transform(ε::T, δ::Complex{T}, ϕ::T, v::Vector{T}) where T <: Float64
     len = length(v)
     n_max = get_n(len - 1)
-    τ = abs(δ)
-    σ = angle(δ)
     order = Tuple{Int, Int, Int}[]
     mapping = remap(n_max)
     N = zeros(Float64, len, len)
     R = copy(N)
-    ηₛ = copy(N)
-    ηᵣ = zeros(ComplexF64, len, len)
-    ηₜ = zeros(Complex{Float64}, len, len)
-    i = 1
+    if iszero(δ)
+        ηₛ = copy(N)
+    else
+        ηₜ = zeros(Complex{T}, len, len)
+    end
+    if !iszero(ϕ)
+        ηᵣ = zeros(ComplexF64, len, len)
+    end
+    i = 0
     for m = -n_max:n_max
         μ = abs(m)
         for n = μ:2:n_max
+            i += 1
             j = get_j(m, n)
             k1 = (n - μ) ÷ 2
             push!(order, (j + 1, get_j(-m, n) + 1, sign(m)))
@@ -25,21 +29,37 @@ function transform(ε::T, δ::Complex{T}, ϕ::T, v::Vector{T}) where T <: Float6
             for s = 0:k1
                 setindex!(R, λ[n-2s+1], mapping[(m, n-2s)], i)
             end
-            ηₛ[i,i] = ε ^ n
-            ηᵣ[i,i] = ℯ(m * ϕ)
+            if !iszero(ϕ)
+                ηᵣ[i,i] = ℯ(m * ϕ)
+            end
+            if iszero(δ)
+                ηₛ[i,i] = ε ^ n
+                continue
+            end
+            ρₜ, θₜ = abs(δ), angle(δ)
             k2 = (n + m) ÷ 2
             k3 = (n - m) ÷ 2
             for p = 0:k2, q = 0:k3
                 n′ = n - p - q
                 m′ = m - p + q
-                z = b(k2,p) * b(k3,q) * ε^n′ * τ^(p+q) * ℯ((p-q)σ)
+                z = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ℯ((p-q)θₜ)
                 setindex!(ηₜ, z, mapping[(m′, n′)], i)
             end
-            i += 1
         end
     end
+    if !iszero(δ)
+        if !iszero(ϕ)
+            η = ηᵣ * ηₜ
+        else
+            η = ηₜ
+        end
+    elseif !iszero(ϕ)
+        η = ηᵣ * ηₛ
+    else
+        η = ηₛ
+    end
     c = to_complex(v, order)
-    C = (R * N) \ (ηₜ * R * N)
+    C = (R * N) \ (η * R * N)
     c′ = C * c
     v2 = to_real(c′, order)
     return v2
