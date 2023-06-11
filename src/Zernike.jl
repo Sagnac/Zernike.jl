@@ -167,7 +167,7 @@ function Z(m::Int, n::Int; scale::Int = 100)
 end
 
 # overload show to clean up the output
-show(io::IO, Z::T) where {T <: Polynomial} = print(io, "$T", Z.inds, " --> Z(ρ, θ)")
+show(io::IO, Z::T) where {T <: Polynomial} = print(io, T, Z.inds, " --> Z(ρ, θ)")
 show(::IO, ::Output) = nothing
 
 # extend getindex to allow indexing the output

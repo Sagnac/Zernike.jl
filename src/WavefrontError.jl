@@ -90,7 +90,7 @@ end
 # overload show to clean up the output
 function show(io::IO, W::T) where {T <: WavefrontError}
     strip3 = map(-, displaysize(io), (3, 0))
-    println(io, "$T(n_max = $(W.n_max))")
+    println(io, T, "(n_max = ", W.n_max, ")")
     println(io, "   ∑aᵢZᵢ(ρ, θ):")
     show(IOContext(io, :limit => true, :displaysize => strip3), "text/plain", W.i)
     print(io, "\n   --> ΔW(ρ, θ)")
@@ -98,7 +98,7 @@ end
 
 function show(io::IO, W::T) where {T <: WavefrontOutput}
     strip3 = map(-, displaysize(io), (3, 0))
-    println(io, "$T(a, v, metrics, fig)")
+    println(io, T, "(a, v, metrics, fig)")
     println(io, "Summary:")
     show(IOContext(io, :limit => true, :displaysize => strip3), "text/plain", W.a)
     println(io)
