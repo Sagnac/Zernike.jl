@@ -93,6 +93,31 @@ function translate(ε::Float64, δ::ComplexF64, remap::Dict)
     return ηₜ
 end
 
+function elliptical(v::Vector{T}, ξ::T, φ::T) where T <: Float64
+    !(0.0 ≤ ξ ≤ 1.0) && error("Bounds: 0.0 ≤ ξ ≤ 1.0\n")
+    len = length(v)
+    n_max = get_n(len - 1)
+    remap = Dict{Tuple{Int, Int}, Int}()
+    ηₑ = zeros(ComplexF64, len, len)
+    i = 0
+    for m = -n_max:n_max, n = abs(m):2:n_max
+        i += 1
+        push!(remap, (m, n) => i)
+    end
+    for m = -n_max:n_max, n = abs(m):2:n_max
+        k2 = (n + m) ÷ 2
+        k3 = (n - m) ÷ 2
+        for p = 0:k2, q = 0:k3
+            m′ = m - 2p + 2q
+            z = 0.5^n * b(k2,p) * b(k3,q) *
+                (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ℯ(2(p-q)φ)
+            o = (remap[(m′, n)], remap[(m, n)])
+            ηₑ[o...] += z
+        end
+    end
+    return ηₑ
+end
+
 function to_complex(v::Vector{Float64}, order::Vector{Tuple{Int, Int, Int}})
     c = Vector{Complex{Float64}}(undef, length(v)) 
     for (i, j) in pairs(order)
