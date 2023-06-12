@@ -8,7 +8,7 @@ https://www.jeos.org/index.php/jeos_rp/article/view/07012
 
 =#
 
-function Π(ε::T, v::Vector{T}) where T <: Float64
+function Π(v::Vector{T}, ε::T) where T <: Float64
     !(0.0 ≤ ε ≤ 1.0) && error("Bounds: 0.0 ≤ ε ≤ 1.0\n")
     j_max::Int = length(v) - 1
     n_max::Int = get_n(j_max)
@@ -40,15 +40,15 @@ function Π(ε::T, v::Vector{T}) where T <: Float64
     return v2, n_max
 end
 
-function S(ε::Float64, v::Vector{Float64}; precision = 3, scale::Int = 101)
-    v2, n_max = Π(ε, v)
+function S(v::Vector{Float64}, ε::Float64; precision = 3, scale::Int = 101)
+    v2, n_max = Π(v, ε)
     Zᵢ = Vector{Polynomial}(undef, length(v))
     ΔW, b = Ψ(v2, Zᵢ, n_max; precision)
     Λ(ΔW, b, v2, n_max; scale)
 end
 
-function S(ε::Float64, v::Vector{Float64}, ::Model; precision = 3)
-    v2, n_max = Π(ε, v)
+function S(v::Vector{Float64}, ε::Float64, ::Model; precision = 3)
+    v2, n_max = Π(v, ε)
     Zᵢ = Vector{Polynomial}(undef, length(v))
     Ψ(v2, Zᵢ, n_max; precision)[1]
 end
