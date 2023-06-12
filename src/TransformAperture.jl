@@ -87,7 +87,7 @@ function translate(ε::Float64, δ::ComplexF64, remap::Dict)
             n′ = n - p - q
             m′ = m - p + q
             z = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ℯ((p-q)θₜ)
-            setindex!(ηₜ, z, remap[(m′, n′)], i)
+            ηₜ[remap[(m′, n′)], i] += z
         end
     end
     return ηₜ
