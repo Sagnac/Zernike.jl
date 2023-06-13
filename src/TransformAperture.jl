@@ -11,11 +11,11 @@ https://opg.optica.org/josaa/abstract.cfm?uri=josaa-24-3-569
 using LinearAlgebra
 
 const b = binomial
-const ℯ = cis # ℯ(x) = exp(im*x)
+const ei = cis # ei(x) = exp(im*x)
 
 function transform(v::Vector{T}, ε::T,
                    δ::Complex{T}, ϕ::T, ω::Tuple{T, T}) where T <: Float64
-    !(0.0 ≤ ε + abs(δ) ≤ 1.0) && error("Bounds: 0.0 ≤ ε + abs(δ) ≤ 1.0\n")
+    !(0.0 ≤ ε + abs(δ) ≤ 1.0) && error("Bounds: 0.0 ≤ ε + |δ| ≤ 1.0\n")
     !(0.0 ≤ ω[1] ≤ 1.0) && error("Bounds: 0.0 ≤ ω[1] ≤ 1.0\n")
     len = length(v)
     n_max = get_n(len - 1)
@@ -45,7 +45,7 @@ function transform(v::Vector{T}, ε::T,
                 setindex!(R, λ[n-2s+1], remap[(m, n-2s)], i)
             end
             if !iszero(ϕ)
-                ηᵣ[i,i] = ℯ(m * ϕ)
+                ηᵣ[i,i] = ei(m * ϕ)
             end
             if iszero(δ)
                 ηₛ[i,i] = ε ^ n
@@ -86,7 +86,7 @@ function translate(ε::Float64, δ::ComplexF64, remap::Dict)
         for p = 0:k2, q = 0:k3
             n′ = n - p - q
             m′ = m - p + q
-            z = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ℯ((p-q)θₜ)
+            z = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ei((p-q)θₜ)
             o = (remap[(m′, n′)], remap[(m, n)])
             ηₛ[o...] += z
         end
@@ -103,7 +103,7 @@ function elliptical(ξ::Float64, φ::Float64, remap::Dict)
         k3 = (n - m) ÷ 2
         for p = 0:k2, q = 0:k3
             m′ = m - 2p + 2q
-            z = 0.5^n * b(k2,p) * b(k3,q) * (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ℯ(2(p-q)φ)
+            z = 0.5^n * b(k2,p) * b(k3,q) * (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ei(2(p-q)φ)
             o = (remap[(m′, n)], remap[(m, n)])
             ηₑ[o...] += z
         end
@@ -126,11 +126,11 @@ function mapped(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64, remap::Di
             # translation
             n′ = n - p - q
             m′ = m - p + q
-            z = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ℯ((p-q)θₜ)
+            z = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ei((p-q)θₜ)
             ηₛ[remap[(m′, n′)], i] += z
             # elliptical transform
             m′ = m - 2p + 2q
-            z = 0.5^n * b(k2,p) * b(k3,q) * (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ℯ(2(p-q)φ)
+            z = 0.5^n * b(k2,p) * b(k3,q) * (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ei(2(p-q)φ)
             ηₑ[remap[(m′, n)], i] += z
         end
     end
