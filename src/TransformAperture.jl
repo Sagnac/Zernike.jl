@@ -52,10 +52,13 @@ function transform(v::Vector{T}, ε::T,
             end
         end
     end
-    if !iszero(δ)
+    if !iszero(δ) && !isone(ω[1])
         ηₛ, ηₑ = mapped(ε, δ, ω..., remap)
+    elseif !iszero(δ)
+        ηₛ = translate(ε, δ, remap)
+        ηₑ = I
     elseif !isone(ω[1])
-        ηₑ = mapped(ε, δ, ω..., remap)[2]
+        ηₑ = elliptical(ω..., remap)
     else
         ηₑ = I
     end
@@ -72,35 +75,66 @@ function transform(v::Vector{T}, ε::T,
     return v2, n_max
 end
 
-# translation and elliptical transforms under a fully mapped order
+function translate(ε::Float64, δ::ComplexF64, remap::Dict)
+    ρₜ, θₜ = abs(δ), angle(δ)
+    len = length(remap)
+    n_max = get_n(len - 1)
+    ηₛ = zeros(ComplexF64, len, len)
+    for m = -n_max:n_max, n = abs(m):2:n_max
+        k2 = (n + m) ÷ 2
+        k3 = (n - m) ÷ 2
+        for p = 0:k2, q = 0:k3
+            n′ = n - p - q
+            m′ = m - p + q
+            z = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ℯ((p-q)θₜ)
+            o = (remap[(m′, n′)], remap[(m, n)])
+            ηₛ[o...] += z
+        end
+    end
+    return ηₛ
+end
+
+function elliptical(ξ::Float64, φ::Float64, remap::Dict)
+    len = length(remap)
+    n_max = get_n(len - 1)
+    ηₑ = zeros(ComplexF64, len, len)
+    for m = -n_max:n_max, n = abs(m):2:n_max
+        k2 = (n + m) ÷ 2
+        k3 = (n - m) ÷ 2
+        for p = 0:k2, q = 0:k3
+            m′ = m - 2p + 2q
+            z = 0.5^n * b(k2,p) * b(k3,q) * (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ℯ(2(p-q)φ)
+            o = (remap[(m′, n)], remap[(m, n)])
+            ηₑ[o...] += z
+        end
+    end
+    return ηₑ
+end
+
+# translational + elliptical transforms under a fully mapped order
 function mapped(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64, remap::Dict)
     ρₜ, θₜ = abs(δ), angle(δ)
     len = length(remap)
     n_max = get_n(len - 1)
-    ηₜ = !iszero(δ) ? zeros(ComplexF64, len, len) : I
-    ηₑ = !isone(ξ) ? zeros(ComplexF64, len, len) : I
+    ηₛ = zeros(ComplexF64, len, len)
+    ηₑ = copy(ηₛ)
     for m = -n_max:n_max, n = abs(m):2:n_max
         k2 = (n + m) ÷ 2
         k3 = (n - m) ÷ 2
         i = remap[(m, n)]
         for p = 0:k2, q = 0:k3
-            if !iszero(δ)
-                n′ = n - p - q
-                m′ = m - p + q
-                z = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ℯ((p-q)θₜ)
-                o = (remap[(m′, n′)], i)
-                ηₜ[o...] += z
-            end
-            if !isone(ξ)
-                m′ = m - 2p + 2q
-                z = 0.5^n * b(k2,p) * b(k3,q) *
-                    (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ℯ(2(p-q)φ)
-                o = (remap[(m′, n)], i)
-                ηₑ[o...] += z
-            end
+            # translation
+            n′ = n - p - q
+            m′ = m - p + q
+            z = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ℯ((p-q)θₜ)
+            ηₛ[remap[(m′, n′)], i] += z
+            # elliptical transform
+            m′ = m - 2p + 2q
+            z = 0.5^n * b(k2,p) * b(k3,q) * (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ℯ(2(p-q)φ)
+            ηₑ[remap[(m′, n)], i] += z
         end
     end
-    return ηₜ, ηₑ
+    return ηₛ, ηₑ
 end
 
 function to_complex(v::Vector{Float64}, order::Vector{Tuple{Int, Int, Int}})
