@@ -53,9 +53,12 @@ function transform(v::Vector{T}, ε::T,
         end
     end
     if !iszero(δ)
-        ηₛ = translate(ε, δ, remap)
+        ηₛ, ηₑ = mapped(ε, δ, ω..., remap)
+    elseif !isone(ω[1])
+        ηₑ = mapped(ε, δ, ω..., remap)[2]
+    else
+        ηₑ = I
     end
-    ηₑ = !iszero(ω[1]) ? elliptical(ω..., remap) : I
     # net transformation matrix
     η = ηₑ * ηᵣ * ηₛ
     # complex Zernike expansion coefficients
@@ -69,42 +72,35 @@ function transform(v::Vector{T}, ε::T,
     return v2, n_max
 end
 
-function translate(ε::Float64, δ::ComplexF64, remap::Dict)
+# translation and elliptical transforms under a fully mapped order
+function mapped(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64, remap::Dict)
     ρₜ, θₜ = abs(δ), angle(δ)
     len = length(remap)
     n_max = get_n(len - 1)
-    ηₜ = zeros(ComplexF64, len, len)
-    i = 0
-    for m = -n_max:n_max, n = abs(m):2:n_max
-        i += 1
-        k2 = (n + m) ÷ 2
-        k3 = (n - m) ÷ 2
-        for p = 0:k2, q = 0:k3
-            n′ = n - p - q
-            m′ = m - p + q
-            z = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ℯ((p-q)θₜ)
-            ηₜ[remap[(m′, n′)], i] += z
-        end
-    end
-    return ηₜ
-end
-
-function elliptical(ξ::Float64, φ::Float64, remap::Dict)
-    len = length(remap)
-    n_max = get_n(len - 1)
-    ηₑ = zeros(ComplexF64, len, len)
+    ηₜ = !iszero(δ) ? zeros(ComplexF64, len, len) : I
+    ηₑ = !isone(ξ) ? zeros(ComplexF64, len, len) : I
     for m = -n_max:n_max, n = abs(m):2:n_max
         k2 = (n + m) ÷ 2
         k3 = (n - m) ÷ 2
+        i = remap[(m, n)]
         for p = 0:k2, q = 0:k3
-            m′ = m - 2p + 2q
-            z = 0.5^n * b(k2,p) * b(k3,q) *
-                (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ℯ(2(p-q)φ)
-            o = (remap[(m′, n)], remap[(m, n)])
-            ηₑ[o...] += z
+            if !iszero(δ)
+                n′ = n - p - q
+                m′ = m - p + q
+                z = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ℯ((p-q)θₜ)
+                o = (remap[(m′, n′)], i)
+                ηₜ[o...] += z
+            end
+            if !isone(ξ)
+                m′ = m - 2p + 2q
+                z = 0.5^n * b(k2,p) * b(k3,q) *
+                    (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ℯ(2(p-q)φ)
+                o = (remap[(m′, n)], i)
+                ηₑ[o...] += z
+            end
         end
     end
-    return ηₑ
+    return ηₜ, ηₑ
 end
 
 function to_complex(v::Vector{Float64}, order::Vector{Tuple{Int, Int, Int}})
@@ -137,7 +133,7 @@ function to_real(c::Vector{Complex{Float64}}, order::Vector{Tuple{Int, Int, Int}
 end
 
 function S(v::Vector{T}, ε::T, δ::Complex{T} = 0.0im,
-           ϕ::T = 0.0, ω::Tuple{T, T} = (0.0, 0.0);
+           ϕ::T = 0.0, ω::Tuple{T, T} = (1.0, 0.0);
            precision = 3, scale::Int = 101) where T <: Float64
     v2, n_max = transform(v, ε, δ, ϕ, ω)
     Zᵢ = Vector{Polynomial}(undef, length(v))
@@ -147,21 +143,21 @@ end
 
 function S(v::Vector{T}, ε::T, ::Model;
            precision = 3) where T <: Float64
-    v2, n_max = transform(v, ε, 0.0im, zero(T), (0.0, 0.0))
+    v2, n_max = transform(v, ε, 0.0im, zero(T), (1.0, 0.0))
     Zᵢ = Vector{Polynomial}(undef, length(v))
     Ψ(v2, Zᵢ, n_max; precision)[1]
 end
 
 function S(v::Vector{T}, ε::T, δ::Complex{T}, ::Model;
            precision = 3) where T <: Float64
-    v2, n_max = transform(v, ε, δ, zero(T), (0.0, 0.0))
+    v2, n_max = transform(v, ε, δ, zero(T), (1.0, 0.0))
     Zᵢ = Vector{Polynomial}(undef, length(v))
     Ψ(v2, Zᵢ, n_max; precision)[1]
 end
 
 function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ::Model;
            precision = 3) where T <: Float64
-    v2, n_max = transform(v, ε, δ, ϕ, (0.0, 0.0))
+    v2, n_max = transform(v, ε, δ, ϕ, (1.0, 0.0))
     Zᵢ = Vector{Polynomial}(undef, length(v))
     Ψ(v2, Zᵢ, n_max; precision)[1]
 end
