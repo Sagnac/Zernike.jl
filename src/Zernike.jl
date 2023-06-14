@@ -7,7 +7,7 @@
 
 module Zernike
 
-export Z, W, S, Model
+export Z, W, P, Model
 
 using GLMakie
 import GLMakie: Makie.latexstring, Makie.LaTeXString
@@ -44,7 +44,7 @@ include("ZernikePlot.jl")
 include("WavefrontError.jl")
 include("RadialCoefficients.jl")
 include("FormatStrings.jl")
-# include("ScaleAperture.jl")
+include("ScaleAperture.jl")
 include("TransformAperture.jl")
 include("Docstrings.jl")
 
@@ -112,7 +112,6 @@ function radicand(m, n)
     (2n + 2) ÷ (1 + δ(m))
 end
 
-#=
 # This is the naive approach which implements the original explicit formula
 # for computing the polynomial coefficients.
 function fact(t::Float64)
@@ -129,7 +128,6 @@ function λ(μ, n, s, k)
     τ = t .|> fact
     (-1)^s * τ[1] / prod(τ[2:4])
 end
-# =#
 
 # computation and construction function
 # binds the indices and produces a specific polynomial function

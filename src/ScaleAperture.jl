@@ -40,14 +40,14 @@ function Π(v::Vector{T}, ε::T) where T <: Float64
     return v2, n_max
 end
 
-function S(v::Vector{Float64}, ε::Float64; precision = 3, scale::Int = 101)
+function J(v::Vector{Float64}, ε::Float64; precision = 3, scale::Int = 101)
     v2, n_max = Π(v, ε)
     Zᵢ = Vector{Polynomial}(undef, length(v))
     ΔW, b = Ψ(v2, Zᵢ, n_max; precision)
     Λ(ΔW, b, v2, n_max; scale)
 end
 
-function S(v::Vector{Float64}, ε::Float64, ::Model; precision = 3)
+function J(v::Vector{Float64}, ε::Float64, ::Model; precision = 3)
     v2, n_max = Π(v, ε)
     Zᵢ = Vector{Polynomial}(undef, length(v))
     Ψ(v2, Zᵢ, n_max; precision)[1]

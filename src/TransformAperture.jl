@@ -13,8 +13,7 @@ using LinearAlgebra
 const b = binomial
 const ei = cis # ei(x) = exp(im*x)
 
-function transform(v::Vector{T}, ε::T,
-                   δ::Complex{T}, ϕ::T, ω::Tuple{T, T}) where T <: Float64
+function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <: Float64
     !(0.0 ≤ ε + abs(δ) ≤ 1.0) && error("Bounds: 0.0 ≤ ε + |δ| ≤ 1.0\n")
     !(0.0 < ω[1] ≤ 1.0) && error("Bounds: 0.0 < ω[1] ≤ 1.0\n")
     len = length(v)
@@ -53,7 +52,7 @@ function transform(v::Vector{T}, ε::T,
         end
     end
     if !iszero(δ) && !isone(ω[1])
-        ηₛ, ηₑ = mapped(ε, δ, ω..., remap)
+        ηₛ, ηₑ = transform(ε, δ, ω..., remap)
     elseif !iszero(δ)
         ηₛ = translate(ε, δ, remap)
         ηₑ = I
@@ -111,8 +110,8 @@ function elliptical(ξ::Float64, φ::Float64, remap::Dict)
     return ηₑ
 end
 
-# translational + elliptical transforms under a fully mapped order
-function mapped(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64, remap::Dict)
+# translate + elliptical
+function transform(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64, remap::Dict)
     ρₜ, θₜ = abs(δ), angle(δ)
     len = length(remap)
     n_max = get_n(len - 1)
@@ -128,7 +127,7 @@ function mapped(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64, remap::Di
             m′ = m - p + q
             z = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ei((p-q)θₜ)
             ηₛ[remap[(m′, n′)], i] += z
-            # elliptical transform
+            # elliptical pupil transform
             m′ = m - 2p + 2q
             z = 0.5^n * b(k2,p) * b(k3,q) * (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ei(2(p-q)φ)
             ηₑ[remap[(m′, n)], i] += z
@@ -166,39 +165,39 @@ function to_real(c::Vector{Complex{Float64}}, order::Vector{Tuple{Int, Int, Int}
     return v2
 end
 
-function S(v::Vector{T}, ε::T, δ::Complex{T} = 0.0im,
+function P(v::Vector{T}, ε::T, δ::Complex{T} = 0.0im,
            ϕ::T = 0.0, ω::Tuple{T, T} = (1.0, 0.0);
            precision = 3, scale::Int = 101) where T <: Float64
-    v2, n_max = transform(v, ε, δ, ϕ, ω)
+    v2, n_max = S(v, ε, δ, ϕ, ω)
     Zᵢ = Vector{Polynomial}(undef, length(v))
     ΔW, b = Ψ(v2, Zᵢ, n_max; precision)
     Λ(ΔW, b, v2, n_max; scale)
 end
 
-function S(v::Vector{T}, ε::T, ::Model;
+function P(v::Vector{T}, ε::T, ::Model;
            precision = 3) where T <: Float64
-    v2, n_max = transform(v, ε, 0.0im, zero(T), (1.0, 0.0))
+    v2, n_max = S(v, ε, 0.0im, zero(T), (1.0, 0.0))
     Zᵢ = Vector{Polynomial}(undef, length(v))
     Ψ(v2, Zᵢ, n_max; precision)[1]
 end
 
-function S(v::Vector{T}, ε::T, δ::Complex{T}, ::Model;
+function P(v::Vector{T}, ε::T, δ::Complex{T}, ::Model;
            precision = 3) where T <: Float64
-    v2, n_max = transform(v, ε, δ, zero(T), (1.0, 0.0))
+    v2, n_max = S(v, ε, δ, zero(T), (1.0, 0.0))
     Zᵢ = Vector{Polynomial}(undef, length(v))
     Ψ(v2, Zᵢ, n_max; precision)[1]
 end
 
-function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ::Model;
+function P(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ::Model;
            precision = 3) where T <: Float64
-    v2, n_max = transform(v, ε, δ, ϕ, (1.0, 0.0))
+    v2, n_max = S(v, ε, δ, ϕ, (1.0, 0.0))
     Zᵢ = Vector{Polynomial}(undef, length(v))
     Ψ(v2, Zᵢ, n_max; precision)[1]
 end
 
-function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T, T}, ::Model;
+function P(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T, T}, ::Model;
            precision = 3) where T <: Float64
-    v2, n_max = transform(v, ε, δ, ϕ, ω)
+    v2, n_max = S(v, ε, δ, ϕ, ω)
     Zᵢ = Vector{Polynomial}(undef, length(v))
     Ψ(v2, Zᵢ, n_max; precision)[1]
 end
