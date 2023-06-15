@@ -96,9 +96,9 @@ function get_j(noll::Int)
     if noll < 1
         error("Noll index must be ≥ 1\n")
     end
-    n::Int = floor(√(2noll - 1) + 0.5) - 1
-    t = 2noll - (n + 1)n + 1
-    m::Int = iseven(n) ? 2floor(t/4) : 2floor((t+1)/4)-1
+    n::Int = trunc(√(2noll - 1) + 0.5) - 1
+    n_mod_2 = isodd(n)
+    m::Int = 2((2noll - (n + 1)n + 1 + n_mod_2) ÷ 4) - n_mod_2
     m = flipsign(m, iseven(noll) ? 1 : -1)
     get_j(m, n)
 end
