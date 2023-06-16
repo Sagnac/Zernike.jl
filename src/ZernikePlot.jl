@@ -1,6 +1,6 @@
 import GLMakie: GLFW.GetPrimaryMonitor, MonitorProperties
 
-function ZPlot(ρ, θ, Zp; titles...)
+function ZPlot(ρ, θ, Zp; high_order = false, titles...)
     monitor_properties = MonitorProperties(GetPrimaryMonitor())
     (; height) = monitor_properties.videomode
     resolution = (0.85height, height/2)
@@ -21,6 +21,10 @@ function ZPlot(ρ, θ, Zp; titles...)
     ρᵧ = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
     fig = Figure(; resolution)
     axis3 = Axis3(fig[1,1]; axis3attributes...)
+    if high_order
+        Zp = @. sign(Zp) * log10(abs(Zp * log(10)) + 1)
+        axis3.title[] = "Log transform of $(titles[:plot])"
+    end
     surface!(axis3, ρᵪ, ρᵧ, Zp; colormap = :oslo)
     # hacky way to produce a top-down heatmap-style view without generating
     # another plot with a different set of data
