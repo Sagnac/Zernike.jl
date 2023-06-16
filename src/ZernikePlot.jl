@@ -37,9 +37,9 @@ function ZPlot(ρ, θ, Zp; high_order = false, titles...)
         :zspinesvisible,
     )
     label = Label(fig, "Pupil view"; fontsize = 0.76fontsize)
-    pupil = Toggle(fig)
+    pupil = Toggle(fig; active = true)
     fig[1,2] = grid!([label pupil]; tellheight = false, valign = :bottom)
-    on(pupil.active) do active
+    on(pupil.active; update = true) do active
         for property in zproperties
             getfield(axis3, property)[] = !active
         end
