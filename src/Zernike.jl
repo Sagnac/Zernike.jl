@@ -171,7 +171,7 @@ function Z(m::Int, n::Int; scale::Int = 100)
     if n ≥ 48
         high_order = true
         println()
-        @info "Coefficients are stored in the coeffs field of the current output."
+        @info "Coefficients are stored in the coeffs field of the current output." γ
     else
         high_order = false
         print("Z = ", Z_Unicode)
