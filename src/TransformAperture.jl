@@ -24,6 +24,7 @@ function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <
     N = zeros(Float64, len, len)
     # radial coefficient block-diagonal matrix
     R = copy(N)
+    λ = Φ(n_max, n_max)
     # scaling
     if iszero(δ)
         ηₛ = copy(N)
@@ -39,9 +40,9 @@ function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <
             push!(remap, (m, n) => i)
             push!(order, (get_j(m, n) + 1, get_j(-m, n) + 1, sign(m)))
             N[i,i] = √(n+1)
-            λ = Φ(μ, n)
+            γ = λ[get_i(μ, n)]
             for s = 0:k1
-                setindex!(R, λ[n-2s+1], remap[(m, n-2s)], i)
+                setindex!(R, γ[n-2s+1], remap[(m, n-2s)], i)
             end
             if !iszero(ϕ)
                 ηᵣ[i,i] = ei(m * ϕ)

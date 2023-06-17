@@ -29,11 +29,6 @@ function Φ(m_max::Int, n_max::Int)
             """
         )
     end
-    if m_max == n_max
-        λᵢ = zeros(Float64, n_max + 1)
-        λᵢ[end] = 1.0
-        return λᵢ
-    end
     λ = Vector{Float64}[]
     i = 0
     n_even = true
@@ -53,5 +48,5 @@ function Φ(m_max::Int, n_max::Int)
             push!(λ, λᵢ)
         end
     end
-    return λ[end]
+    return λ
 end

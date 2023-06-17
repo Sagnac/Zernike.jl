@@ -145,7 +145,7 @@ function Zf(m::Int, n::Int)
     # power (exponent)
     ν = Int[n - 2s for s = 0:k]
     # polynomial coefficients
-    λ = Φ(μ, n)
+    λ = μ == n ? ones(Float64, n + 1) : Φ(μ, n)[end]
     γ = Float64[λ[νᵢ+1] for νᵢ in ν]
     # γ = Float64[λ(μ, n, s, k) for s = 0:k]
     inds = (j = j, n = n, m = m)
