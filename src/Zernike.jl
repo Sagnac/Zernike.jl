@@ -10,7 +10,7 @@ module Zernike
 export Z, W, P, Model
 
 using GLMakie
-import GLMakie: Makie.latexstring, Makie.LaTeXString
+import .Makie: latexstring, LaTeXString
 import Base: show, getindex, iterate
 
 const ∑ = sum
