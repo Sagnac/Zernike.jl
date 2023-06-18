@@ -7,7 +7,7 @@
 
 module Zernike
 
-export Z, W, P, Model
+export Z, W, P, Model, noll_to_j, standardize, fringe_to_j, standardize!
 
 using GLMakie
 import .Makie: latexstring, LaTeXString
@@ -90,8 +90,7 @@ function get_mn(j)
     return m, n
 end
 
-# converts Noll indices to ANSI standard indices
-function get_j(noll::Int)
+function noll_to_j(noll::Int)
     if noll < 1
         error("Noll index must be ≥ 1\n")
     end
@@ -102,8 +101,32 @@ function get_j(noll::Int)
     get_j(m, n)
 end
 
-# re-orders a Noll specified Zernike expansion coefficient vector according to ANSI
-standardize!(v::Vector) = invpermute!(v, [get_j(i) + 1 for i in eachindex(v)])
+function standardize!(noll::Vector)
+    invpermute!(noll, [noll_to_j(i) + 1 for i in eachindex(noll)])
+end
+
+function fringe_to_j(fringe::Int)
+    fringe ∉ 1:37 && error("Invalid Fringe index. fringe ∈ 1:37\n")
+    if fringe == 37
+        return get_j(0, 12)
+    end
+    d = trunc(√(fringe - 1)) + 1
+    d2 = d^2 - fringe
+    d2_mod_2 = isodd(d2)
+    m::Int = (d2 + d2_mod_2) ÷ 2
+    m = flipsign(m, d2_mod_2 ? -1 : 1)
+    n::Int = 2(d - 1) - abs(m)
+    get_j(m, n)
+end
+
+function standardize(fringe::Vector)
+    j = fringe_to_j.(eachindex(fringe))
+    a = zeros(eltype(fringe), maximum(j) + 1)
+    # normalize
+    N = broadcast(x -> √radicand(x...), get_mn.(j))
+    a[j.+1] = fringe ./ N
+    return a
+end
 
 function radicand(m, n)
     # Kronecker delta δ_{m0}
