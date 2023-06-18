@@ -20,7 +20,6 @@ struct Model end
 struct RadialPolynomial
     γ::Vector{Float64}
     ν::Vector{Int}
-    k::Int
 end
 
 struct Sinusoid
@@ -49,8 +48,8 @@ include("TransformAperture.jl")
 include("Docstrings.jl")
 
 function (R::RadialPolynomial)(ρ)::Float64
-    (; γ, ν, k) = R
-    ∑(γ[i] * ρ ^ ν[i] for i = 1:k+1)
+    (; γ, ν) = R
+    ∑(γ .* ρ .^ ν)
 end
 
 function (M::Sinusoid)(θ)::Float64
@@ -137,7 +136,7 @@ function Zf(m::Int, n::Int)
     if n < 0 || μ > n || isodd(n - μ)
         error("Bounds:\nn ≥ 0\n|m| ≤ n\nn - |m| even\n")
     end
-    # upper bound for the sum (number of terms -1 [indexing from zero])
+    # upper bound for the sum (number of terms - 1 [indexing from zero])
     k = (n - μ) ÷ 2
     j = get_j(m, n)
     # normalization constant following the orthogonality relation
@@ -150,7 +149,7 @@ function Zf(m::Int, n::Int)
     # γ = Float64[λ(μ, n, s, k) for s = 0:k]
     inds = (j = j, n = n, m = m)
     # radial polynomial
-    R = RadialPolynomial(γ, ν, k)
+    R = RadialPolynomial(γ, ν)
     # azimuthal / meridional component
     M = Sinusoid(m)
     # Zernike polynomial

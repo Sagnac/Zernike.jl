@@ -7,8 +7,9 @@ using Printf
 function format_strings(Z::Polynomial)
     (; j, n, m) = Z.inds
     N = Z.N
-    (; γ, ν, k) = Z.R
+    (; γ, ν) = Z.R
     μ = abs(m)
+    k = length(γ) - 1
     γₛ = [@sprintf "%d" abs(γᵢ) for γᵢ ∈ γ]
     UNICODE = ones(String, 3)
     LaTeX = ones(String, 3)
