@@ -10,9 +10,8 @@ https://www.jeos.org/index.php/jeos_rp/article/view/07012
 
 function Π(v::Vector{T}, ε::T) where T <: Float64
     !(0.0 ≤ ε ≤ 1.0) && error("Bounds: 0.0 ≤ ε ≤ 1.0\n")
-    j_max::Int = length(v) - 1
-    n_max::Int = get_n(j_max)
-    v2 = Vector{Float64}(undef, j_max + 1)
+    len, n_max = validate_length(v)
+    v2 = Vector{Float64}(undef, len)
     n = 0
     m = 0
     for i in eachindex(v)

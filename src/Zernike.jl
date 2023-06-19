@@ -102,6 +102,7 @@ function noll_to_j(noll::Int)
 end
 
 function standardize!(noll::Vector)
+    validate_length(noll)
     invpermute!(noll, [noll_to_j(i) + 1 for i in eachindex(noll)])
 end
 
@@ -128,6 +129,21 @@ function standardize(fringe::Vector)
     N = broadcast(x -> √radicand(x...), get_mn.(j))
     a[j.+1] = fringe ./ N
     return a
+end
+
+function validate_length(v::Vector)
+    len = length(v)
+    j_max = len - 1
+    n_max = get_n(j_max)
+    if j_max ≠ get_j(n_max, n_max)
+        error(
+            """
+            Invalid number of coefficients.
+            Coefficients for Zernike polynomials up to m = n_max, n = n_max required.
+            """
+        )
+    end
+    return len, n_max
 end
 
 function radicand(m, n)
