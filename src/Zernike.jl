@@ -121,7 +121,9 @@ end
 
 function standardize(fringe::Vector)
     j = fringe_to_j.(eachindex(fringe))
-    a = zeros(eltype(fringe), maximum(j) + 1)
+    n_max = get_n(maximum(j))
+    j_max = get_j(n_max, n_max)
+    a = zeros(eltype(fringe), j_max + 1)
     # normalize
     N = broadcast(x -> √radicand(x...), get_mn.(j))
     a[j.+1] = fringe ./ N
