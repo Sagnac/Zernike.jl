@@ -1,4 +1,4 @@
-#= This algorithm is based on a formula presented by Janssen and Dirksen in:
+#= This algorithm is based on a formula presented in:
 
 https://doi.org/10.2971/jeos.2007.07012
 

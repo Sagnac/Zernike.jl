@@ -2,7 +2,11 @@
     Z(m, n)
     Z(j)
 
-Plots a Zernike polynomial of azimuthal order `m` and radial degree `n`. The single index `j` begins at zero and follows the ANSI / OSA standard. Returns three values contained within a Zernike.Output type, with fields:
+Plot a Zernike polynomial of azimuthal order `m` and radial degree `n`.
+
+The single index `j` begins at zero and follows the ANSI Z80.28-2004 / ISO 24157:2008 / Optica (OSA) standard.
+
+Returns three values contained within a Zernike.Output type, with fields:
 
 1. `fig`: the Makie figure;
 2. `coeffs`: vector of radial polynomial coefficients;
@@ -14,13 +18,15 @@ The coefficients belong to terms with exponent `n - 2(i - 1)` where `i` is the v
 
 The radial polynomial coefficients are computed using a fast and accurate algorithm suitable for high orders; it is based on a recursive relation presented by Honarvar & Paramesran (2013) doi:10.1364/OL.38.002487.
 
+See also [`W`](@ref), [`P`](@ref).
+
 ----
 
 # Positional argument options:
 
     Z(m, n, Model())
 
-Returns the Zernike polynomial function `Z(ρ, θ)` corresponding to indices `m` and `n`.
+Return the Zernike polynomial function `Z(ρ, θ)` corresponding to indices `m` and `n`.
 
 # Keyword argument options:
 
@@ -34,25 +40,33 @@ Z
     W(ρ, θ, OPD, n_max)
     W(data::Matrix, n_max; options...)
 
-Estimates wavefront error by expressing optical aberrations as a linear combination of weighted Zernike polynomials using a linear least squares method. This representation as an expanded series is approximate, especially if the phase field is not sufficiently sampled.
+Fit wavefront errors up to order n_max.
+
+Estimates wavefront error by expressing optical aberrations as a linear combination of weighted Zernike polynomials using a linear least squares method. The accuracy of this type of wavefront reconstruction represented as an expanded series depends upon a sufficiently sampled phase field and a suitable choice of the fitting order n_max.
+
+# Main arguments
 
 `ρ`, `θ`, and `OPD` must be vectors of equal length; at each specific index the values are elements of an ordered triple over the exit pupil.
 
-* `ρ`: normalized radial exit pupil variable `{0 ≤ ρ ≤ 1}`;
+* `ρ`: normalized radial exit pupil position variable `{0 ≤ ρ ≤ 1}`;
 * `θ`: angular exit pupil variable in radians `(mod 2π)`, defined positive counter-clockwise from the horizontal x-axis;
 * `OPD`: measured optical path difference in waves;
 * `n_max`: maximum radial degree to fit to.
 
 The phase profile data can also be input as a 3 column matrix.
 
+# Return values
+
 Returns four values contained within a WavefrontOutput type, with fields:
 
 1. `a`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients rounded according to `precision`;
-2. `v`: full vector of Zernike expansion coefficients;
-3. `metrics`: 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio;
+2. `v`: full vector of Zernike wavefront error expansion coefficients;
+3. `metrics`: named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio;
 4. `fig`: the plotted Makie figure.
 
 These can also be accessed through indexing and regular non-property destructuring.
+
+See also [`Z`](@ref), [`P`](@ref).
 
 ----
 
@@ -66,7 +80,7 @@ Method accepting normalized Cartesian coordinate data.
 
     W(ρ, θ, OPD, n_max, Model())
 
-Returns the wavefront error function `ΔW(ρ, θ)` corresponding to an `n_max` fit.
+Return the wavefront error function `ΔW(ρ, θ)` corresponding to an `n_max` fit.
 
 # Keyword argument options:
 
@@ -81,39 +95,62 @@ Returns the wavefront error function `ΔW(ρ, θ)` corresponding to an `n_max` f
 W
 
 """
-    S(ε::Float64, v::Vector{Float64})
+    P(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <: Float64
 
-Pupil scaling function which computes a new set of Zernike expansion coefficients under aperture down-scaling and plots the result.
+Compute a new set of Zernike wavefront error expansion coefficients under a given set of transformation factors and plot the result.
 
-* `ε`: scaling factor `{0 ≤ ε ≤ 1}`;
+Available transformations are scaling, translation, & rotation for circular and elliptical exit pupils. These are essentially coordinate transformations in the pupil plane over the wavefront map.
+
+# Main arguments
+
 * `v`: vector of full Zernike expansion coefficients ordered in accordance with the ANSI / OSA single index standard. This is the `v` vector returned by the wavefront error fitting function `W(ρ, θ, OPD, n_max)`.
+* `ε`: scaling factor `{0 ≤ ε ≤ 1}`;
+* `δ`: translational complex coordinates (displacement of the pupil center in the complex plane);
+* `ϕ`: rotation of the pupil in radians `(mod 2π)`, defined positive counter-clockwise from the horizontal x-axis;
+* `ω`: elliptical pupil transform parameters; 2-tuple where `ω[1]` is the ratio of the minor radius to the major radius of the ellipse and `ω[2]` is the angle defined positive counter-clockwise from the horizontal coordinate axis of the exit pupil to the minor axis of the ellipse.
 
-`ε` = `r₂/r₁` where `r₂` is the new radius, `r₁` the original
+The order the transformations are applied is:\\
+scaling --> translation --> rotation --> elliptical transform.
 
-In particular the radial variable corresponding to the rescaled exit pupil is normalized such that:\\
-`ρ` = `r/r₂`; `{0 ≤ ρ ≤ 1}`\\
-`r`: radial pupil position, `r₂`: max. radius\\
-`W₂(ρ₂)` = `W₁(ερ₂)`
+The translation, rotation, and elliptical arguments are optional.
 
-The rescaled expansion coefficients are computed using a fast and accurate algorithm suitable for high orders; it is based on a formula presented by Janssen & Dirksen (2007) doi:10.2971/jeos.2007.07012.
+See also [`Z`](@ref), [`W`](@ref).
+
+----
 
 # Positional argument options:
 
-    S(ε, v, Model())
+    P(v, ε, δ, ϕ, ω, Model())
 
-Returns the wavefront error function `ΔW(ρ, θ)` corresponding to an `ε` aperture scaling.
+Return the wavefront error function `ΔW(ρ, θ)` corresponding to the input transform parameters.
 
 # Keyword argument options:
 
-    S(ε, v; precision = 3, scale::Int)
+    P(v, ε, δ, ϕ, ω; precision = 3, scale::Int)
 
 * `precision`: number of digits to use after the decimal point in computing the expansion coefficients. Results will be rounded according to this precision and any polynomials with zero-valued coefficients will be ignored when pulling in the Zernike functions while constructing the composite wavefront error; this means lower precision values yield faster results.
 
 \u2063\u2063\u2063\u2063 If you want full 64-bit floating-point precision use `precision = "full"`.
 
 * `scale`: `{1 ≤ scale ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 1 million.
+
+# Extended help
+
+`ε` = `r₂/r₁` where `r₂` is the new smaller radius, `r₁` the original
+
+In particular the radial variable corresponding to the rescaled exit pupil is normalized such that:\\
+`ρ` = `r/r₂`; `{0 ≤ ρ ≤ 1}`\\
+`r`: radial pupil position, `r₂`: max. radius\\
+`ΔW₂(ρ₂, θ)` = `ΔW₁(ερ₂, θ)`
+
+For translation the shift must be within the bounds of the scaling applied such that:\\
+`0.0 ≤ ε + |δ| ≤ 1.0`.
+
+For elliptical pupils (usually the result of measuring the wavefront off-axis), the major radius is defined such that it equals the radius of the circle and so `ω[1]` is the fraction of the circular pupil covered by the minor radius (this is approximated well by a cosine projection factor for angles up to 40 degrees); `ω[2]` is then the direction of the stretching applied under transformation in converting the ellipse to a circle before fitting the expansion coefficients.
+
+The transformed expansion coefficients are computed using a fast and accurate algorithm suitable for high orders; it is based on a formulation presented by Lundström & Unsbo (2007) doi:10.1364/JOSAA.24.000569.
 """
-S
+P
 
 """
 `Zernike.Polynomial`
@@ -126,6 +163,8 @@ Fields:
 2. `N`: normalization factor;
 3. `R`: RadialPolynomial callable type: function `R(ρ)`;
 4. `M`: Sinusoid callable type: function `M(θ)`.
+
+See also [`Zernike.WavefrontError`](@ref).
 """
 Polynomial
 
@@ -142,5 +181,49 @@ Fields:
 2. `n_max`: maximum radial degree fit to;
 3. `a`: vector of the Zernike expansion coefficients used in the fit;
 4. `Z`: the respective Zernike polynomial functions.
+
+See also [`Zernike.Polynomial`](@ref).
 """
 WavefrontError
+
+"""
+    noll_to_j(noll::Int)
+
+Convert Noll indices to ANSI standard indices.
+
+See also [`fringe_to_j`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
+"""
+noll_to_j
+
+"""
+    standardize!(noll::Vector)
+
+Re-order a Noll specified Zernike expansion coefficient vector according to the ANSI standard.
+
+This requires a full ordered vector up to n_max.
+
+See also [`standardize`](@ref), [`noll_to_j`](@ref), [`fringe_to_j`](@ref).
+"""
+standardize!
+
+"""
+    fringe_to_j(fringe::Int)
+
+Convert Fringe indices to ANSI standard indices.
+
+Only indices 1:37 are valid.
+
+See also [`noll_to_j`](@ref), [`standardize`](@ref), [`standardize!`](@ref).
+"""
+fringe_to_j
+
+"""
+    standardize(fringe::Vector)
+
+Format a Fringe specified Zernike expansion coefficient vector according to the ANSI standard.
+
+This function expects unnormalized coefficients; the input coefficients will be re-ordered and normalized in line with the orthonormal standard. As Fringe is a 37 polynomial subset of the full set of Zernike polynomials any coefficients in the standard order missing a counterpart in the input vector will be set to zero.
+
+See also [`standardize!`](@ref), [`fringe_to_j`](@ref), [`noll_to_j`](@ref).
+"""
+standardize
