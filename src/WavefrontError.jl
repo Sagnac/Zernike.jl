@@ -1,6 +1,7 @@
 struct WavefrontError
     i::Vector{NamedTuple{(:j, :n, :m, :a), Tuple{Int, Int, Int, Float64}}}
     n_max::Int
+    fit_to::Vector{Tuple{Int, Int}}
     a::Vector{Float64}
     Z::Vector{Polynomial}
 end
@@ -18,21 +19,26 @@ function (ΔW::WavefrontError)(ρ, θ)::Float64
 end
 
 # fitting function (construction function 1)
-function Wf(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int)
+function Wf(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int,
+            orders::Vector{Tuple{Int, Int}} = Tuple{Int, Int}[])
     if !allequal(length.((ρ, θ, OPD)))
         error("Vectors must be of equal length.\n")
     end
-    j_max = get_j(n_max, n_max)
-    Zᵢ = Polynomial[Z(j, Model()) for j = 0:j_max]
+    if isempty(orders)
+        j_max = get_j(n_max, n_max)
+        Zᵢ = Polynomial[Z(j, Model()) for j = 0:j_max]
+    else
+        Zᵢ = Polynomial[Zf(mn...) for mn ∈ orders]
+    end
     # linear least squares
-    A = reduce(hcat, Zᵢ[i].(ρ, θ) for i = 1:j_max+1)
+    A = reduce(hcat, Z.(ρ, θ) for Z ∈ Zᵢ)
     # Zernike expansion coefficients
     v = A isa Matrix ? A \ OPD : [A \ OPD]
-    return v, Zᵢ, n_max
+    return v, Zᵢ
 end
 
 # filtering function (construction function 2)
-function Ψ(v, Zᵢ, n_max; precision)
+function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision)
     if precision ≠ "full" && !isa(precision, Int)
         precision = 3
     end
@@ -52,9 +58,13 @@ function Ψ(v, Zᵢ, n_max; precision)
             push!(Zₐ, Zᵢ[i])
         end
     end
+    # pad the output coefficient vector if needed
+    if !isempty(orders)
+        v = standardize(v, orders)
+    end
     # create the fitted polynomial
-    ΔW = WavefrontError(a, n_max, av, Zₐ)
-    return ΔW, a
+    ΔW = WavefrontError(a, n_max, orders, av, Zₐ)
+    return ΔW, a, v
 end
 
 # synthesis function
@@ -87,6 +97,14 @@ function W(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int; precision = 3, scale
     Λ(ΔW, a, v, n_max; scale)
 end
 
+function W(ρ::Vector, θ::Vector, OPD::Vector,
+           orders::Vector{Tuple{Int, Int}}; precision = 3, scale = 101)
+    n_max = maximum(mn -> mn[2], orders; init = 0)
+    v, Zᵢ = Wf(ρ, θ, OPD, n_max, orders)
+    ΔW, a, v = Ψ(v, Zᵢ, n_max, orders; precision)
+    Λ(ΔW, a, v, n_max; scale)
+end
+
 # overload show to clean up the output
 function show(io::IO, W::T) where {T <: WavefrontError}
     strip3 = map(-, displaysize(io), (3, 0))
@@ -111,9 +129,27 @@ getindex(W::T, i) where {T <: WavefrontOutput} = getfield(W, fieldnames(T)[i])
 # hook into iterate to allow non-property destructuring of the output
 iterate(W::WavefrontOutput, i = 1) = (i > 4 ? nothing : (W[i], i + 1))
 
+# pads a subset Zernike expansion coefficient vector to standard length
+function standardize(v_sub::Vector, orders::Vector{Tuple{Int, Int}})
+    j = [get_j(mn...) for mn in orders]
+    n_max = get_n(maximum(j))
+    j_max = get_j(n_max, n_max)
+    v_padded = zeros(eltype(v_sub), j_max + 1)
+    v_padded[j.+1] .= v_sub
+    return v_padded
+end
+
 # methods
 function W(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int, ::Model; precision = 3)
-    return Ψ(Wf(ρ, θ, OPD, n_max)...; precision)[1]
+    v, Zᵢ = Wf(ρ, θ, OPD, n_max)
+    return Ψ(v, Zᵢ, n_max; precision)[1]
+end
+
+function W(ρ::Vector, θ::Vector, OPD::Vector,
+           orders::Vector{Tuple{Int, Int}}, ::Model; precision = 3)
+    n_max = maximum(mn -> mn[2], orders; init = 0)
+    v, Zᵢ = Wf(ρ, θ, OPD, n_max, orders)
+    return Ψ(v, Zᵢ, n_max, orders; precision)[1]
 end
 
 W(; r, t, OPD, n_max, options...) = W(r, t, OPD, n_max; options...)
