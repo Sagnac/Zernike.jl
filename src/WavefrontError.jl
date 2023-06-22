@@ -27,7 +27,7 @@ function Wf(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int)
     # linear least squares
     A = reduce(hcat, Zᵢ[i].(ρ, θ) for i = 1:j_max+1)
     # Zernike expansion coefficients
-    v::Vector{Float64} = A \ OPD
+    v = A isa Matrix ? A \ OPD : [A \ OPD]
     return v, Zᵢ, n_max
 end
 
