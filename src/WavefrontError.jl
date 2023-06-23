@@ -85,7 +85,7 @@ function metrics(v, ΔWp)
     # RMS wavefront error
     # where σ² is the variance (second central moment about the mean)
     # the mean is the first a00 piston term
-    σ = ∑(v[i]^2 for i = 2:lastindex(v)) |> sqrt
+    σ = sqrt(∑(v.^2) - v[1]^2)
     Strehl_ratio = exp(-(2π * σ)^2)
     return (PV = PV, RMS = σ, Strehl = Strehl_ratio)
 end
