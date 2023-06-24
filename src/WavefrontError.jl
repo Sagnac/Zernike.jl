@@ -18,23 +18,27 @@ function (ΔW::WavefrontError)(ρ, θ)::Float64
     ∑(aᵢ * Z[i](ρ, θ) for (i, aᵢ) ∈ pairs(a))
 end
 
-# fitting function (construction function 1)
-function Wf(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int,
-            orders::Vector{Tuple{Int, Int}} = Tuple{Int, Int}[])
+function fit(ρ::Vector, θ::Vector, OPD::Vector, Zᵢ::Vector{Polynomial})
     if !allequal(length.((ρ, θ, OPD)))
         error("Vectors must be of equal length.\n")
-    end
-    if isempty(orders)
-        j_max = get_j(n_max, n_max)
-        Zᵢ = Polynomial[Z(j, Model()) for j = 0:j_max]
-    else
-        Zᵢ = Polynomial[Zf(mn...) for mn ∈ orders]
     end
     # linear least squares
     A = reduce(hcat, Z.(ρ, θ) for Z ∈ Zᵢ)
     # Zernike expansion coefficients
     v = A isa Matrix ? A \ OPD : [A \ OPD]
     return v, Zᵢ
+end
+
+# fitting function (construction function 1)
+function Wf(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int)
+    j_max = get_j(n_max, n_max)
+    Zᵢ = Polynomial[Z(j, Model()) for j = 0:j_max]
+    fit(ρ, θ, OPD, Zᵢ)
+end
+
+function Wf(ρ::Vector, θ::Vector, OPD::Vector, orders::Vector{Tuple{Int, Int}})
+    Zᵢ = Polynomial[Zf(mn...) for mn ∈ orders]
+    fit(ρ, θ, OPD, Zᵢ)
 end
 
 # filtering function (construction function 2)
@@ -100,7 +104,7 @@ end
 function W(ρ::Vector, θ::Vector, OPD::Vector,
            orders::Vector{Tuple{Int, Int}}; precision = 3, scale = 101)
     n_max = maximum(mn -> mn[2], orders; init = 0)
-    v, Zᵢ = Wf(ρ, θ, OPD, n_max, orders)
+    v, Zᵢ = Wf(ρ, θ, OPD, orders)
     ΔW, a, v = Ψ(v, Zᵢ, n_max, orders; precision)
     Λ(ΔW, a, v, n_max; scale)
 end
@@ -148,20 +152,20 @@ end
 function W(ρ::Vector, θ::Vector, OPD::Vector,
            orders::Vector{Tuple{Int, Int}}, ::Model; precision = 3)
     n_max = maximum(mn -> mn[2], orders; init = 0)
-    v, Zᵢ = Wf(ρ, θ, OPD, n_max, orders)
+    v, Zᵢ = Wf(ρ, θ, OPD, orders)
     return Ψ(v, Zᵢ, n_max, orders; precision)[1]
 end
 
-W(; r, t, OPD, n_max, options...) = W(r, t, OPD, n_max; options...)
+W(; r, t, OPD, fit_to, options...) = W(r, t, OPD, fit_to; options...)
 
-function W(x::Vector, y::Vector, OPD::Vector; n_max::Int, options...)
+function W(x::Vector, y::Vector, OPD::Vector; fit_to, options...)
     ρ = hypot.(x, y)
     θ = atan.(y, x)
-    W(ρ, θ, OPD, n_max; options...)
+    W(ρ, θ, OPD, fit_to; options...)
 end
 
-function W(data::Matrix, n_max::Int; options...)
-    W((data[:, i] for i = 1:3)..., n_max; options...)
+function W(data::Matrix, fit_to; options...)
+    W((data[:, i] for i = 1:3)..., fit_to; options...)
 end
 
-W(data; n_max, options...) = W(data, n_max; options...)
+W(data; fit_to, options...) = W(data, fit_to; options...)
