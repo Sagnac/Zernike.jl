@@ -83,13 +83,13 @@ function Λ(ΔW, a, v, n_max; scale::Int)
     WavefrontOutput(a, v, metrics(v, ΔWp), fig)
 end
 
-function metrics(v, ΔWp)
+function metrics(v::Vector, ΔWp::Matrix)
     # Peak-to-valley wavefront error
     PV = maximum(ΔWp) - minimum(ΔWp)
     # RMS wavefront error
     # where σ² is the variance (second central moment about the mean)
     # the mean is the first a00 piston term
-    σ = sqrt(∑(v.^2) - v[1]^2)
+    σ = sqrt(v' * v - v[1]^2)
     Strehl_ratio = exp(-(2π * σ)^2)
     return (PV = PV, RMS = σ, Strehl = Strehl_ratio)
 end

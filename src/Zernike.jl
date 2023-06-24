@@ -49,7 +49,7 @@ include("Docstrings.jl")
 
 function (R::RadialPolynomial)(ρ)::Float64
     (; γ, ν) = R
-    ∑(γ .* ρ .^ ν)
+    γ⋅ρ.^ν
 end
 
 function (M::Sinusoid)(θ)::Float64
