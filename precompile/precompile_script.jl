@@ -1,7 +1,7 @@
 using Zernike
 
 # uniform sampling over the unit disk
-ρ = range(0, 1, 21)
+ρ = range(0.0, 1.0, 21)
 OPD = stack(2sinc.(5ρ) for i = 1:21; dims = 1)
 fig, coeffs, latex = Z(0, 4)
 wait(fig.scene.current_screens[])

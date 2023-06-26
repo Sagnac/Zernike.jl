@@ -69,8 +69,8 @@ function polar(m, n; scale::Int = 100)
     ϵ₁ = clamp(ϵ₁, ϵ₁, 1000)
     ϵ₂ = scale * (2m + 1)
     ϵ₂ = clamp(ϵ₂, ϵ₂, 1000)
-    ρ = range(0, 1, ϵ₁)
-    θ = range(0, 2π, ϵ₂)
+    ρ = range(0.0, 1.0, ϵ₁)
+    θ = range(0.0, 2π, ϵ₂)
     return ρ, θ
 end
 

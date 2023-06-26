@@ -180,8 +180,8 @@ end
 # extract pupil coordinates
 function coords(OPD::FloatMat)
     u, v = size(OPD)
-    ρ = repeat(range(0, 1, v); inner = u)
-    θ = repeat(range(0, 2π, u); outer = v)
+    ρ = repeat(range(0.0, 1.0, v); inner = u)
+    θ = repeat(range(0.0, 2π, u); outer = v)
     return ρ, θ
 end
 
