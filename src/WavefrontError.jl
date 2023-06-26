@@ -164,8 +164,26 @@ function W(x::Vector, y::Vector, OPD::Vector; fit_to, options...)
     W(ρ, θ, OPD, fit_to; options...)
 end
 
-function W(data::Matrix, fit_to; options...)
-    W((data[:, i] for i = 1:3)..., fit_to; options...)
+# [ρ θ OPD] input format
+# W(split_data(data)..., fit_to, etc.)
+function split_data(data::Matrix)
+    (data[:, i] for i = 1:3)
 end
 
-W(data; fit_to, options...) = W(data, fit_to; options...)
+# extract pupil coordinates
+function coords(OPD::Matrix)
+    u, v = size(OPD)
+    ρ = repeat(range(0, 1, v); inner = u)
+    θ = repeat(range(0, 2π, u); outer = v)
+    return ρ, θ
+end
+
+# assumes dim(θ) x dim(ρ) matrix polar mapping
+# W(OPD', fit_to, etc.) for dim(ρ) x dim(θ) matrix
+function W(OPD::Matrix, fit_to; options...)
+    W(coords(OPD)..., vec(OPD), fit_to; options...)
+end
+
+function W(OPD::Matrix, fit_to, ::Model; precision = 3)
+    W(coords(OPD)..., vec(OPD), fit_to, Model(); precision)
+end
