@@ -23,9 +23,9 @@ function fit(ρ::Vector, θ::Vector, OPD::Vector, Zᵢ::Vector{Polynomial})
         error("Vectors must be of equal length.\n")
     end
     # linear least squares
-    A = reduce(hcat, Z.(ρ, θ) for Z ∈ Zᵢ)
+    A = stack(Z.(ρ, θ) for Z ∈ Zᵢ)
     # Zernike expansion coefficients
-    v = A isa Matrix ? A \ OPD : [A \ OPD]
+    v = A \ OPD
     return v, Zᵢ
 end
 
