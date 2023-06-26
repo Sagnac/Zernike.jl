@@ -18,7 +18,11 @@ function (ΔW::WavefrontError)(ρ, θ)::Float64
     ∑(aᵢ * Z[i](ρ, θ) for (i, aᵢ) ∈ pairs(a))
 end
 
-function fit(ρ::Vector, θ::Vector, OPD::Vector, Zᵢ::Vector{Polynomial})
+# Type aliases
+const FloatVec = AbstractVector{<:AbstractFloat}
+const FloatMat = AbstractMatrix{<:AbstractFloat}
+
+function fit(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, Zᵢ::Vector{Polynomial})
     if !allequal(length.((ρ, θ, OPD)))
         error("Vectors must be of equal length.\n")
     end
@@ -30,13 +34,14 @@ function fit(ρ::Vector, θ::Vector, OPD::Vector, Zᵢ::Vector{Polynomial})
 end
 
 # fitting function (construction function 1)
-function Wf(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int)
+function Wf(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int)
     j_max = get_j(n_max, n_max)
     Zᵢ = Polynomial[Z(j, Model()) for j = 0:j_max]
     fit(ρ, θ, OPD, Zᵢ)
 end
 
-function Wf(ρ::Vector, θ::Vector, OPD::Vector, orders::Vector{Tuple{Int, Int}})
+function Wf(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
+            orders::Vector{Tuple{Int, Int}})
     Zᵢ = Polynomial[Zf(mn...) for mn ∈ orders]
     fit(ρ, θ, OPD, Zᵢ)
 end
@@ -83,7 +88,7 @@ function Λ(ΔW, a, v, n_max; scale::Int)
     WavefrontOutput(a, v, metrics(v, ΔWp), fig)
 end
 
-function metrics(v::Vector, ΔWp::Matrix)
+function metrics(v::FloatVec, ΔWp::FloatMat)
     # Peak-to-valley wavefront error
     PV = maximum(ΔWp) - minimum(ΔWp)
     # RMS wavefront error
@@ -95,14 +100,15 @@ function metrics(v::Vector, ΔWp::Matrix)
 end
 
 # main interface function
-function W(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int; precision = 3, scale = 101)
+function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int;
+           precision = 3, scale = 101)
     v, Zᵢ = Wf(ρ, θ, OPD, n_max)
     ΔW, a = Ψ(v, Zᵢ, n_max; precision)
     Λ(ΔW, a, v, n_max; scale)
 end
 
-function W(ρ::Vector, θ::Vector, OPD::Vector,
-           orders::Vector{Tuple{Int, Int}}; precision = 3, scale = 101)
+function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, orders::Vector{Tuple{Int, Int}};
+           precision = 3, scale = 101)
     n_max = maximum(mn -> mn[2], orders; init = 0)
     v, Zᵢ = Wf(ρ, θ, OPD, orders)
     ΔW, a, v = Ψ(v, Zᵢ, n_max, orders; precision)
@@ -134,7 +140,7 @@ getindex(W::T, i) where {T <: WavefrontOutput} = getfield(W, fieldnames(T)[i])
 iterate(W::WavefrontOutput, i = 1) = (i > 4 ? nothing : (W[i], i + 1))
 
 # pads a subset Zernike expansion coefficient vector to standard length
-function standardize(v_sub::Vector, orders::Vector{Tuple{Int, Int}})
+function standardize(v_sub::FloatVec, orders::Vector{Tuple{Int, Int}})
     j = [get_j(mn...) for mn in orders]
     n_max = get_n(maximum(j))
     j_max = get_j(n_max, n_max)
@@ -144,12 +150,13 @@ function standardize(v_sub::Vector, orders::Vector{Tuple{Int, Int}})
 end
 
 # methods
-function W(ρ::Vector, θ::Vector, OPD::Vector, n_max::Int, ::Model; precision = 3)
+function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int, ::Model;
+           precision = 3)
     v, Zᵢ = Wf(ρ, θ, OPD, n_max)
     return Ψ(v, Zᵢ, n_max; precision)[1]
 end
 
-function W(ρ::Vector, θ::Vector, OPD::Vector,
+function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
            orders::Vector{Tuple{Int, Int}}, ::Model; precision = 3)
     n_max = maximum(mn -> mn[2], orders; init = 0)
     v, Zᵢ = Wf(ρ, θ, OPD, orders)
@@ -158,7 +165,7 @@ end
 
 W(; r, t, OPD, fit_to, options...) = W(r, t, OPD, fit_to; options...)
 
-function W(x::Vector, y::Vector, OPD::Vector; fit_to, options...)
+function W(x::FloatVec, y::FloatVec, OPD::FloatVec; fit_to, options...)
     ρ = hypot.(x, y)
     θ = atan.(y, x)
     W(ρ, θ, OPD, fit_to; options...)
@@ -166,12 +173,12 @@ end
 
 # [ρ θ OPD] input format
 # W(split_data(data)..., fit_to, etc.)
-function split_data(data::Matrix)
+function split_data(data::FloatMat)
     (data[:, i] for i = 1:3)
 end
 
 # extract pupil coordinates
-function coords(OPD::Matrix)
+function coords(OPD::FloatMat)
     u, v = size(OPD)
     ρ = repeat(range(0, 1, v); inner = u)
     θ = repeat(range(0, 2π, u); outer = v)
@@ -180,10 +187,10 @@ end
 
 # assumes dim(θ) x dim(ρ) matrix polar mapping
 # W(OPD', fit_to, etc.) for dim(ρ) x dim(θ) matrix
-function W(OPD::Matrix, fit_to; options...)
+function W(OPD::FloatMat, fit_to; options...)
     W(coords(OPD)..., vec(OPD), fit_to; options...)
 end
 
-function W(OPD::Matrix, fit_to, ::Model; precision = 3)
+function W(OPD::FloatMat, fit_to, ::Model; precision = 3)
     W(coords(OPD)..., vec(OPD), fit_to, Model(); precision)
 end
