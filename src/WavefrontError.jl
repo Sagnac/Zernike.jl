@@ -173,9 +173,7 @@ end
 
 # [ρ θ OPD] input format
 # W(split_data(data)..., fit_to, etc.)
-function split_data(data::FloatMat)
-    (data[:, i] for i = 1:3)
-end
+split_data(data::FloatMat) = (data[:, i] for i = 1:3)
 
 # extract pupil coordinates
 function coords(OPD::FloatMat)

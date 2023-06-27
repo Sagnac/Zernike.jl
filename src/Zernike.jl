@@ -236,20 +236,12 @@ getindex(Z::T, i) where {T <: Output} = getfield(Z, fieldnames(T)[i])
 iterate(Z::Output, i = 1) = (i > 3 ? nothing : (Z[i], i + 1))
 
 # methods
-function Z(m::Int, n::Int, ::Model)
-    Zf(m, n)
-end
+Z(m::Int, n::Int, ::Model) = Zf(m, n)
 
-function Z(; m, n, scale::Int = 100)
-    Z(m, n; scale)
-end
+Z(; m, n, scale::Int = 100) = Z(m, n; scale)
 
-function Z(j::Int; scale::Int = 100)
-    Z(get_mn(j)...; scale)
-end
+Z(j::Int; scale::Int = 100) = Z(get_mn(j)...; scale)
 
-function Z(j::Int, ::Model)
-    Zf(get_mn(j)...)
-end
+Z(j::Int, ::Model) = Zf(get_mn(j)...)
 
 end
