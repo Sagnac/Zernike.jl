@@ -47,22 +47,22 @@ include("ScaleAperture.jl")
 include("TransformAperture.jl")
 include("Docstrings.jl")
 
-function (R::RadialPolynomial)(ρ)::Float64
+function (R::RadialPolynomial)(ρ)
     (; γ, ν) = R
     γ⋅ρ.^ν
 end
 
-function (M::Sinusoid)(θ)::Float64
+function (M::Sinusoid)(θ)
     (; m) = M
     m < 0 ? -sin(m * θ) : cos(m * θ)
 end
 
-function (Z::Polynomial)(ρ, θ)::Float64
+function (Z::Polynomial)(ρ, θ)
     (; N, R, M) = Z
     N * R(ρ) * M(θ)
 end
 
-function polar(m, n; scale::Int = 100)
+function polar(m::Int, n::Int; scale::Int = 100)
     m = abs(m)
     scale = clamp(scale, 1, 100)
     ϵ₁ = scale * (ceil(Int, π * n) + 1)
@@ -75,13 +75,13 @@ function polar(m, n; scale::Int = 100)
 end
 
 # radial order
-get_n(j)::Int = ceil((-3 + √(9 + 8j)) / 2)
+get_n(j::Int)::Int = ceil((-3 + √(9 + 8j)) / 2)
 # azimuthal frequency
-get_m(j, n)::Int = 2j - (n + 2)n
+get_m(j::Int, n::Int) = 2j - (n + 2)n
 # ISO / ANSI / OSA standard single mode-ordering index
-get_j(m, n)::Int = ((n + 2)n + m) ÷ 2
+get_j(m::Int, n::Int) = ((n + 2)n + m) ÷ 2
 
-function get_mn(j)
+function get_mn(j::Int)
     if j < 0
         error("j must be ≥ 0\n")
     end
@@ -146,7 +146,7 @@ function validate_length(v::Vector)
     return len, n_max
 end
 
-function radicand(m, n)
+function radicand(m::Int, n::Int)
     # Kronecker delta δ_{m0}
     δ(m) = m == 0
     (2n + 2) ÷ (1 + δ(m))

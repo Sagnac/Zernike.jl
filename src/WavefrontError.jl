@@ -13,7 +13,7 @@ struct WavefrontOutput
     fig::Makie.Figure
 end
 
-function (ΔW::WavefrontError)(ρ, θ)::Float64
+function (ΔW::WavefrontError)(ρ, θ)
     (; a, Z) = ΔW
     ∑(aᵢ * Z[i](ρ, θ) for (i, aᵢ) ∈ pairs(a))
 end
