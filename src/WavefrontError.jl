@@ -29,21 +29,22 @@ function fit(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, Zᵢ::Vector{Polynomial}
     # linear least squares
     A = stack(Z.(ρ, θ) for Z ∈ Zᵢ)
     # Zernike expansion coefficients
-    v = A \ OPD
-    return v, Zᵢ
+    A \ OPD
 end
 
 # fitting function (construction function 1)
 function Wf(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int)
     j_max = get_j(n_max, n_max)
     Zᵢ = Polynomial[Z(j, Model()) for j = 0:j_max]
-    fit(ρ, θ, OPD, Zᵢ)
+    v = fit(ρ, θ, OPD, Zᵢ)
+    return v, Zᵢ
 end
 
 function Wf(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
             orders::Vector{Tuple{Int, Int}})
     Zᵢ = Polynomial[Zf(mn...) for mn ∈ orders]
-    fit(ρ, θ, OPD, Zᵢ)
+    v = fit(ρ, θ, OPD, Zᵢ)
+    return v, Zᵢ
 end
 
 # filtering function (construction function 2)
