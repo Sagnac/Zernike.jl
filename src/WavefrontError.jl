@@ -78,9 +78,9 @@ function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision)
 end
 
 # synthesis function
-function Λ(ΔW, a, v, n_max; scale::Int)
-    scale = scale ∈ 1:100 ? scale : ceil(Int, 100 / √ length(a))
-    ρ, θ = polar(n_max, n_max; scale)
+function Λ(ΔW, a, v, n_max; finesse::Int)
+    finesse = finesse ∈ 1:100 ? finesse : ceil(Int, 100 / √ length(a))
+    ρ, θ = polar(n_max, n_max; finesse)
     # construct the estimated wavefront error
     ΔWp = ΔW.(ρ', θ)
     W_LaTeX = format_strings(a)
@@ -102,18 +102,18 @@ end
 
 # main interface function
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int;
-           precision = 3, scale = 101)
+           precision = 3, finesse = 101)
     v, Zᵢ = Wf(ρ, θ, OPD, n_max)
     ΔW, a = Ψ(v, Zᵢ, n_max; precision)
-    Λ(ΔW, a, v, n_max; scale)
+    Λ(ΔW, a, v, n_max; finesse)
 end
 
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, orders::Vector{Tuple{Int, Int}};
-           precision = 3, scale = 101)
+           precision = 3, finesse = 101)
     n_max = maximum(mn -> mn[2], orders; init = 0)
     v, Zᵢ = Wf(ρ, θ, OPD, orders)
     ΔW, a, v = Ψ(v, Zᵢ, n_max, orders; precision)
-    Λ(ΔW, a, v, n_max; scale)
+    Λ(ΔW, a, v, n_max; finesse)
 end
 
 # overload show to clean up the output

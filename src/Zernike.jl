@@ -62,12 +62,12 @@ function (Z::Polynomial)(ρ, θ)
     N * R(ρ) * M(θ)
 end
 
-function polar(m::Int, n::Int; scale::Int = 100)
+function polar(m::Int, n::Int; finesse::Int = 100)
     m = abs(m)
-    scale = clamp(scale, 1, 100)
-    ϵ₁ = scale * (ceil(Int, π * n) + 1)
+    finesse = clamp(finesse, 1, 100)
+    ϵ₁ = finesse * (ceil(Int, π * n) + 1)
     ϵ₁ = clamp(ϵ₁, ϵ₁, 1000)
-    ϵ₂ = scale * (2m + 1)
+    ϵ₂ = finesse * (2m + 1)
     ϵ₂ = clamp(ϵ₂, ϵ₂, 1000)
     ρ = range(0.0, 1.0, ϵ₁)
     θ = range(0.0, 2π, ϵ₂)
@@ -203,10 +203,10 @@ function Zf(m::Int, n::Int)
 end
 
 # main interface function
-function Z(m::Int, n::Int; scale::Int = 100)
+function Z(m::Int, n::Int; finesse::Int = 100)
     Z = Zf(m, n)
     (; γ) = Z.R
-    ρ, θ = polar(m, n; scale)
+    ρ, θ = polar(m, n; finesse)
     Zp = Z.(ρ', θ)
     Zmn, Z_LaTeX, Z_Unicode = format_strings(Z)
     indices = replace(Z.inds |> string, '(':')' => "")
@@ -238,9 +238,9 @@ iterate(Z::Output, i = 1) = (i > 3 ? nothing : (Z[i], i + 1))
 # methods
 Z(m::Int, n::Int, ::Model) = Zf(m, n)
 
-Z(; m, n, scale::Int = 100) = Z(m, n; scale)
+Z(; m, n, finesse::Int = 100) = Z(m, n; finesse)
 
-Z(j::Int; scale::Int = 100) = Z(get_mn(j)...; scale)
+Z(j::Int; finesse::Int = 100) = Z(get_mn(j)...; finesse)
 
 Z(j::Int, ::Model) = Zf(get_mn(j)...)
 

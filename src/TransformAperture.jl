@@ -168,11 +168,11 @@ end
 
 function P(v::Vector{T}, ε::T, δ::Complex{T} = 0.0im,
            ϕ::T = 0.0, ω::Tuple{T, T} = (1.0, 0.0);
-           precision = 3, scale::Int = 101) where T <: Float64
+           precision = 3, finesse::Int = 101) where T <: Float64
     v2, n_max = S(v, ε, δ, ϕ, ω)
     Zᵢ = Vector{Polynomial}(undef, length(v))
     ΔW, b = Ψ(v2, Zᵢ, n_max; precision)
-    Λ(ΔW, b, v2, n_max; scale)
+    Λ(ΔW, b, v2, n_max; finesse)
 end
 
 function P(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T, T}, ::Model;
