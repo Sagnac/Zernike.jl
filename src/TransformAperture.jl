@@ -23,11 +23,11 @@ function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <
     # normalization factors for complex Zernike polynomials
     N = zeros(Float64, len, len)
     # radial coefficient block-diagonal matrix
-    R = copy(N)
+    R = zeros(Float64, len, len)
     λ = Φ(n_max, n_max)
     # scaling
     if iszero(δ)
-        ηₛ = copy(N)
+        ηₛ = zeros(Float64, len, len)
     end
     # rotation
     ηᵣ = !iszero(ϕ) ? zeros(ComplexF64, len, len) : I
@@ -117,7 +117,7 @@ function transform(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64, remap:
     len = length(remap)
     n_max = get_n(len - 1)
     ηₛ = zeros(ComplexF64, len, len)
-    ηₑ = copy(ηₛ)
+    ηₑ = zeros(ComplexF64, len, len)
     for m = -n_max:n_max, n = abs(m):2:n_max
         k2 = (n + m) ÷ 2
         k3 = (n - m) ÷ 2
