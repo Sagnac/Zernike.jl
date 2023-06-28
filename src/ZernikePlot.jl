@@ -22,7 +22,7 @@ function ZPlot(ρ, θ, Zp; high_order = false, titles...)
     fig = Figure(; resolution)
     axis3 = Axis3(fig[1,1]; axis3attributes...)
     if high_order
-        Zp = @. sign(Zp) * log10(abs(Zp * log(10)) + 1)
+        @. Zp = sign(Zp) * log10(abs(Zp * log(10)) + 1)
         axis3.title[] = "Log transform of $(titles[:plot])"
     end
     surface!(axis3, ρᵪ, ρᵧ, Zp; colormap = :oslo)
