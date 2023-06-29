@@ -25,12 +25,14 @@ function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <
     # radial coefficient block-diagonal matrix
     R = zeros(Float64, len, len)
     λ = Φ(n_max, n_max)
-    # scaling
-    if iszero(δ)
+    _scale_ = iszero(δ)
+    _translate_ = !_scale_
+    _rotate_ = !iszero(ϕ)
+    _elliptic_ = !isone(ω[1])
+    if _scale_
         ηₛ = zeros(Float64, len, len)
     end
-    # rotation
-    ηᵣ = !iszero(ϕ) ? zeros(ComplexF64, len, len) : I
+    ηᵣ = _rotate_ ? zeros(ComplexF64, len, len) : I
     i = 0
     for m = -n_max:n_max
         μ = abs(m)
@@ -44,20 +46,20 @@ function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <
             for s = 0:k1
                 setindex!(R, γ[n-2s+1], remap[(m, n-2s)], i)
             end
-            if !iszero(ϕ)
+            if _rotate_
                 ηᵣ[i,i] = ei(m * ϕ)
             end
-            if iszero(δ)
+            if _scale_
                 ηₛ[i,i] = ε ^ n
             end
         end
     end
-    if !iszero(δ) && !isone(ω[1])
+    if _translate_ && _elliptic_
         ηₛ, ηₑ = transform(ε, δ, ω..., remap)
-    elseif !iszero(δ)
+    elseif _translate_
         ηₛ = translate(ε, δ, remap)
         ηₑ = I
-    elseif !isone(ω[1])
+    elseif _elliptic_
         ηₑ = elliptical(ω..., remap)
     else
         ηₑ = I
