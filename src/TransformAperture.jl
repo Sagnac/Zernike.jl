@@ -77,6 +77,24 @@ function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <
     return v2, n_max
 end
 
+
+macro translation_kernel()
+    quote
+        n′ = n - p - q
+        m′ = m - p + q
+        z = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ei((p-q)θₜ)
+        ηₛ[remap[(m′, n′)], i] += z
+    end |> esc
+end
+
+macro elliptical_kernel()
+    quote
+        m′ = m - 2p + 2q
+        z = 0.5^n * b(k2,p) * b(k3,q) * (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ei(2(p-q)φ)
+        ηₑ[remap[(m′, n)], i] += z
+    end |> esc
+end
+
 function translate(ε::Float64, δ::ComplexF64, remap::Dict)
     ρₜ, θₜ = abs(δ), angle(δ)
     len = length(remap)
@@ -85,12 +103,9 @@ function translate(ε::Float64, δ::ComplexF64, remap::Dict)
     for m = -n_max:n_max, n = abs(m):2:n_max
         k2 = (n + m) ÷ 2
         k3 = (n - m) ÷ 2
+        i = remap[(m, n)]
         for p = 0:k2, q = 0:k3
-            n′ = n - p - q
-            m′ = m - p + q
-            z = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ei((p-q)θₜ)
-            o = (remap[(m′, n′)], remap[(m, n)])
-            ηₛ[o...] += z
+            @translation_kernel
         end
     end
     return ηₛ
@@ -103,11 +118,9 @@ function elliptical(ξ::Float64, φ::Float64, remap::Dict)
     for m = -n_max:n_max, n = abs(m):2:n_max
         k2 = (n + m) ÷ 2
         k3 = (n - m) ÷ 2
+        i = remap[(m, n)]
         for p = 0:k2, q = 0:k3
-            m′ = m - 2p + 2q
-            z = 0.5^n * b(k2,p) * b(k3,q) * (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ei(2(p-q)φ)
-            o = (remap[(m′, n)], remap[(m, n)])
-            ηₑ[o...] += z
+            @elliptical_kernel
         end
     end
     return ηₑ
@@ -125,15 +138,8 @@ function transform(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64, remap:
         k3 = (n - m) ÷ 2
         i = remap[(m, n)]
         for p = 0:k2, q = 0:k3
-            # translation
-            n′ = n - p - q
-            m′ = m - p + q
-            z = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ei((p-q)θₜ)
-            ηₛ[remap[(m′, n′)], i] += z
-            # elliptical pupil transform
-            m′ = m - 2p + 2q
-            z = 0.5^n * b(k2,p) * b(k3,q) * (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ei(2(p-q)φ)
-            ηₑ[remap[(m′, n)], i] += z
+            @translation_kernel
+            @elliptical_kernel
         end
     end
     return ηₛ, ηₑ
