@@ -1,6 +1,7 @@
 import GLMakie: GLFW.GetPrimaryMonitor, MonitorProperties
 
-function ZPlot(ρ, θ, Zp; high_order = false, window = "ZernikePlot", plot = window)
+function ZPlot(ρ::FloatVec, θ::FloatVec, Zp::FloatMat;
+               high_order = false, window = "ZernikePlot", plot = window)
     monitor_properties = MonitorProperties(GetPrimaryMonitor())
     (; height) = monitor_properties.videomode
     resolution = (0.85height, height/2)

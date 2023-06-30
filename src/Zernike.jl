@@ -15,6 +15,10 @@ import Base: show, getindex, iterate
 
 const ∑ = sum
 
+# Type aliases
+const FloatVec = AbstractVector{<:AbstractFloat}
+const FloatMat = AbstractMatrix{<:AbstractFloat}
+
 struct Model end
 
 struct RadialPolynomial

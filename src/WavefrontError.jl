@@ -18,10 +18,6 @@ function (ΔW::WavefrontError)(ρ, θ)
     ∑(aᵢ * Z[i](ρ, θ) for (i, aᵢ) ∈ pairs(a))
 end
 
-# Type aliases
-const FloatVec = AbstractVector{<:AbstractFloat}
-const FloatMat = AbstractMatrix{<:AbstractFloat}
-
 function fit(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, Zᵢ::Vector{Polynomial})
     if !allequal(length.((ρ, θ, OPD)))
         error("Vectors must be of equal length.\n")
