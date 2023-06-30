@@ -36,9 +36,8 @@ function Φ(m_max::Int, n_max::Int)
         for m = !n_even:2:ifelse(n ≠ n_max, n, m_max)
             i += 1
             if m == n
-                λᵢ = zeros(Float64, n_max + 1)
-                λᵢ[n+1] = 1.0
-                λ[i] = λᵢ
+                λ[i] = zeros(n_max + 1)
+                λ[i][n+1] = 1.0
                 n_even = !n_even
             elseif m == 0
                 λ[i] = 2shift(λ[i-n÷2], 1) - λ[i-n]
