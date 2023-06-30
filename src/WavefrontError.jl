@@ -193,3 +193,12 @@ end
 function W(OPD::FloatMat, fit_to, ::Model; precision = 3)
     W(coords(OPD)..., vec(OPD), fit_to, Model(); precision)
 end
+
+# reverse transform;
+# for input vectors corresponding to ordered triples over the exit pupil
+# returns uniquely valued coordinate vectors and a phase matrix pinned by them
+# such that OPD = ΔW.(ρ', θ)
+function map_phase(ρ::FloatVec, θ::FloatVec, OPD::FloatVec)
+    ρ, θ = (sort ∘ union).((ρ, θ))
+    return ρ, θ, reshape(OPD, length.((ρ, θ)))
+end
