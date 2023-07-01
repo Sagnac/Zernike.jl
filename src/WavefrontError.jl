@@ -192,9 +192,9 @@ end
 
 # reverse transform;
 # for input vectors corresponding to ordered triples over the exit pupil
+# under the assumption of equally spaced uniform and regular sampling
 # returns uniquely valued coordinate vectors and a phase matrix pinned by them
 # such that OPD = ΔW.(ρ', θ)
 function map_phase(ρ::FloatVec, θ::FloatVec, OPD::FloatVec)
-    ρ, θ = (sort ∘ union).((ρ, θ))
-    return ρ, θ, reshape(OPD, length.((ρ, θ)))
+    union!(ρ), union!(θ), reshape(OPD, length.((θ, ρ)))
 end
