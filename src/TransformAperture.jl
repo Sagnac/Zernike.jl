@@ -77,6 +77,13 @@ function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <
     return v2, n_max
 end
 
+macro init()
+    quote
+        k2 = (n + m) ÷ 2
+        k3 = (n - m) ÷ 2
+        i = remap[(m, n)]
+    end |> esc
+end
 
 macro translation_kernel()
     quote
@@ -101,9 +108,7 @@ function translate(ε::Float64, δ::ComplexF64, remap::Dict)
     n_max = get_n(len - 1)
     ηₛ = zeros(ComplexF64, len, len)
     for m = -n_max:n_max, n = abs(m):2:n_max
-        k2 = (n + m) ÷ 2
-        k3 = (n - m) ÷ 2
-        i = remap[(m, n)]
+        @init
         for p = 0:k2, q = 0:k3
             @translation_kernel
         end
@@ -116,9 +121,7 @@ function elliptical(ξ::Float64, φ::Float64, remap::Dict)
     n_max = get_n(len - 1)
     ηₑ = zeros(ComplexF64, len, len)
     for m = -n_max:n_max, n = abs(m):2:n_max
-        k2 = (n + m) ÷ 2
-        k3 = (n - m) ÷ 2
-        i = remap[(m, n)]
+        @init
         for p = 0:k2, q = 0:k3
             @elliptical_kernel
         end
@@ -134,9 +137,7 @@ function transform(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64, remap:
     ηₛ = zeros(ComplexF64, len, len)
     ηₑ = zeros(ComplexF64, len, len)
     for m = -n_max:n_max, n = abs(m):2:n_max
-        k2 = (n + m) ÷ 2
-        k3 = (n - m) ÷ 2
-        i = remap[(m, n)]
+        @init
         for p = 0:k2, q = 0:k3
             @translation_kernel
             @elliptical_kernel
