@@ -10,11 +10,7 @@ https://opg.optica.org/ol/abstract.cfm?uri=ol-38-14-2487
 
 import ShiftedArrays: circshift as shift
 
-function get_i(m_max, n_max)
-    n_mod_2 = isodd(n_max)
-    i_max = ((n_max + 2)n_max + n_mod_2) ÷ 4 + (m_max + !n_mod_2 + 1) ÷ 2
-    return i_max
-end
+get_i(m_max, n_max) = ((n_max + 2)n_max + 1) ÷ 4 + (m_max + iseven(n_max) + 1) ÷ 2
 
 function Φ(m_max::Int, n_max::Int)
     if m_max < 0 || n_max < 0 || m_max > n_max || isodd(n_max - m_max)
@@ -30,19 +26,17 @@ function Φ(m_max::Int, n_max::Int)
         )
     end
     i = 0
-    n_even = true
     λ = Vector{Vector{Float64}}(undef, get_i(m_max, n_max))
     for n = 0:n_max
-        for m = !n_even:2:ifelse(n ≠ n_max, n, m_max)
+        for m = isodd(n):2:ifelse(n ≠ n_max, n, m_max)
             i += 1
             if m == n
                 λ[i] = zeros(n_max + 1)
                 λ[i][n+1] = 1.0
-                n_even = !n_even
             elseif m == 0
                 λ[i] = 2shift(λ[i-n÷2], 1) - λ[i-n]
             else
-                Δ = (n + 1 + n_even) ÷ 2
+                Δ = n÷2+1
                 λ[i] = shift(λ[i-Δ] + λ[i-Δ+1], 1) - λ[i-n]
             end
             # @assert i == get_i(m, n)

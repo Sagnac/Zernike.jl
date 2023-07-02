@@ -117,9 +117,8 @@ function fringe_to_j(fringe::Int)
     end
     d = trunc(√(fringe - 1)) + 1
     d2 = d^2 - fringe
-    d2_mod_2 = isodd(d2)
-    m::Int = (d2 + d2_mod_2) ÷ 2
-    m = flipsign(m, d2_mod_2 ? -1 : 1)
+    m::Int = (d2 + 1) ÷ 2
+    m = flipsign(m, isodd(d2) ? -1 : 1)
     n::Int = 2(d - 1) - abs(m)
     get_j(m, n)
 end
