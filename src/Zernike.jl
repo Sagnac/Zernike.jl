@@ -79,7 +79,7 @@ function polar(m::Int, n::Int; finesse::Int = 100)
 end
 
 # radial order
-get_n(j::Int)::Int = ceil((-3 + √(9 + 8j)) / 2)
+get_n(j::Int)::Int = cld(-3 + √(9 + 8j), 2)
 # azimuthal frequency
 get_m(j::Int, n::Int) = 2j - (n + 2)n
 # ISO / ANSI / OSA standard single mode-ordering index
