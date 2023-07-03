@@ -239,12 +239,12 @@ getindex(Z::T, i) where {T <: Output} = getfield(Z, fieldnames(T)[i])
 iterate(Z::Output, i = 1) = (i > 3 ? nothing : (Z[i], i + 1))
 
 # methods
-Z(m::Int, n::Int, ::Model) = Zf(m, n)
+Z(m::Int, n::Int, ::Type{Model}) = Zf(m, n)
 
 Z(; m, n, finesse::Int = 100) = Z(m, n; finesse)
 
 Z(j::Int; finesse::Int = 100) = Z(get_mn(j)...; finesse)
 
-Z(j::Int, ::Model) = Zf(get_mn(j)...)
+Z(j::Int, ::Type{Model}) = Zf(get_mn(j)...)
 
 end

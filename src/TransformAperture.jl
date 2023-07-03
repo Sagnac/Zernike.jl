@@ -184,23 +184,23 @@ function P(v::Vector{T}, ε::T, δ::Complex{T} = 0.0im,
     Λ(ΔW, b, v2, n_max; finesse)
 end
 
-function P(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T, T}, ::Model;
+function P(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T, T}, ::Type{Model};
            precision = 3) where T <: Float64
     v2, n_max = S(v, ε, δ, ϕ, ω)
     Zᵢ = Vector{Polynomial}(undef, length(v))
     Ψ(v2, Zᵢ, n_max; precision)[1]
 end
 
-function P(v::Vector{T}, ε::T, ::Model; precision = 3) where T <: Float64
-    P(v, ε, 0.0im, zero(T), (1.0, 0.0), Model(); precision)
+function P(v::Vector{T}, ε::T, ::Type{Model}; precision = 3) where T <: Float64
+    P(v, ε, 0.0im, zero(T), (1.0, 0.0), Model; precision)
 end
 
-function P(v::Vector{T}, ε::T, δ::Complex{T}, ::Model;
+function P(v::Vector{T}, ε::T, δ::Complex{T}, ::Type{Model};
            precision = 3) where T <: Float64
-    P(v, ε, δ, zero(T), (1.0, 0.0), Model(); precision)
+    P(v, ε, δ, zero(T), (1.0, 0.0), Model; precision)
 end
 
-function P(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ::Model;
+function P(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ::Type{Model};
            precision = 3) where T <: Float64
-    P(v, ε, δ, ϕ, (1.0, 0.0), Model(); precision)
+    P(v, ε, δ, ϕ, (1.0, 0.0), Model; precision)
 end

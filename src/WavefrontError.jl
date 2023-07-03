@@ -31,7 +31,7 @@ end
 # fitting function (construction function 1)
 function Wf(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int)
     j_max = get_j(n_max, n_max)
-    Zᵢ = Polynomial[Z(j, Model()) for j = 0:j_max]
+    Zᵢ = Polynomial[Z(j, Model) for j = 0:j_max]
     v = fit(ρ, θ, OPD, Zᵢ)
     return v, Zᵢ
 end
@@ -57,7 +57,7 @@ function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision)
         aᵢ = precision == "full" ? aᵢ : round(aᵢ; digits = precision)
         if !iszero(aᵢ)
             if clipped
-                Zᵢ[i] = Z(i-1, Model())
+                Zᵢ[i] = Z(i-1, Model)
             end
             push!(a, (; Zᵢ[i].inds..., a = aᵢ))
             push!(av, aᵢ)
@@ -147,14 +147,14 @@ function standardize(v_sub::FloatVec, orders::Vector{Tuple{Int, Int}})
 end
 
 # methods
-function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int, ::Model;
+function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int, ::Type{Model};
            precision = 3)
     v, Zᵢ = Wf(ρ, θ, OPD, n_max)
     return Ψ(v, Zᵢ, n_max; precision)[1]
 end
 
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
-           orders::Vector{Tuple{Int, Int}}, ::Model; precision = 3)
+           orders::Vector{Tuple{Int, Int}}, ::Type{Model}; precision = 3)
     n_max = maximum(mn -> mn[2], orders; init = 0)
     v, Zᵢ = Wf(ρ, θ, OPD, orders)
     return Ψ(v, Zᵢ, n_max, orders; precision)[1]
@@ -186,8 +186,8 @@ function W(OPD::FloatMat, fit_to; options...)
     W(coords(OPD)..., vec(OPD), fit_to; options...)
 end
 
-function W(OPD::FloatMat, fit_to, ::Model; precision = 3)
-    W(coords(OPD)..., vec(OPD), fit_to, Model(); precision)
+function W(OPD::FloatMat, fit_to, ::Type{Model}; precision = 3)
+    W(coords(OPD)..., vec(OPD), fit_to, Model; precision)
 end
 
 # reverse transform;
