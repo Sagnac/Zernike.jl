@@ -48,19 +48,31 @@ The radial polynomial coefficients are computed using a fast and accurate algori
 
 Estimates wavefront error by expressing optical aberrations as a linear combination of weighted Zernike polynomials using a linear least squares method. The accuracy of this type of wavefront reconstruction represented as an expanded series depends upon a sufficiently sampled phase field and a suitable choice of the fitting order n_max.
 
-`ρ`, `θ`, and `OPD` must be vectors of equal length; at each specific index the values are elements of an ordered triple over the exit pupil.
+`ρ`, `θ`, and `OPD` must be floating-point vectors of equal length; at each specific index the values are elements of an ordered triple over the exit pupil.
 
 * `ρ`: normalized radial exit pupil position variable `{0 ≤ ρ ≤ 1}`;
 * `θ`: angular exit pupil variable in radians `(mod 2π)`, defined positive counter-clockwise from the horizontal x-axis;
 * `OPD`: measured optical path difference in waves;
 * `n_max`: maximum radial degree to fit to.
 
-You can input normalized Cartesian coordinates using the 3-positional argument method:<br>
-`W(x, y, OPD; n_max, options...)`.
+Note that specifying `n_max` will fit using the full range of Zernike polynomials from `j = 0` to `j_max` corresponding to the last polynomial with degree `n_max`. If instead you only want to fit to a subset of Zernike polynomials you can specify a vector of `(m, n)` tuples in place of `n_max` using the method:
+```
+W(ρ, θ, OPD, orders::Vector{Tuple{Int, Int}})
+```
 
-The phase profile data can also be input as a 3 column matrix.
+If your phase data is in the form of a floating-point matrix instead you can call the method:
+```
+W(OPD, fit_to; options...)
+```
 
-Returns four values contained within a WavefrontOutput type, with fields:
+This assumes the wavefront error was uniformly measured using polar coordinates; the matrix is expected to be a polar grid of regularly spaced periodic samples with the first element referring to the value at the origin. The first axis of the matrix (the rows) must correspond to the angular variable `θ` while the second axis (the columns) must correspond to the radial variable `ρ`.
+
+`fit_to` can be either `n_max::Int` or `orders::Vector{Tuple{Int, Int}}`.
+
+It is also possible to input normalized Cartesian coordinates using the method with 3 positional arguments and passing `fit_to` as a keyword argument:<br>
+`W(x, y, OPD; fit_to, options...)`.
+
+The function returns four values contained within a WavefrontOutput type, with fields:
 
 1. `a`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients rounded according to `precision`;
 2. `v`: full vector of Zernike wavefront error expansion coefficients;
@@ -106,11 +118,11 @@ The transformed expansion coefficients are computed using a fast and accurate al
 
 There are 2 options you can vary using keyword arguments. All 3 main functions support:
 
-* `scale`: `{1 ≤ scale ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 1 million which should avoid aliasing up to ~317 radially and ~499 azimuthally.
+* `finesse::Int`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 1 million which should avoid aliasing up to ~317 radially and ~499 azimuthally.
 
 Default: `100` (for `Z`, proportionally scaled according to the number of polynomials for the wavefront errors).
 
-In creating the plot matrix the step size / length of the variable ranges is automatically chosen such that aliasing is avoided for reasonable orders. The `scale` parameter controls how fine the granularity is subsequently at the expense of performance.
+In creating the plot matrix the step size / length of the variable ranges is automatically chosen such that aliasing is avoided for reasonable orders. The `finesse` parameter controls how fine the granularity is subsequently at the expense of performance.
 
 Additionally, the wavefront error functions `W(ρ, θ, OPD, n_max)` and `P(v, ε, δ, ϕ, ω)` support:
 
@@ -122,10 +134,10 @@ If you want full 64-bit floating-point precision use `precision = "full"`.
 
 ## Model functions
 
-There exists a special method dispatch which avoids plotting and instead returns the `(ρ, θ)` functions as essentially closures. This is done by calling the 3 main functions with the `Model` constructor as the last positional argument. The pupil can then be evaluated using these functions with polar coordinates:
+There exists a special method dispatch which avoids plotting and instead returns the `(ρ, θ)` functions as essentially closures. This is done by calling the 3 main functions with the `Model` type as the last positional argument. The pupil can then be evaluated using these functions with polar coordinates:
 
 ```
-Z40 = Z(0, 4, Model())
+Z40 = Z(0, 4, Model)
 Z40(0.7, π/4)
 ```
 
@@ -133,18 +145,21 @@ For wavefront reconstruction this is equivalent to `ΔW(ρ, θ)` = `∑aᵢZᵢ(
 
 ## Single-Index Ordering Schemes
 
-This package uses the the ANSI Z80.28-2004 standard ordering scheme where applicable, but provides several functions for converting from two other ordering methods, namely `Noll` and `Fringe`. The following functions are available:
+This package uses the ANSI Z80.28-2004 standard sequential ordering scheme where applicable, but provides several functions for converting from two other ordering methods, namely `Noll` and `Fringe`. The following methods are available:
 
 * `noll_to_j(noll::Int)`: converts Noll indices to ANSI standard indices;
 * `standardize!(noll::Vector)`: re-orders a Noll specified Zernike expansion coefficient vector according to the ANSI standard; this requires a full ordered vector up to n_max;
 * `fringe_to_j(fringe::Int)`: converts Fringe indices to ANSI standard indices; only indices 1:37 are valid;
-* `standardize(fringe::Vector)`: formats a Fringe specified Zernike expansion coefficient vector according to the ANSI standard.
+* `standardize(fringe::Vector)`: formats a Fringe specified Zernike expansion coefficient vector according to the ANSI standard;
+* `standardize(v_sub::Vector, orders::Vector{Tuple{Int, Int}})`: pads a subset Zernike expansion coefficient vector to the full standard length up to `n_max` (`1:j_max+1`).
 
-The last function expects unnormalized coefficients; the input coefficients will be re-ordered and normalized in line with the orthonormal standard. As Fringe is a 37 polynomial subset of the full set of Zernike polynomials any coefficients in the standard order missing a counterpart in the input vector will be set to zero.
+The `standardize` fringe method expects unnormalized coefficients; the input coefficients will be re-ordered and normalized in line with the orthonormal standard. As Fringe is a 37 polynomial subset of the full set of Zernike polynomials any coefficients in the standard order missing a counterpart in the input vector will be set to zero.
+
+For the `standardize` subset method the tuples in `orders` must be of the form `(m, n)` associated with the respective coefficients at each index in `v_sub`.
 
 ## Additional Notes
 
-* The output types for the 3 main functions can also be accessed by indexing them and regular destructuring in addition to property destructuring and getting the fields directly.
+* The values contained within the output types can also be accessed through numerical indexing and regular destructuring in addition to property destructuring and getting the fields directly.
 
 * The Zernike polynomials are currently only valid up to degree ~812 at which point the maximum coefficient approaches the maximum for double-precision floating-point numbers (~1e308).
 

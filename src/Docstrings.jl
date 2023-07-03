@@ -24,21 +24,20 @@ See also [`W`](@ref), [`P`](@ref).
 
 # Positional argument options:
 
-    Z(m, n, Model())
+    Z(m, n, ::Type{Model})
 
 Return the Zernike polynomial function `Z(ρ, θ)` corresponding to indices `m` and `n`.
 
 # Keyword argument options:
 
-    Z(m, n; scale::Int = 100)
+    Z(m, n; [finesse::Int = 100])
 
-`scale`: `{1 ≤ scale ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 1 million.
+`finesse`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 1 million.
 """
 Z
 
 """
     W(ρ, θ, OPD, n_max)
-    W(data::Matrix, n_max; options...)
 
 Fit wavefront errors up to order n_max.
 
@@ -46,14 +45,12 @@ Estimates wavefront error by expressing optical aberrations as a linear combinat
 
 # Main arguments
 
-`ρ`, `θ`, and `OPD` must be vectors of equal length; at each specific index the values are elements of an ordered triple over the exit pupil.
+`ρ`, `θ`, and `OPD` must be floating-point vectors of equal length; at each specific index the values are elements of an ordered triple over the exit pupil.
 
 * `ρ`: normalized radial exit pupil position variable `{0 ≤ ρ ≤ 1}`;
 * `θ`: angular exit pupil variable in radians `(mod 2π)`, defined positive counter-clockwise from the horizontal x-axis;
 * `OPD`: measured optical path difference in waves;
 * `n_max`: maximum radial degree to fit to.
-
-The phase profile data can also be input as a 3 column matrix.
 
 # Return values
 
@@ -70,32 +67,48 @@ See also [`Z`](@ref), [`P`](@ref).
 
 ----
 
-    W(x, y, OPD; n_max, options...)
+    W(ρ, θ, OPD, orders::Vector{Tuple{Int, Int}})
 
-Method accepting normalized Cartesian coordinate data.
+Fit wavefront errors to specific Zernike polynomials specified in `orders` containing Zernike `(m, n)` tuples.
+
+----
+
+    W(OPD, fit_to; options...)
+
+Fitting method accepting a floating-point matrix of phase data uniformly produced in a polar coordinate system over the pupil.
+
+The matrix is expected to be a polar grid of regularly spaced periodic samples with the first element referring to the value at the origin. The first axis of the matrix (the rows) must correspond to the angular variable `θ` while the second axis (the columns) must correspond to the radial variable `ρ`.
+
+`fit_to` can be either `n_max::Int` or `orders::Vector{Tuple{Int, Int}}`.
+
+----
+
+    W(x, y, OPD; fit_to, options...)
+
+Fitting method accepting normalized Cartesian coordinate data.
 
 ----
 
 # Positional argument options:
 
-    W(ρ, θ, OPD, n_max, Model())
+    W(ρ, θ, OPD, n_max, ::Type{Model})
 
 Return the wavefront error function `ΔW(ρ, θ)` corresponding to an `n_max` fit.
 
 # Keyword argument options:
 
-    W(ρ, θ, OPD, n_max; precision = 3, scale)
+    W(ρ, θ, OPD, n_max; [precision = 3], [finesse::Int])
 
 * `precision`: number of digits to use after the decimal point in computing the expansion coefficients. Results will be rounded according to this precision and any polynomials with zero-valued coefficients will be ignored when pulling in the Zernike functions while constructing the composite wavefront error; this means lower precision values yield faster results.
 
 \u2063\u2063\u2063\u2063 If you want full 64-bit floating-point precision use `precision = "full"`.
 
-* `scale`: `{1 ≤ scale ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 1 million.
+* `finesse`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 1 million.
 """
 W
 
 """
-    P(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <: Float64
+    P(v::Vector{T}, ε::T, [δ::Complex{T}], [ϕ::T], [ω::Tuple{T,T}]) where T <: Float64
 
 Compute a new set of Zernike wavefront error expansion coefficients under a given set of transformation factors and plot the result.
 
@@ -112,27 +125,25 @@ Available transformations are scaling, translation, & rotation for circular and 
 The order the transformations are applied is:\\
 scaling --> translation --> rotation --> elliptical transform.
 
-The translation, rotation, and elliptical arguments are optional.
-
 See also [`Z`](@ref), [`W`](@ref).
 
 ----
 
 # Positional argument options:
 
-    P(v, ε, δ, ϕ, ω, Model())
+    P(v, ε, [δ], [ϕ], [ω], ::Type{Model})
 
 Return the wavefront error function `ΔW(ρ, θ)` corresponding to the input transform parameters.
 
 # Keyword argument options:
 
-    P(v, ε, δ, ϕ, ω; precision = 3, scale::Int)
+    P(v, ε, [δ], [ϕ], [ω]; [precision = 3], [finesse::Int])
 
 * `precision`: number of digits to use after the decimal point in computing the expansion coefficients. Results will be rounded according to this precision and any polynomials with zero-valued coefficients will be ignored when pulling in the Zernike functions while constructing the composite wavefront error; this means lower precision values yield faster results.
 
 \u2063\u2063\u2063\u2063 If you want full 64-bit floating-point precision use `precision = "full"`.
 
-* `scale`: `{1 ≤ scale ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 1 million.
+* `finesse`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 1 million.
 
 # Extended help
 
@@ -159,10 +170,10 @@ Callable type: function `Z(ρ, θ)` bound to a given set of Zernike indices `m` 
 
 Fields:
 
-1. `inds`: named tuple containing the Zernike polynomial indices;
-2. `N`: normalization factor;
-3. `R`: RadialPolynomial callable type: function `R(ρ)`;
-4. `M`: Sinusoid callable type: function `M(θ)`.
+* `inds`: named tuple containing the Zernike polynomial indices;
+* `N`: normalization factor;
+* `R`: RadialPolynomial callable type: function `R(ρ)`;
+* `M`: Sinusoid callable type: function `M(θ)`.
 
 See also [`Zernike.WavefrontError`](@ref).
 """
@@ -177,10 +188,13 @@ Specifically, `ΔW(ρ, θ)` = `∑aᵢZᵢ(ρ, θ)`
 
 Fields:
 
-1. `i`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients;
-2. `n_max`: maximum radial degree fit to;
-3. `a`: vector of the Zernike expansion coefficients used in the fit;
-4. `Z`: the respective Zernike polynomial functions.
+* `i`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients;
+* `n_max`: maximum radial degree fit to;
+* `fit_to`: vector of `(m, n)` tuples specifying the polynomials used for the fit;
+* `a`: vector of the Zernike expansion coefficients;
+* `Z`: the respective Zernike polynomial functions.
+
+The `fit_to` field is an empty vector if the default full range up to `n_max` (`0:j_max`) was used with no `orders` specified. Note that these orders could differ from the polynomials determined after the fit; they are simply what was passed to the fitting function and may refer to polynomials not present in the reconstruction if after filtering the corresponding coefficients are zero.
 
 See also [`Zernike.Polynomial`](@ref).
 """
@@ -225,5 +239,13 @@ Format a Fringe specified Zernike expansion coefficient vector according to the 
 This function expects unnormalized coefficients; the input coefficients will be re-ordered and normalized in line with the orthonormal standard. As Fringe is a 37 polynomial subset of the full set of Zernike polynomials any coefficients in the standard order missing a counterpart in the input vector will be set to zero.
 
 See also [`standardize!`](@ref), [`fringe_to_j`](@ref), [`noll_to_j`](@ref).
+
+----
+
+    standardize(v_sub::Vector, orders::Vector{Tuple{Int, Int}})
+
+Pad a subset Zernike expansion coefficient vector to the full standard length up to `n_max` (`1:j_max+1`).
+
+The tuples in `orders` must be of the form `(m, n)` associated with the respective coefficients at each index in `v_sub`.
 """
 standardize
