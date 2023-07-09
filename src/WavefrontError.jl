@@ -196,5 +196,7 @@ end
 # returns uniquely valued coordinate vectors and a phase matrix pinned by them
 # such that OPD = ΔW.(ρ', θ)
 function map_phase(ρ::FloatVec, θ::FloatVec, OPD::FloatVec)
-    union!(ρ), union!(θ), reshape(OPD, length.((θ, ρ)))
+    ρ = union(ρ)
+    θ = union(θ)
+    return ρ, θ, reshape(OPD, length.((θ, ρ)))
 end
