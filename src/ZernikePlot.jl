@@ -42,7 +42,7 @@ function ZPlot(ρ::FloatVec, θ::FloatVec, Zp::FloatMat;
     fig[1,2] = grid!([label pupil]; tellheight = false, valign = :bottom)
     on(pupil.active; update = true) do active
         for property in zproperties
-            getfield(axis3, property)[] = !active
+            getproperty(axis3, property)[] = !active
         end
         axis3.azimuth = active ? -π/2 : 0.275π
         axis3.elevation = active ? π/2 : π/8
