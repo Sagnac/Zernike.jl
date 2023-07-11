@@ -1,5 +1,6 @@
 struct WavefrontError
     i::Vector{NamedTuple{(:j, :n, :m, :a), Tuple{Int, Int, Int, Float64}}}
+    v::Vector{Float64}
     n_max::Int
     fit_to::Vector{Tuple{Int, Int}}
     a::Vector{Float64}
@@ -69,7 +70,7 @@ function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision)
         v = standardize(v, orders)
     end
     # create the fitted polynomial
-    ΔW = WavefrontError(a, n_max, orders, av, Zₐ)
+    ΔW = WavefrontError(a, v, n_max, orders, av, Zₐ)
     return ΔW, a, v
 end
 
