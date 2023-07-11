@@ -189,9 +189,10 @@ Specifically, `ΔW(ρ, θ)` = `∑aᵢZᵢ(ρ, θ)`
 Fields:
 
 * `i`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients;
+* `v`: full vector of the unfiltered full-precision standardized expansion coefficients up to `n_max`;
 * `n_max`: maximum radial degree fit to;
 * `fit_to`: vector of `(m, n)` tuples specifying the polynomials used for the fit;
-* `a`: vector of the Zernike expansion coefficients;
+* `a`: vector of the Zernike expansion coefficients corresponding to each polynomial present;
 * `Z`: the respective Zernike polynomial functions.
 
 The `fit_to` field is an empty vector if the default full range up to `n_max` (`0:j_max`) was used with no `orders` specified. Note that these orders could differ from the polynomials determined after the fit; they are simply what was passed to the fitting function and may refer to polynomials not present in the reconstruction if after filtering the corresponding coefficients are zero.
