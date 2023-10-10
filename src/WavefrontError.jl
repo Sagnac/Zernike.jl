@@ -181,6 +181,12 @@ function coords(OPD::FloatMat)
     return ρ, θ
 end
 
+function coords(ρ::FloatVec, θ::FloatVec)
+    ρ2 = ones(length(θ)) * ρ' |> vec
+    θ2 = θ * ones(length(ρ))' |> vec
+    return ρ2, θ2
+end
+
 # assumes dim(θ) x dim(ρ) matrix polar mapping
 # W(OPD', fit_to, etc.) for dim(ρ) x dim(θ) matrix
 function W(OPD::FloatMat, fit_to; options...)
@@ -189,6 +195,15 @@ end
 
 function W(OPD::FloatMat, fit_to, ::Type{Model}; precision = 3)
     W(coords(OPD)..., vec(OPD), fit_to, Model; precision)
+end
+
+function W(ρ::FloatVec, θ::FloatVec, OPD::FloatMat, fit_to; options...)
+    W(coords(ρ, θ)..., vec(OPD), fit_to; options...)
+end
+
+function W(ρ::FloatVec, θ::FloatVec, OPD::FloatMat, fit_to,
+           ::Type{Model}; precision = 3)
+    W(coords(ρ, θ)..., vec(OPD), fit_to, Model; precision)
 end
 
 # reverse transform;
