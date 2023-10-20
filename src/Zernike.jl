@@ -14,6 +14,7 @@ import .Makie: latexstring, LaTeXString
 import Base: show, getindex, iterate
 
 const ∑ = sum
+const ϵ_max = 2^10
 
 # Type aliases
 const FloatVec = AbstractVector{<:AbstractFloat}
@@ -69,12 +70,12 @@ end
 function polar(m::Int, n::Int; finesse::Int = 100)
     m = abs(m)
     finesse = clamp(finesse, 1, 100)
-    ϵ₁ = finesse * (ceil(Int, π * n) + 1)
-    ϵ₁ = clamp(ϵ₁, ϵ₁, 1000)
-    ϵ₂ = finesse * (2m + 1)
-    ϵ₂ = clamp(ϵ₂, ϵ₂, 1000)
-    ρ = range(0.0, 1.0, ϵ₁)
-    θ = range(0.0, 2π, ϵ₂)
+    ϵ_n = finesse * (ceil(Int, π * n) + 1)
+    ϵ_n = min(ϵ_n, ϵ_max)
+    ϵ_m = finesse * (2m + 1)
+    ϵ_m = min(ϵ_m, ϵ_max)
+    ρ = range(0.0, 1.0, ϵ_n)
+    θ = range(0.0, 2π, ϵ_m)
     return ρ, θ
 end
 
