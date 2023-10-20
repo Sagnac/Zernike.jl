@@ -23,6 +23,7 @@ const FloatMat = AbstractMatrix{<:AbstractFloat}
 struct Model end
 
 struct RadialPolynomial
+    λ::Vector{Float64}
     γ::Vector{Float64}
     ν::Vector{Int}
 end
@@ -53,8 +54,8 @@ include("TransformAperture.jl")
 include("Docstrings.jl")
 
 function (R::RadialPolynomial)(ρ)
-    (; γ, ν) = R
-    γ⋅ρ.^ν
+    (; λ) = R
+    evalpoly(ρ, λ)
 end
 
 function (M::Sinusoid)(θ)
@@ -190,6 +191,7 @@ function Zf(m::Int, n::Int)
     ν = Int[n - 2s for s = 0:k]
     # polynomial coefficients
     if μ == n
+        λ = [zeros(n); 1.0]
         γ = [1.0]
     else
         λ = Φ(μ, n)[end]
@@ -198,7 +200,7 @@ function Zf(m::Int, n::Int)
     # γ = Float64[λ(μ, n, s, k) for s = 0:k]
     inds = (j = j, n = n, m = m)
     # radial polynomial
-    R = RadialPolynomial(γ, ν)
+    R = RadialPolynomial(λ, γ, ν)
     # azimuthal / meridional component
     M = Sinusoid(m)
     # Zernike polynomial
