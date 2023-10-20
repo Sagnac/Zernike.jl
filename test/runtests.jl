@@ -77,6 +77,15 @@ v = Wf(r, t, OPD_vec, 8)[1]
     @testset "expansion coefficients" for i in inds_a
         @test i[:a] ≈ v[i[:j] + 1] atol = 1e-7
     end
+    Z44 = Z(4, 4, Model)
+    ρ_rs = rand(2^8)
+    θ_rs = 2π * rand(2^8)
+    OPD_matrix = 7.0 * Z44.(ρ_rs', θ_rs)
+    OPD_coords = [(i, j) for j in θ_rs, i in ρ_rs]
+    unrolled_coords = (vec(getindex.(OPD_coords, i)) for i = 1:2)
+    ΔW44_vector_phase = W(unrolled_coords..., vec(OPD_matrix), 4, Model)
+    ΔW44_matrix_phase = W(ρ_rs, θ_rs, OPD_matrix, 4, Model)
+    @test ΔW44_vector_phase.v == ΔW44_matrix_phase.v
 end
 
 @testset "format strings" begin
