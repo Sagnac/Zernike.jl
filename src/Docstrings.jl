@@ -75,11 +75,17 @@ Fit wavefront errors to specific Zernike polynomials specified in `orders` conta
 
     W(OPD, fit_to; options...)
 
-Fitting method accepting a floating-point matrix of phase data uniformly produced in a polar coordinate system over the pupil.
+Fitting method accepting a floating-point matrix of phase data _uniformly_ produced in a polar coordinate system over the pupil.
 
 The matrix is expected to be a polar grid of regularly spaced periodic samples with the first element referring to the value at the origin. The first axis of the matrix (the rows) must correspond to the angular variable `θ` while the second axis (the columns) must correspond to the radial variable `ρ`.
 
 `fit_to` can be either `n_max::Int` or `orders::Vector{Tuple{Int, Int}}`.
+
+----
+
+    W(ρ::Vector, θ::Vector, OPD::Matrix, fit_to; options...)
+
+Fitting method accepting coordinate vectors and a floating-point matrix of corresponding phase data produced in a polar coordinate system over the pupil under the aforementioned dimensional ordering assumption. This method does not assume equally spaced samples.
 
 ----
 
@@ -103,7 +109,7 @@ Return the wavefront error function `ΔW(ρ, θ)` corresponding to an `n_max` fi
 
 \u2063\u2063\u2063\u2063 If you want full 64-bit floating-point precision use `precision = "full"`.
 
-* `finesse`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 1 million.
+* `finesse`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 2^20 (~ 1 million).
 """
 W
 
@@ -143,7 +149,7 @@ Return the wavefront error function `ΔW(ρ, θ)` corresponding to the input tra
 
 \u2063\u2063\u2063\u2063 If you want full 64-bit floating-point precision use `precision = "full"`.
 
-* `finesse`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 1 million.
+* `finesse`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 2^20 (~ 1 million).
 
 # Extended help
 

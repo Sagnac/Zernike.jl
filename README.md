@@ -67,6 +67,12 @@ W(OPD, fit_to; options...)
 
 This assumes the wavefront error was uniformly measured using polar coordinates; the matrix is expected to be a polar grid of regularly spaced periodic samples with the first element referring to the value at the origin. The first axis of the matrix (the rows) must correspond to the angular variable `θ` while the second axis (the columns) must correspond to the radial variable `ρ`.
 
+If instead your data is not equally spaced you can call:
+```
+W(ρ::Vector, θ::Vector, OPD::Matrix, fit_to; options...)
+```
+under the aforementioned dimensional ordering assumption.
+
 `fit_to` can be either `n_max::Int` or `orders::Vector{Tuple{Int, Int}}`.
 
 It is also possible to input normalized Cartesian coordinates using the method with 3 positional arguments and passing `fit_to` as a keyword argument:<br>
@@ -118,7 +124,7 @@ The transformed expansion coefficients are computed using a fast and accurate al
 
 There are 2 options you can vary using keyword arguments. All 3 main functions support:
 
-* `finesse::Int`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 1 million which should avoid aliasing up to ~317 radially and ~499 azimuthally.
+* `finesse::Int`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 2^20 (~ 1 million) which should avoid aliasing up to ~317 radially and ~499 azimuthally.
 
 Default: `100` (for `Z`, proportionally scaled according to the number of polynomials for the wavefront errors).
 
