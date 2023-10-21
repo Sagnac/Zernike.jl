@@ -52,6 +52,8 @@ Z62 = Z(2, 6, Model)
     @test_throws "Bounds" Z(0, 3)
     polynomial(ρ, θ) = √14 * (15ρ^6 - 20ρ^4 + 6ρ^2)cos(2θ)
     @test Z62(0.3, 0.7) ≈ polynomial(0.3, 0.7)
+    (; R) = Z(0, 30, Model)
+    @test R(1.0) ≈ sum(R.γ) ≈ sum(R.λ) ≈ 1.0
 end
 
 ρ = range(0.0, 1.0, 21)
