@@ -26,7 +26,7 @@ function ZPlot(ρ::FloatVec, θ::FloatVec, Zp::FloatMat;
         @. Zp = sign(Zp) * log10(abs(Zp * log(10)) + 1)
         axis3.title[] = "Log transform of $plot"
     end
-    surface!(axis3, ρᵪ, ρᵧ, Zp; colormap = :oslo)
+    surface!(axis3, ρᵪ, ρᵧ, Zp; shading = false, colormap = :oslo)
     # hacky way to produce a top-down heatmap-style view without generating
     # another plot with a different set of data
     # accomplished by adding a toggle which changes the perspective on demand
