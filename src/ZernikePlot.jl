@@ -1,11 +1,15 @@
-import GLMakie: GLFW.GetPrimaryMonitor, MonitorProperties
+import GLMakie: GLFW.GetPrimaryMonitor, GLFW.GetMonitorContentScale,
+                MonitorProperties, activate!
 
 function ZPlot(ρ::FloatVec, θ::FloatVec, Zp::FloatMat;
                high_order = false, window = "ZernikePlot", plot = window)
-    monitor_properties = MonitorProperties(GetPrimaryMonitor())
+    monitor = GetPrimaryMonitor()
+    monitor_properties = MonitorProperties(monitor)
+    monitor_scale = GetMonitorContentScale(monitor)
+    dpi_scale = sum(monitor_scale) / length(monitor_scale)
     (; height) = monitor_properties.videomode
-    resolution = (0.85height, height/2)
-    fontsize = 0.13 * monitor_properties.dpi[1]
+    size = (0.72height, 0.6height) ./ dpi_scale
+    fontsize = 0.13 * monitor_properties.dpi[1] / dpi_scale
     axis3attributes = (
         title = plot,
         titlesize = fontsize,
@@ -20,13 +24,13 @@ function ZPlot(ρ::FloatVec, θ::FloatVec, Zp::FloatMat;
     )
     ρᵪ = [ρⱼ * cos(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
     ρᵧ = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
-    fig = Figure(; resolution)
+    fig = Figure(; size)
     axis3 = Axis3(fig[1,1]; axis3attributes...)
     if high_order
         @. Zp = sign(Zp) * log10(abs(Zp * log(10)) + 1)
         axis3.title[] = "Log transform of $plot"
     end
-    surface!(axis3, ρᵪ, ρᵧ, Zp; shading = false, colormap = :oslo)
+    surface!(axis3, ρᵪ, ρᵧ, Zp; shading = NoShading, colormap = :oslo)
     # hacky way to produce a top-down heatmap-style view without generating
     # another plot with a different set of data
     # accomplished by adding a toggle which changes the perspective on demand
@@ -49,7 +53,7 @@ function ZPlot(ρ::FloatVec, θ::FloatVec, Zp::FloatMat;
         axis3.ylabeloffset = active ? 90 : 40
         axis3.xlabeloffset = active ? 50 : 40
     end
-    set_window_config!(title = window, focus_on_show = true)
+    activate!(title = window, focus_on_show = true)
     display(fig)
     return fig
 end
