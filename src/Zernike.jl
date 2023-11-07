@@ -7,11 +7,11 @@
 
 module Zernike
 
-export Z, W, P, Model, noll_to_j, standardize, fringe_to_j, standardize!
+export Z, W, P, Model, noll_to_j, standardize, fringe_to_j, standardize!, plotconfig
 
 using GLMakie
 import .Makie: latexstring, LaTeXString
-import Base: show, getindex, iterate
+import Base: show, getindex, iterate, setproperty!, propertynames
 
 const ∑ = sum
 const ϵ_max = 2^10

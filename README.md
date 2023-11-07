@@ -138,6 +138,10 @@ If you want full 64-bit floating-point precision use `precision = "full"`.
 
 ----
 
+Plot options can be set by setting the `plotconfig` fields; see the docstring for more details.
+
+----
+
 ## Model functions
 
 There exists a special method dispatch which avoids plotting and instead returns the `(ρ, θ)` functions as essentially closures. This is done by calling the 3 main functions with the `Model` type as the last positional argument. The pupil can then be evaluated using these functions with polar coordinates:

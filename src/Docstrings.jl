@@ -256,3 +256,22 @@ Pad a subset Zernike expansion coefficient vector to the full standard length up
 The tuples in `orders` must be of the form `(m, n)` associated with the respective coefficients at each index in `v_sub`.
 """
 standardize
+
+"""
+`plotconfig`
+
+`Zernike` plot settings.
+
+Fields / Options:
+
+* `size`::**Tuple{Float64, Float64}**: window size (DPI scaled resolution);
+* `fontsize`::**Float64**: text size;
+* `colormap`::**Symbol**: Default: `:oslo`;
+* `focus_on_show`::**Bool**: whether the window is focused on generation (default: `true`).
+
+There are two additional properties which trigger a settings refresh:
+
+* `plotconfig.reset = true` will reset all of the settings to their defaults;
+* `plotconfig.resize = true` will reset only the `size` and `fontsize` settings. This is useful if your primary monitor changes or you want to return to the automatically determined values.
+"""
+plotconfig
