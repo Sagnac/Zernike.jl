@@ -7,7 +7,8 @@
 
 module Zernike
 
-export Z, W, P, Model, noll_to_j, standardize, fringe_to_j, standardize!, plotconfig
+export Z, W, P, Model, noll_to_j, standardize, fringe_to_j, standardize!,
+       plotconfig, zplot
 
 using GLMakie
 import .Makie: latexstring, LaTeXString
@@ -45,10 +46,10 @@ struct Output
     latex::LaTeXString
 end
 
-include("ZernikePlot.jl")
-include("WavefrontError.jl")
 include("RadialCoefficients.jl")
 include("FormatStrings.jl")
+include("WavefrontError.jl")
+include("ZernikePlot.jl")
 include("ScaleAperture.jl")
 include("TransformAperture.jl")
 include("Docstrings.jl")
@@ -78,6 +79,12 @@ function polar(m::Int, n::Int; finesse::Int = 100)
     ρ = range(0.0, 1.0, ϵ_n)
     θ = range(0.0, 2π, ϵ_m)
     return ρ, θ
+end
+
+function polar_mat(ρ, θ)
+    ρᵪ = [ρⱼ * cos(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
+    ρᵧ = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
+    return ρᵪ, ρᵧ
 end
 
 # radial order
@@ -212,8 +219,6 @@ end
 function Z(m::Int, n::Int; finesse::Int = 100)
     Z = Zf(m, n)
     (; γ) = Z.R
-    ρ, θ = polar(m, n; finesse)
-    Zp = Z.(ρ', θ)
     Zmn, Z_LaTeX, Z_Unicode = format_strings(Z)
     indices = replace(Z.inds |> string, '(':')' => "")
     window_title = "Zernike Polynomial: $indices"
@@ -227,7 +232,7 @@ function Z(m::Int, n::Int; finesse::Int = 100)
         print("Z = ", Z_Unicode)
     end
     titles = (plot = Z.inds.j < 153 ? Z_LaTeX : Zmn, window = window_title)
-    fig = ZPlot(ρ, θ, Zp; high_order, titles...)
+    fig = zplot(Z; m, n, finesse, high_order, titles...)
     Output(fig, γ, Z_LaTeX)
 end
 

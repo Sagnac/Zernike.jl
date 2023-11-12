@@ -1,5 +1,6 @@
 import GLMakie: GLFW.GetPrimaryMonitor, GLFW.GetMonitorContentScale,
                 MonitorProperties, activate!
+import .Makie: plot!
 
 mutable struct PlotConfig
     size::Tuple{Float64, Float64}
@@ -52,11 +53,48 @@ end
 
 propertynames(plotconfig::PlotConfig) = fieldnames(PlotConfig)..., :reset, :resize
 
-function ZPlot(ρ::FloatVec, θ::FloatVec, Zp::FloatMat;
-               high_order = false, window = "ZernikePlot", plot = window)
+@recipe(ZernikePlot) do scene
+    Attributes(
+        colormap = :oslo,
+        m = 10,
+        n = 10,
+        finesse = 100,
+        high_order = false,
+    )
+end
+
+const ZW = Union{Polynomial, WavefrontError}
+
+# specialized for Zernike polynomial and wavefront error functions
+function plot!(zernikeplot::ZernikePlot{Tuple{T}}) where T <: ZW
+    Z = to_value(zernikeplot[1])
+    args = @extract zernikeplot (m, n, finesse, high_order)
+    m, n, finesse, high_order = to_value.(args)
+    (; colormap) = plotconfig
+    ρ, θ = polar(m, n; finesse)
+    ρᵪ, ρᵧ = polar_mat(ρ, θ)
+    Zp = Z.(ρ', θ)
+    if high_order
+        @. Zp = sign(Zp) * log10(abs(Zp * log(10)) + 1)
+    end
+    surface!(zernikeplot, ρᵪ, ρᵧ, Zp; shading = NoShading, colormap)
+    zernikeplot
+end
+
+# specialized for wavefront error matrices
+function plot!(zernikeplot::ZernikePlot)
+    ρ, θ, ΔWp = [to_value(zernikeplot[i]) for i = 1:3]
+    ρᵪ, ρᵧ = polar_mat(ρ, θ)
+    (; colormap) = plotconfig
+    surface!(zernikeplot, ρᵪ, ρᵧ, ΔWp; shading = NoShading, colormap)
+    zernikeplot
+end
+
+function zplot(args...; window = "ZernikePlot", plot = window, kwargs...)
     (; size, fontsize, colormap, focus_on_show) = plotconfig
+    high_order = haskey(kwargs, :high_order) && kwargs[:high_order]
     axis3attributes = (
-        title = plot,
+        title = high_order ? latexstring("Log transform of ", plot) : plot,
         titlesize = fontsize,
         xlabel = L"\rho_x",
         ylabel = L"\rho_y",
@@ -67,15 +105,9 @@ function ZPlot(ρ::FloatVec, θ::FloatVec, Zp::FloatMat;
         azimuth = 0.275π,
         protrusions = 80,
     )
-    ρᵪ = [ρⱼ * cos(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
-    ρᵧ = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
     fig = Figure(; size)
     axis3 = Axis3(fig[1,1]; axis3attributes...)
-    if high_order
-        @. Zp = sign(Zp) * log10(abs(Zp * log(10)) + 1)
-        axis3.title[] = "Log transform of $plot"
-    end
-    surface!(axis3, ρᵪ, ρᵧ, Zp; shading = NoShading, colormap)
+    zernikeplot!(axis3, args...; kwargs...)
     # hacky way to produce a top-down heatmap-style view without generating
     # another plot with a different set of data
     # accomplished by adding a toggle which changes the perspective on demand
