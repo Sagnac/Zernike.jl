@@ -98,6 +98,17 @@ function ZPlot(ρ::FloatVec, θ::FloatVec, Zp::FloatMat;
         axis3.ylabeloffset = active ? 90 : 40
         axis3.xlabeloffset = active ? 50 : 40
     end
+    colsize!(fig.layout, 1, Aspect(1, 1.0))
+    resize_to_layout!(fig)
+    register_interaction!(axis3, :resize) do event::MouseEvent, axis::Axis3
+        if event.type === MouseEventTypes.rightclick &&
+           ispressed(axis.scene, Keyboard.left_control)
+            resize_to_layout!(fig)
+            return Consume(true)
+        else
+            return Consume(false)
+        end
+    end
     activate!(; title = window, focus_on_show)
     display(fig)
     return fig
