@@ -275,3 +275,10 @@ There are two additional properties which trigger a settings refresh:
 * `plotconfig.resize = true` will reset only the `size` and `fontsize` settings. This is useful if your primary monitor changes or you want to return to the automatically determined values.
 """
 plotconfig
+
+"""
+    zplot(args..., kwargs...)
+
+Plot `Polynomial` and `WavefrontError` input function types as well as quantized wavefront errors; for the latter `args...` must be a collection of discretized ρ, θ, ΔWp objects where the radial variables refer to either ranges or vectors and the wavefront error is a matrix.
+"""
+zplot

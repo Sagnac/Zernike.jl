@@ -169,11 +169,15 @@ For the `standardize` subset method the tuples in `orders` must be of the form `
 
 ## Additional Notes
 
-* The values contained within the output types can also be accessed through numerical indexing and regular destructuring in addition to property destructuring and getting the fields directly.
+* The `zplot` function can be invoked independently using `Polynomial` and `WavefrontError` function types as well as quantized wavefront errors;
 
-* The Zernike polynomials are currently only valid up to degree ~812 at which point the maximum coefficient approaches the maximum for double-precision floating-point numbers (~1e308).
+* If you resize the plot window right clicking on the figure will resize / trim the plot automatically so that it fits within the window without extra space;
 
-* If you're interested in precompiling the package into a system image in order to speed up load times please see the [precompile directory](precompile) (at the moment PrecompileTools or the like is not used).
+* The values contained within the output types can also be accessed through numerical indexing and regular destructuring in addition to property destructuring and getting the fields directly;
+
+* The Zernike polynomials are currently only valid up to degree ~812 at which point the maximum coefficient approaches the maximum for double-precision floating-point numbers (~1e308);
+
+* If you're interested in precompiling the package into a system image in order to speed up load times please see the [precompile directory](precompile) (at the moment PrecompileTools or the like is not used);
 
 * If you're interested in only the full vector of Zernike expansion coefficients obtained through the least squares fit and want to avoid computing extra values and plotting the results you can call:
 ```
