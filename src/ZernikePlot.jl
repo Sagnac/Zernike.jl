@@ -55,7 +55,6 @@ propertynames(plotconfig::PlotConfig) = fieldnames(PlotConfig)..., :reset, :resi
 
 @recipe(ZernikePlot) do scene
     Attributes(
-        colormap = :oslo,
         m = 10,
         n = 10,
         finesse = 100,
@@ -68,8 +67,7 @@ const ZW = Union{Polynomial, WavefrontError}
 # specialized for Zernike polynomial and wavefront error functions
 function plot!(zernikeplot::ZernikePlot{Tuple{T}}) where T <: ZW
     Z = to_value(zernikeplot[1])
-    args = @extract zernikeplot (m, n, finesse, high_order)
-    m, n, finesse, high_order = to_value.(args)
+    m, n, finesse, high_order = @extractvalue zernikeplot (m, n, finesse, high_order)
     (; colormap) = plotconfig
     ρ, θ = polar(m, n; finesse)
     ρᵪ, ρᵧ = polar_mat(ρ, θ)
@@ -91,7 +89,7 @@ function plot!(zernikeplot::ZernikePlot)
 end
 
 function zplot(args...; window = "ZernikePlot", plot = window, kwargs...)
-    (; size, fontsize, colormap, focus_on_show) = plotconfig
+    (; size, fontsize, focus_on_show) = plotconfig
     high_order = haskey(kwargs, :high_order) && kwargs[:high_order]
     axis3attributes = (
         title = high_order ? latexstring("Log transform of ", plot) : plot,
