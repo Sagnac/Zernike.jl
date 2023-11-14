@@ -262,7 +262,7 @@ standardize
 
 `Zernike` plot settings.
 
-Fields / Options:
+# Fields / Options:
 
 * `size`::**Tuple{Float64, Float64}**: window size (DPI scaled resolution);
 * `fontsize`::**Float64**: text size;
@@ -273,6 +273,8 @@ There are two additional properties which trigger a settings refresh:
 
 * `plotconfig.reset = true` will reset all of the settings to their defaults;
 * `plotconfig.resize = true` will reset only the `size` and `fontsize` settings. This is useful if your primary monitor changes or you want to return to the automatically determined values.
+
+See also [`zplot`](@ref)
 """
 plotconfig
 
@@ -280,5 +282,20 @@ plotconfig
     zplot(args..., kwargs...)
 
 Plot `Polynomial` and `WavefrontError` input function types as well as quantized wavefront errors; for the latter `args...` must be a collection of discretized ρ, θ, ΔWp objects where the radial variables refer to either ranges or vectors and the wavefront error is a matrix.
+
+# Keyword arguments:
+
+* `size`::**Tuple{Float64, Float64}**: window size (DPI scaled resolution);
+* `fontsize`::**Float64**: text size;
+* `colormap`::**Symbol**: Default: `:oslo`;
+* `focus_on_show`::**Bool**: whether the window is focused on generation (default: `true`);
+* `window`::**String**: window title;
+* `plot`::**Union{String, LaTeXString}: plot title;
+* `m`::**Int**: azimuthal order (used to determine matrix size);
+* `n`::**Int**: radial order (used to determine matrix size);
+* `finesse`::**Int**: `{1 ≤ finesse ≤ 100}`: (used to determine matrix size);
+* `high_order`::**Bool**: whether to apply a logarithmic transform (default: `false`).
+
+See also [`plotconfig`](@ref)
 """
 zplot
