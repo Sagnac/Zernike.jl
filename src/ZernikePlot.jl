@@ -53,31 +53,43 @@ end
 
 propertynames(plotconfig::PlotConfig) = fieldnames(PlotConfig)..., :reset, :resize
 
+@recipe(ZernikePlot) do scene
+    Attributes(
+        m = 10,
+        n = 10,
+        finesse = 100,
+        high_order = false,
+    )
+end
+
 const ZW = Union{Polynomial, WavefrontError}
-const RangeOrVec = Union{AbstractRange, FloatVec}
 
 # specialized for Zernike polynomial and wavefront error functions
-function zernikeplot!(axis, Z::ZW; m = 10, n = 10, finesse = 100,
-                      high_order = false, colormap = plotconfig.colormap)
+function plot!(zernikeplot::ZernikePlot{Tuple{T}}) where T <: ZW
+    Z = to_value(zernikeplot[1])
+    m, n, finesse, high_order = @extractvalue zernikeplot (m, n, finesse, high_order)
+    (; colormap) = plotconfig
     ρ, θ = polar(m, n; finesse)
     ρᵪ, ρᵧ = polar_mat(ρ, θ)
     Zp = Z.(ρ', θ)
     if high_order
         @. Zp = sign(Zp) * log10(abs(Zp * log(10)) + 1)
     end
-    surface!(axis, ρᵪ, ρᵧ, Zp; shading = NoShading, colormap)
+    surface!(zernikeplot, ρᵪ, ρᵧ, Zp; shading = NoShading, colormap)
+    zernikeplot
 end
 
 # specialized for wavefront error matrices
-function zernikeplot!(axis, ρ::RangeOrVec, θ::RangeOrVec, ΔWp::FloatMat; kwargs...)
+function plot!(zernikeplot::ZernikePlot)
+    ρ, θ, ΔWp = [to_value(zernikeplot[i]) for i = 1:3]
     ρᵪ, ρᵧ = polar_mat(ρ, θ)
-    colormap = haskey(kwargs, :colormap) ? kwargs[:colormap] : plotconfig.colormap
-    surface!(axis, ρᵪ, ρᵧ, ΔWp; shading = NoShading, colormap)
+    (; colormap) = plotconfig
+    surface!(zernikeplot, ρᵪ, ρᵧ, ΔWp; shading = NoShading, colormap)
+    zernikeplot
 end
 
-function zplot(args...; window = "ZernikePlot", plot = window,
-               size = plotconfig.size, fontsize = plotconfig.fontsize,
-               focus_on_show = plotconfig.focus_on_show, kwargs...)
+function zplot(args...; window = "ZernikePlot", plot = window, kwargs...)
+    (; size, fontsize, focus_on_show) = plotconfig
     high_order = haskey(kwargs, :high_order) && kwargs[:high_order]
     axis3attributes = (
         title = high_order ? latexstring("Log transform of ", plot) : plot,
