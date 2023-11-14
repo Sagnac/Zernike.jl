@@ -132,15 +132,7 @@ function zplot(args...; window = "ZernikePlot", plot = window, kwargs...)
     end
     colsize!(fig.layout, 1, Aspect(1, 1.0))
     resize_to_layout!(fig)
-    register_interaction!(axis3, :resize) do event::MouseEvent, axis::Axis3
-        if event.type === MouseEventTypes.rightclick &&
-           ispressed(axis.scene, Keyboard.left_control)
-            resize_to_layout!(fig)
-            return Consume(true)
-        else
-            return Consume(false)
-        end
-    end
+    onmouserightclick(_ -> resize_to_layout!(fig), addmouseevents!(fig.scene))
     activate!(; title = window, focus_on_show)
     display(fig)
     return fig
