@@ -53,41 +53,31 @@ end
 
 propertynames(plotconfig::PlotConfig) = fieldnames(PlotConfig)..., :reset, :resize
 
-@recipe(ZernikePlot) do scene
-    Attributes(
-        m = 10,
-        n = 10,
-        finesse = 100,
-        high_order = false,
-    )
-end
-
 # specialized for Zernike polynomial and wavefront error functions
-function plot!(zernikeplot::ZernikePlot{Tuple{T}}) where T <: Phase
-    Z = zernikeplot[1]
-    m, n, finesse, high_order = @extractvalue zernikeplot (m, n, finesse, high_order)
-    (; colormap) = plotconfig
+function zernikeplot!(axis, Z; m = 10, n = 10, finesse = 100,
+                      high_order = false, colormap = plotconfig.colormap)
+    if !(Z isa Observable)
+        Z = Observable(Z)
+    end
     ρ, θ = polar(m, n; finesse)
     ρᵪ, ρᵧ = polar_mat(ρ, θ)
     Zp = @lift($Z.(ρ', θ))
     if high_order
         @. Zp[] = sign(Zp[]) * log10(abs(Zp[] * log(10)) + 1)
     end
-    surface!(zernikeplot, ρᵪ, ρᵧ, Zp; shading = NoShading, colormap)
-    zernikeplot
+    surface!(axis, ρᵪ, ρᵧ, Zp; shading = NoShading, colormap)
 end
 
 # specialized for wavefront error matrices
-function plot!(zernikeplot::ZernikePlot)
-    ρ, θ, ΔWp = [to_value(zernikeplot[i]) for i = 1:3]
+function zernikeplot!(axis, ρ, θ, ΔWp; kwargs...)
     ρᵪ, ρᵧ = polar_mat(ρ, θ)
-    (; colormap) = plotconfig
-    surface!(zernikeplot, ρᵪ, ρᵧ, ΔWp; shading = NoShading, colormap)
-    zernikeplot
+    colormap = haskey(kwargs, :colormap) ? kwargs[:colormap] : plotconfig.colormap
+    surface!(axis, ρᵪ, ρᵧ, ΔWp; shading = NoShading, colormap)
 end
 
-function zplot(args...; window = "ZernikePlot", plot = window, kwargs...)
-    (; size, fontsize, focus_on_show) = plotconfig
+function zplot(args...; window = "ZernikePlot", plot = window,
+               size = plotconfig.size, fontsize = plotconfig.fontsize,
+               focus_on_show = plotconfig.focus_on_show, kwargs...)
     high_order = haskey(kwargs, :high_order) && kwargs[:high_order]
     axis3attributes = (
         title = high_order ? latexstring("Log transform of ", plot) : plot,
