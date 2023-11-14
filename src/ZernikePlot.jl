@@ -62,10 +62,8 @@ propertynames(plotconfig::PlotConfig) = fieldnames(PlotConfig)..., :reset, :resi
     )
 end
 
-const ZW = Union{Polynomial, WavefrontError}
-
 # specialized for Zernike polynomial and wavefront error functions
-function plot!(zernikeplot::ZernikePlot{Tuple{T}}) where T <: ZW
+function plot!(zernikeplot::ZernikePlot{Tuple{T}}) where T <: Phase
     Z = to_value(zernikeplot[1])
     m, n, finesse, high_order = @extractvalue zernikeplot (m, n, finesse, high_order)
     (; colormap) = plotconfig

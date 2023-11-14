@@ -7,8 +7,8 @@
 
 module Zernike
 
-export Z, W, P, Model, noll_to_j, standardize, fringe_to_j, standardize!,
-       plotconfig, zplot
+export Z, W, P, Model, WavefrontError, noll_to_j, standardize, fringe_to_j,
+       standardize!, Observable, plotconfig, zplot
 
 using GLMakie
 import .Makie: latexstring, LaTeXString
@@ -20,6 +20,8 @@ const ϵ_max = 2^10
 # Type aliases
 const FloatVec = AbstractVector{<:AbstractFloat}
 const FloatMat = AbstractMatrix{<:AbstractFloat}
+
+abstract type Phase end
 
 struct Model end
 
@@ -33,7 +35,7 @@ struct Sinusoid
     m::Int
 end
 
-struct Polynomial
+struct Polynomial <: Phase
     inds::NamedTuple{(:j, :n, :m), Tuple{Int64, Int64, Int64}}
     N::Float64
     R::RadialPolynomial

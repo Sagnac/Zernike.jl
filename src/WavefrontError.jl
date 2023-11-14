@@ -1,4 +1,4 @@
-struct WavefrontError
+struct WavefrontError <: Phase
     i::Vector{NamedTuple{(:j, :n, :m, :a), Tuple{Int, Int, Int, Float64}}}
     v::Vector{Float64}
     n_max::Int
@@ -12,6 +12,50 @@ struct WavefrontOutput
     v::Vector{Float64}
     metrics::NamedTuple{(:PV, :RMS, :Strehl), Tuple{Float64, Float64, Float64}}
     fig::Makie.Figure
+end
+
+function WavefrontError(a::FloatVec)
+    fit_to = []
+    v = a
+    len = length(a)
+    i = Vector{NamedTuple}(undef, len)
+    Zⱼ = Vector{Polynomial}(undef, len)
+    local n
+    for (j, a) ∈ pairs(a)
+        m, n = get_mn(j)
+        i[j] = (; j, n, m, a)
+        Zⱼ[j] = Z(j, Model)
+    end
+    n_max = n
+    return WavefrontError(i, v, n_max, fit_to, a, Zⱼ)
+end
+
+function WavefrontError(orders::Vector{Tuple{Int, Int}}, a::FloatVec)
+    len = length(a)
+    len != length(orders) && throw(ArgumentError("Lengths must be equal."))
+    fit_to = []
+    i = Vector{NamedTuple}(undef, len)
+    Zᵢ = Vector{Polynomial}(undef, len)
+    local n
+    for (idx, mn) ∈ pairs(orders)
+        m, n = mn
+        aᵢ = a[idx]
+        j = get_j(m, n)
+        i[idx] = (; j, n, m, a = aᵢ)
+        Zᵢ[idx] = Z(m, n, Model)
+    end
+    n_max = n
+    v = standardize(a, orders)
+    return WavefrontError(i, v, n_max, fit_to, a, Zᵢ)
+end
+
+function WavefrontError(orders::Vector{NamedTuple{(:m, :n), Tuple{Int, Int}}},
+                        a::FloatVec)
+    WavefrontError([(mn...,) for mn ∈ orders], a)
+end
+
+function WavefrontError(orders::Vector{Int}, a::FloatVec)
+    WavefrontError([get_mn(j) for j ∈ orders], a)
 end
 
 function (ΔW::WavefrontError)(ρ, θ)
