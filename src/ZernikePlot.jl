@@ -64,14 +64,14 @@ end
 
 # specialized for Zernike polynomial and wavefront error functions
 function plot!(zernikeplot::ZernikePlot{Tuple{T}}) where T <: Phase
-    Z = to_value(zernikeplot[1])
+    Z = zernikeplot[1]
     m, n, finesse, high_order = @extractvalue zernikeplot (m, n, finesse, high_order)
     (; colormap) = plotconfig
     ρ, θ = polar(m, n; finesse)
     ρᵪ, ρᵧ = polar_mat(ρ, θ)
-    Zp = Z.(ρ', θ)
+    Zp = @lift($Z.(ρ', θ))
     if high_order
-        @. Zp = sign(Zp) * log10(abs(Zp * log(10)) + 1)
+        @. Zp[] = sign(Zp[]) * log10(abs(Zp[] * log(10)) + 1)
     end
     surface!(zernikeplot, ρᵪ, ρᵧ, Zp; shading = NoShading, colormap)
     zernikeplot
