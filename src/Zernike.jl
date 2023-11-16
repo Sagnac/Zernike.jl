@@ -44,6 +44,8 @@ end
 
 struct Output
     fig::Makie.Figure
+    axis::Axis3
+    plot::Surface{Tuple{T, T, T}} where T <: Matrix{Float32}
     coeffs::Vector{Float64}
     latex::LaTeXString
 end
@@ -234,8 +236,8 @@ function Z(m::Int, n::Int; finesse::Int = 100)
         print("Z = ", Z_Unicode)
     end
     titles = (plot_title = Z.inds.j < 153 ? Z_LaTeX : Zmn, window = window_title)
-    fig = zplot(Z; m, n, finesse, high_order, titles...)
-    Output(fig, γ, Z_LaTeX)
+    fig, axis, plot = zplot(Z; m, n, finesse, high_order, titles...)
+    Output(fig, axis, plot, γ, Z_LaTeX)
 end
 
 # overload show to clean up the output
@@ -246,7 +248,7 @@ show(::IO, ::Output) = nothing
 getindex(Z::T, i) where {T <: Output} = getfield(Z, fieldnames(T)[i])
 
 # hook into iterate to allow non-property destructuring of the output
-iterate(Z::Output, i = 1) = (i > 3 ? nothing : (Z[i], i + 1))
+iterate(Z::Output, i = 1) = (i > 5 ? nothing : (Z[i], i + 1))
 
 # methods
 Z(m::Int, n::Int, ::Type{Model}) = Zf(m, n)

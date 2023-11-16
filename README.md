@@ -32,11 +32,13 @@ Generates a Zernike polynomial.
 * `n`: radial degree;
 * `j`: ANSI Z80.28-2004 / ISO 24157:2008 / Optica (OSA) standard single-mode ordering index.
 
-Returns three values contained within a Zernike.Output type, with fields:
+Returns five values contained within a Zernike.Output type, with fields:
 
 1. `fig`: the Makie figure;
-2. `coeffs`: vector of radial polynomial coefficients;
-3. `latex`: LaTeX string of the Zernike polynomial.
+2. `axis`: the plot axis;
+3. `plot`: the surface plot object;
+4. `coeffs`: vector of radial polynomial coefficients;
+5. `latex`: LaTeX string of the Zernike polynomial.
 
 The coefficients belong to terms with exponent `n − 2(i − 1)` where `i` is the vector's index.
 
@@ -78,12 +80,14 @@ under the aforementioned dimensional ordering assumption.
 It is also possible to input normalized Cartesian coordinates using the method with 3 positional arguments and passing `fit_to` as a keyword argument:<br>
 `W(x, y, OPD; fit_to, options...)`.
 
-The function returns four values contained within a WavefrontOutput type, with fields:
+The function returns six values contained within a WavefrontOutput type, with fields:
 
 1. `a`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients rounded according to `precision`;
 2. `v`: full vector of Zernike wavefront error expansion coefficients;
 3. `metrics`: named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio;
 4. `fig`: the plotted Makie figure.
+5. `axis`: the plot axis;
+6. `plot`: the surface plot object.
 
 ----
 

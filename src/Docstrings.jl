@@ -6,11 +6,13 @@ Plot a Zernike polynomial of azimuthal order `m` and radial degree `n`.
 
 The single index `j` begins at zero and follows the ANSI Z80.28-2004 / ISO 24157:2008 / Optica (OSA) standard.
 
-Returns three values contained within a Zernike.Output type, with fields:
+Returns five values contained within a Zernike.Output type, with fields:
 
 1. `fig`: the Makie figure;
-2. `coeffs`: vector of radial polynomial coefficients;
-3. `latex`: LaTeX string of the Zernike polynomial.
+2. `axis`: the plot axis;
+3. `plot`: the surface plot object;
+4. `coeffs`: vector of radial polynomial coefficients;
+5. `latex`: LaTeX string of the Zernike polynomial.
 
 These can also be accessed through indexing and regular non-property destructuring.
 
@@ -54,12 +56,14 @@ Estimates wavefront error by expressing optical aberrations as a linear combinat
 
 # Return values
 
-Returns four values contained within a WavefrontOutput type, with fields:
+Returns six values contained within a WavefrontOutput type, with fields:
 
 1. `a`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients rounded according to `precision`;
 2. `v`: full vector of Zernike wavefront error expansion coefficients;
 3. `metrics`: named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio;
 4. `fig`: the plotted Makie figure.
+5. `axis`: the plot axis;
+6. `plot`: the surface plot object.
 
 These can also be accessed through indexing and regular non-property destructuring.
 

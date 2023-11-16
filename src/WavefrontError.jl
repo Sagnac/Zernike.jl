@@ -12,6 +12,8 @@ struct WavefrontOutput
     v::Vector{Float64}
     metrics::NamedTuple{(:PV, :RMS, :Strehl), Tuple{Float64, Float64, Float64}}
     fig::Makie.Figure
+    axis::Axis3
+    plot::Surface{Tuple{T, T, T}} where T <: Matrix{Float32}
 end
 
 function WavefrontError(a::FloatVec)
@@ -126,8 +128,8 @@ function Λ(ΔW, a, v, n_max; finesse::Int)
     ΔWp = ΔW.(ρ', θ)
     W_LaTeX = format_strings(a)
     titles = (plot_title = W_LaTeX, window = "Estimated wavefront error")
-    fig = zplot(ρ, θ, ΔWp; titles...)
-    WavefrontOutput(a, v, metrics(v, ΔWp), fig)
+    fig, axis, plot = zplot(ρ, θ, ΔWp; titles...)
+    WavefrontOutput(a, v, metrics(v, ΔWp), fig, axis, plot)
 end
 
 function metrics(v::FloatVec, ΔWp::FloatMat)
@@ -168,7 +170,7 @@ end
 
 function show(io::IO, W::T) where {T <: WavefrontOutput}
     strip3 = map(-, displaysize(io), (3, 0))
-    println(io, T, "(a, v, metrics, fig)")
+    println(io, T, "(a, v, metrics, fig, axis, plot)")
     println(io, "Summary:")
     show(IOContext(io, :limit => true, :displaysize => strip3), "text/plain", W.a)
     println(io)
@@ -179,7 +181,7 @@ end
 getindex(W::T, i) where {T <: WavefrontOutput} = getfield(W, fieldnames(T)[i])
 
 # hook into iterate to allow non-property destructuring of the output
-iterate(W::WavefrontOutput, i = 1) = (i > 4 ? nothing : (W[i], i + 1))
+iterate(W::WavefrontOutput, i = 1) = (i > 6 ? nothing : (W[i], i + 1))
 
 # pads a subset Zernike expansion coefficient vector to standard length
 function standardize(v_sub::FloatVec, orders::Vector{Tuple{Int, Int}})
