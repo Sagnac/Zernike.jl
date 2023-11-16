@@ -75,12 +75,14 @@ function zernikeplot!(axis, ρ, θ, ΔWp; kwargs...)
     surface!(axis, ρᵪ, ρᵧ, ΔWp; shading = NoShading, colormap)
 end
 
-function zplot(args...; window = "ZernikePlot", plot = window,
+function zplot(args...; window = "ZernikePlot", plot_title = window,
                size = plotconfig.size, fontsize = plotconfig.fontsize,
                focus_on_show = plotconfig.focus_on_show, kwargs...)
-    high_order = haskey(kwargs, :high_order) && kwargs[:high_order]
+    if haskey(kwargs, :high_order) && kwargs[:high_order]
+        plot_title = latexstring("Log transform of ", plot_title)
+    end
     axis3attributes = (
-        title = high_order ? latexstring("Log transform of ", plot) : plot,
+        title = plot_title,
         titlesize = fontsize,
         xlabel = L"\rho_x",
         ylabel = L"\rho_y",
