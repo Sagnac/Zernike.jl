@@ -293,7 +293,7 @@ Plot `Polynomial` and `WavefrontError` input function types as well as quantized
 * `fontsize`::**Float64**: text size;
 * `colormap`::**Symbol**: Default: `:oslo`;
 * `focus_on_show`::**Bool**: whether the window is focused on generation (default: `true`);
-* `window`::**String**: window title;
+* `window_title`::**String**: window title;
 * `plot_title`::**Union{String, LaTeXString}: plot title;
 * `m`::**Int**: azimuthal order (used to determine matrix size);
 * `n`::**Int**: radial order (used to determine matrix size);

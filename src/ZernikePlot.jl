@@ -75,7 +75,7 @@ function zernikeplot!(axis, ρ, θ, w; kwargs...)
     surface!(axis, ρᵪ, ρᵧ, w; shading = NoShading, colormap)
 end
 
-function zplot(args...; window = "ZernikePlot", plot_title = window,
+function zplot(args...; window_title = "ZernikePlot", plot_title = window_title,
                size = plotconfig.size, fontsize = plotconfig.fontsize,
                focus_on_show = plotconfig.focus_on_show, kwargs...)
     if haskey(kwargs, :high_order) && kwargs[:high_order]
@@ -121,7 +121,7 @@ function zplot(args...; window = "ZernikePlot", plot_title = window,
     colsize!(fig.layout, 1, Aspect(1, 1.0))
     resize_to_layout!(fig)
     onmouserightclick(_ -> resize_to_layout!(fig), addmouseevents!(fig.scene))
-    activate!(; title = window, focus_on_show)
+    activate!(; title = window_title, focus_on_show)
     display(fig)
     return fig, axis3, plot
 end

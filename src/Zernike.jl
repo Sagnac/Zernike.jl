@@ -235,7 +235,7 @@ function Z(m::Int, n::Int; finesse::Int = 100)
         high_order = false
         print("Z = ", Z_Unicode)
     end
-    titles = (plot_title = Z.inds.j < 153 ? Z_LaTeX : Z_mn, window = window_title)
+    titles = (; plot_title = Z.inds.j < 153 ? Z_LaTeX : Z_mn, window_title)
     fig, axis, plot = zplot(Z; m, n, finesse, high_order, titles...)
     Output(fig, axis, plot, γ, Z_LaTeX)
 end

@@ -127,7 +127,7 @@ function Λ(ΔW; finesse::Int)
     # construct the estimated wavefront error
     w = ΔW.(ρ', θ)
     W_LaTeX = format_strings(i)
-    titles = (plot_title = W_LaTeX, window = "Estimated wavefront error")
+    titles = (plot_title = W_LaTeX, window_title = "Estimated wavefront error")
     fig, axis, plot = zplot(ρ, θ, w; titles...)
     WavefrontOutput(i, v, metrics(v, w), fig, axis, plot)
 end
