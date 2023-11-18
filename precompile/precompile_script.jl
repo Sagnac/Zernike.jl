@@ -1,4 +1,5 @@
 using Zernike
+using Zernike: Z, W, P
 
 # uniform sampling over the unit disk
 ρ = range(0.0, 1.0, 21)

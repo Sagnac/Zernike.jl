@@ -75,22 +75,21 @@ function fit(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, Zᵢ::Vector{Polynomial}
     A \ OPD
 end
 
-# fitting function (construction function 1)
-function Wf(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int)
+function reconstruct(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int)
     j_max = get_j(n_max, n_max)
     Zᵢ = Polynomial[Z(j, Model) for j = 0:j_max]
     v = fit(ρ, θ, OPD, Zᵢ)
     return v, Zᵢ
 end
 
-function Wf(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
-            orders::Vector{Tuple{Int, Int}})
-    Zᵢ = Polynomial[Zf(mn...) for mn ∈ orders]
+function reconstruct(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
+                     orders::Vector{Tuple{Int, Int}})
+    Zᵢ = Polynomial[construct(mn...) for mn ∈ orders]
     v = fit(ρ, θ, OPD, Zᵢ)
     return v, Zᵢ
 end
 
-# filtering function (construction function 2)
+# filtering function
 function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision)
     if precision ≠ "full" && !isa(precision, Int)
         precision = 3
@@ -125,16 +124,16 @@ function Λ(ΔW, a, v, n_max; finesse::Int)
     finesse::Int = finesse ∈ 1:100 ? finesse : cld(100, √ length(a))
     ρ, θ = polar(n_max, n_max; finesse)
     # construct the estimated wavefront error
-    ΔWp = ΔW.(ρ', θ)
+    w = ΔW.(ρ', θ)
     W_LaTeX = format_strings(a)
     titles = (plot_title = W_LaTeX, window = "Estimated wavefront error")
-    fig, axis, plot = zplot(ρ, θ, ΔWp; titles...)
-    WavefrontOutput(a, v, metrics(v, ΔWp), fig, axis, plot)
+    fig, axis, plot = zplot(ρ, θ, w; titles...)
+    WavefrontOutput(a, v, metrics(v, w), fig, axis, plot)
 end
 
-function metrics(v::FloatVec, ΔWp::FloatMat)
+function metrics(v::FloatVec, w::FloatMat)
     # Peak-to-valley wavefront error
-    PV = maximum(ΔWp) - minimum(ΔWp)
+    PV = maximum(w) - minimum(w)
     # RMS wavefront error
     # where σ² is the variance (second central moment about the mean)
     # the mean is the first a00 piston term
@@ -146,7 +145,7 @@ end
 # main interface function
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int;
            precision = 3, finesse = 101)
-    v, Zᵢ = Wf(ρ, θ, OPD, n_max)
+    v, Zᵢ = reconstruct(ρ, θ, OPD, n_max)
     ΔW, a = Ψ(v, Zᵢ, n_max; precision)
     Λ(ΔW, a, v, n_max; finesse)
 end
@@ -154,7 +153,7 @@ end
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, orders::Vector{Tuple{Int, Int}};
            precision = 3, finesse = 101)
     n_max = maximum(mn -> mn[2], orders; init = 0)
-    v, Zᵢ = Wf(ρ, θ, OPD, orders)
+    v, Zᵢ = reconstruct(ρ, θ, OPD, orders)
     ΔW, a, v = Ψ(v, Zᵢ, n_max, orders; precision)
     Λ(ΔW, a, v, n_max; finesse)
 end
@@ -196,14 +195,14 @@ end
 # methods
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int, ::Type{Model};
            precision = 3)
-    v, Zᵢ = Wf(ρ, θ, OPD, n_max)
+    v, Zᵢ = reconstruct(ρ, θ, OPD, n_max)
     return Ψ(v, Zᵢ, n_max; precision)[1]
 end
 
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
            orders::Vector{Tuple{Int, Int}}, ::Type{Model}; precision = 3)
     n_max = maximum(mn -> mn[2], orders; init = 0)
-    v, Zᵢ = Wf(ρ, θ, OPD, orders)
+    v, Zᵢ = reconstruct(ρ, θ, OPD, orders)
     return Ψ(v, Zᵢ, n_max, orders; precision)[1]
 end
 

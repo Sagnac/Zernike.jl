@@ -17,15 +17,15 @@ function Π(v::Vector{T}, ε::T) where T <: Float64
     for i in eachindex(v)
         a = v[i]
         Nmn = √radicand(m, n)
-        R0 = Zf(n, n).R(ε)
+        R0 = construct(n, n).R(ε)
         v2[i] = a * Nmn * R0
         ii = i
         for n′ = n+2:2:n_max
             ii += 2n′
             a = v[ii]
             N = √radicand(m, n′)
-            R1 = Zf(n, n′).R(ε)
-            R2 = Zf(n+2, n′).R(ε)
+            R1 = construct(n, n′).R(ε)
+            R2 = construct(n+2, n′).R(ε)
             v2[i] += a * N * (R1 - R2)
         end
         v2[i] /= Nmn

@@ -55,10 +55,10 @@ function format_strings(Z::Polynomial)
         LaTeX[3] = "\\cos($(υ)\\theta)"
     end
     parentheses = k ≠ 0 ? ("(", ")") : ""
-    Zmn = "Z_{$n}^{$m}"
+    Z_mn = "Z_{$n}^{$m}"
     Z_Unicode = join(UNICODE, parentheses...)
-    Z_LaTeX = latexstring(Zmn, " = ", join(LaTeX, parentheses...))
-    return latexstring(Zmn), Z_LaTeX, Z_Unicode
+    Z_LaTeX = latexstring(Z_mn, " = ", join(LaTeX, parentheses...))
+    return latexstring(Z_mn), Z_LaTeX, Z_Unicode
 end
 
 function format_strings(a::Vector)

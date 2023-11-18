@@ -7,8 +7,9 @@
 
 module Zernike
 
-export Z, W, P, Model, WavefrontError, noll_to_j, standardize, fringe_to_j,
-       standardize!, Observable, plotconfig, zplot
+export zernike, wavefront, transform, Model, WavefrontError,
+       noll_to_j, fringe_to_j, standardize, standardize!,
+       Observable, plotconfig, zplot
 
 using GLMakie
 import .Makie: latexstring, LaTeXString
@@ -185,9 +186,8 @@ function λ(μ, n, s, k)
     (-1)^s * τ[1] / prod(τ[2:4])
 end
 
-# computation and construction function
 # binds the indices and produces a specific polynomial function
-function Zf(m::Int, n::Int)
+function construct(m::Int, n::Int)
     μ = abs(m)
     # validate
     if n < 0 || μ > n || isodd(n - μ)
@@ -221,9 +221,9 @@ end
 
 # main interface function
 function Z(m::Int, n::Int; finesse::Int = 100)
-    Z = Zf(m, n)
+    Z = construct(m, n)
     (; γ) = Z.R
-    Zmn, Z_LaTeX, Z_Unicode = format_strings(Z)
+    Z_mn, Z_LaTeX, Z_Unicode = format_strings(Z)
     indices = replace(Z.inds |> string, '(':')' => "")
     window_title = "Zernike Polynomial: $indices"
     println(indices)
@@ -235,7 +235,7 @@ function Z(m::Int, n::Int; finesse::Int = 100)
         high_order = false
         print("Z = ", Z_Unicode)
     end
-    titles = (plot_title = Z.inds.j < 153 ? Z_LaTeX : Zmn, window = window_title)
+    titles = (plot_title = Z.inds.j < 153 ? Z_LaTeX : Z_mn, window = window_title)
     fig, axis, plot = zplot(Z; m, n, finesse, high_order, titles...)
     Output(fig, axis, plot, γ, Z_LaTeX)
 end
@@ -251,12 +251,20 @@ getindex(Z::T, i) where {T <: Output} = getfield(Z, fieldnames(T)[i])
 iterate(Z::Output, i = 1) = (i > 5 ? nothing : (Z[i], i + 1))
 
 # methods
-Z(m::Int, n::Int, ::Type{Model}) = Zf(m, n)
+Z(m::Int, n::Int, ::Type{Model}) = construct(m, n)
 
 Z(; m, n, finesse::Int = 100) = Z(m, n; finesse)
 
 Z(j::Int; finesse::Int = 100) = Z(get_mn(j)...; finesse)
 
-Z(j::Int, ::Type{Model}) = Zf(get_mn(j)...)
+Z(j::Int, ::Type{Model}) = construct(get_mn(j)...)
+
+# aliases for the API namespace
+const zernike = Z
+const wavefront = W
+const transform = P
+const scale = J
+const coefficients = Φ
+const transform_coefficients = S
 
 end

@@ -55,7 +55,7 @@ function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <
         end
     end
     if _translate_ && _elliptic_
-        ηₛ, ηₑ = transform(ε, δ, ω..., remap)
+        ηₛ, ηₑ = translate_ellipse(ε, δ, ω..., remap)
     elseif _translate_
         ηₛ = translate(ε, δ, remap)
         ηₑ = I
@@ -89,16 +89,16 @@ macro translation_kernel()
     quote
         n′ = n - p - q
         m′ = m - p + q
-        z = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ei((p-q)θₜ)
-        ηₛ[remap[(m′, n′)], i] += z
+        t = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ei((p-q)θₜ)
+        ηₛ[remap[(m′, n′)], i] += t
     end |> esc
 end
 
 macro elliptical_kernel()
     quote
         m′ = m - 2p + 2q
-        z = 0.5^n * b(k2,p) * b(k3,q) * (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ei(2(p-q)φ)
-        ηₑ[remap[(m′, n)], i] += z
+        t = 0.5^n * b(k2,p) * b(k3,q) * (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ei(2(p-q)φ)
+        ηₑ[remap[(m′, n)], i] += t
     end |> esc
 end
 
@@ -129,8 +129,8 @@ function elliptical(ξ::Float64, φ::Float64, remap::Dict)
     return ηₑ
 end
 
-# translate + elliptical
-function transform(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64, remap::Dict)
+function translate_ellipse(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64,
+                           remap::Dict)
     ρₜ, θₜ = abs(δ), angle(δ)
     len = length(remap)
     n_max = get_n(len - 1)

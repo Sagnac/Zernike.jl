@@ -61,18 +61,18 @@ function zernikeplot!(axis, Z; m = 10, n = 10, finesse = 100,
     end
     ρ, θ = polar(m, n; finesse)
     ρᵪ, ρᵧ = polar_mat(ρ, θ)
-    Zp = @lift($Z.(ρ', θ))
+    z = @lift($Z.(ρ', θ))
     if high_order
-        @. Zp[] = sign(Zp[]) * log10(abs(Zp[] * log(10)) + 1)
+        @. z[] = sign(z[]) * log10(abs(z[] * log(10)) + 1)
     end
-    surface!(axis, ρᵪ, ρᵧ, Zp; shading = NoShading, colormap)
+    surface!(axis, ρᵪ, ρᵧ, z; shading = NoShading, colormap)
 end
 
 # specialized for wavefront error matrices
-function zernikeplot!(axis, ρ, θ, ΔWp; kwargs...)
+function zernikeplot!(axis, ρ, θ, w; kwargs...)
     ρᵪ, ρᵧ = polar_mat(ρ, θ)
     colormap = haskey(kwargs, :colormap) ? kwargs[:colormap] : plotconfig.colormap
-    surface!(axis, ρᵪ, ρᵧ, ΔWp; shading = NoShading, colormap)
+    surface!(axis, ρᵪ, ρᵧ, w; shading = NoShading, colormap)
 end
 
 function zplot(args...; window = "ZernikePlot", plot_title = window,

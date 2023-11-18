@@ -1,7 +1,7 @@
 using Test
 using Zernike
-using Zernike: radicand, Φ, get_i, λ, coords, Wf, validate_length, map_phase,
-               format_strings, get_mn, LaTeXString, latexstring, J
+using Zernike: Z, W, P, radicand, Φ, get_i, λ, coords, reconstruct, validate_length,
+               map_phase, format_strings, get_mn, LaTeXString, latexstring, J
 
 @testset "fringe" begin
     @test_throws "37" fringe_to_j(38)
@@ -58,11 +58,11 @@ end
 
 ρ = range(0.0, 1.0, 21)
 θ = range(0, 2π, 21)
-Zp = Z62.(ρ', θ)
-OPD = Zp + [10sinc(5r) for i = 1:21, r ∈ ρ]
+z = Z62.(ρ', θ)
+OPD = z + [10sinc(5r) for i = 1:21, r ∈ ρ]
 r, t = coords(OPD)
 OPD_vec = vec(OPD)
-v = Wf(r, t, OPD_vec, 8)[1]
+v = reconstruct(r, t, OPD_vec, 8)[1]
 
 @testset "wavefront error" begin
     @test_throws "number" validate_length(ones(5))
@@ -72,7 +72,7 @@ v = Wf(r, t, OPD_vec, 8)[1]
     v_full = standardize(v_sub, orders)
     @test length(v_full) == 45
     @test getindex(v_full, [5, 13, 25, 26, 41]) == v_sub
-    ΔW = W(Zp, 6, Model; precision = 0)
+    ΔW = W(z, 6, Model; precision = 0)
     @test ΔW(0.3, 0.7) ≈ Z62(0.3, 0.7)
     @test map_phase(r, t, OPD_vec) == (ρ, θ, OPD)
     inds_a = getfield(W(OPD, 8, Model; precision = 7), :i)
