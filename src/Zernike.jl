@@ -3,7 +3,7 @@
 # 2023-10-22
 # https://github.com/Sagnac/Zernike.jl
 
-# Generates Zernike polynomials, models wavefront errors, and plots them in Makie.
+# Generates Zernike polynomials, models wavefront errors, and plots them using Makie.
 
 module Zernike
 
