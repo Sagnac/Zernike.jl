@@ -42,12 +42,12 @@ end
 function J(v::Vector{Float64}, ε::Float64; precision = 3, finesse::Int = 101)
     v2, n_max = Π(v, ε)
     Zᵢ = Vector{Polynomial}(undef, length(v))
-    ΔW, b = Ψ(v2, Zᵢ, n_max; precision)
-    Λ(ΔW, b, v2, n_max; finesse)
+    ΔW = Ψ(v2, Zᵢ, n_max; precision)
+    Λ(ΔW; finesse)
 end
 
 function J(v::Vector{Float64}, ε::Float64, ::Type{Model}; precision = 3)
     v2, n_max = Π(v, ε)
     Zᵢ = Vector{Polynomial}(undef, length(v))
-    Ψ(v2, Zᵢ, n_max; precision)[1]
+    Ψ(v2, Zᵢ, n_max; precision)
 end

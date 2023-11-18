@@ -180,15 +180,15 @@ function P(v::Vector{T}, ε::T, δ::Complex{T} = 0.0im,
            precision = 3, finesse::Int = 101) where T <: Float64
     v2, n_max = S(v, ε, δ, ϕ, ω)
     Zᵢ = Vector{Polynomial}(undef, length(v))
-    ΔW, b = Ψ(v2, Zᵢ, n_max; precision)
-    Λ(ΔW, b, v2, n_max; finesse)
+    ΔW = Ψ(v2, Zᵢ, n_max; precision)
+    Λ(ΔW; finesse)
 end
 
 function P(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T, T}, ::Type{Model};
            precision = 3) where T <: Float64
     v2, n_max = S(v, ε, δ, ϕ, ω)
     Zᵢ = Vector{Polynomial}(undef, length(v))
-    Ψ(v2, Zᵢ, n_max; precision)[1]
+    Ψ(v2, Zᵢ, n_max; precision)
 end
 
 function P(v::Vector{T}, ε::T, ::Type{Model}; precision = 3) where T <: Float64
