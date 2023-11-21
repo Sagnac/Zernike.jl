@@ -58,7 +58,7 @@ Estimates wavefront error by expressing optical aberrations as a linear combinat
 
 Returns six values contained within a `WavefrontOutput` type, with fields:
 
-1. `a`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients rounded according to `precision`;
+1. `recap`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients rounded according to `precision`;
 2. `v`: full vector of Zernike wavefront error expansion coefficients;
 3. `metrics`: named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio;
 4. `fig`: the plotted `Makie` figure.
@@ -198,7 +198,7 @@ Specifically, `ΔW(ρ, θ)` = `∑aᵢZᵢ(ρ, θ)`
 
 Fields:
 
-* `i`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients;
+* `recap`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients;
 * `v`: full vector of the unfiltered full-precision standardized expansion coefficients up to `n_max`;
 * `n_max`: maximum radial degree fit to;
 * `fit_to`: vector of `(m, n)` tuples specifying the polynomials used for the fit;

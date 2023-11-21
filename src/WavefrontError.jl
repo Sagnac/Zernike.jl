@@ -1,5 +1,7 @@
+const Recap = Vector{NamedTuple{(:j, :n, :m, :a), Tuple{Int, Int, Int, Float64}}}
+
 struct WavefrontError <: Phase
-    i::Vector{NamedTuple{(:j, :n, :m, :a), Tuple{Int, Int, Int, Float64}}}
+    recap::Recap
     v::Vector{Float64}
     n_max::Int
     fit_to::Vector{Tuple{Int, Int}}
@@ -8,7 +10,7 @@ struct WavefrontError <: Phase
 end
 
 struct WavefrontOutput
-    a::Vector{NamedTuple{(:j, :n, :m, :a), Tuple{Int, Int, Int, Float64}}}
+    recap::Recap
     v::Vector{Float64}
     metrics::NamedTuple{(:PV, :RMS, :Strehl), Tuple{Float64, Float64, Float64}}
     fig::Makie.Figure
@@ -20,35 +22,35 @@ function WavefrontError(a::FloatVec)
     fit_to = []
     v = a
     len = length(a)
-    i = Vector{NamedTuple}(undef, len)
+    recap = Vector{NamedTuple}(undef, len)
     Zⱼ = Vector{Polynomial}(undef, len)
     local n
     for (j, a) ∈ pairs(a)
         m, n = get_mn(j)
-        i[j] = (; j, n, m, a)
+        recap[j] = (; j, n, m, a)
         Zⱼ[j] = Z(j, Model)
     end
     n_max = n
-    return WavefrontError(i, v, n_max, fit_to, a, Zⱼ)
+    return WavefrontError(recap, v, n_max, fit_to, a, Zⱼ)
 end
 
 function WavefrontError(orders::Vector{Tuple{Int, Int}}, a::FloatVec)
     len = length(a)
     len != length(orders) && throw(ArgumentError("Lengths must be equal."))
     fit_to = []
-    i = Vector{NamedTuple}(undef, len)
+    recap = Vector{NamedTuple}(undef, len)
     Zᵢ = Vector{Polynomial}(undef, len)
     local n
     for (idx, mn) ∈ pairs(orders)
         m, n = mn
         aᵢ = a[idx]
         j = get_j(m, n)
-        i[idx] = (; j, n, m, a = aᵢ)
+        recap[idx] = (; j, n, m, a = aᵢ)
         Zᵢ[idx] = Z(m, n, Model)
     end
     n_max = n
     v = standardize(a, orders)
-    return WavefrontError(i, v, n_max, fit_to, a, Zᵢ)
+    return WavefrontError(recap, v, n_max, fit_to, a, Zᵢ)
 end
 
 function WavefrontError(orders::Vector{NamedTuple{(:m, :n), Tuple{Int, Int}}},
@@ -94,8 +96,8 @@ function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision)
     if precision ≠ "full" && !isa(precision, Int)
         precision = 3
     end
-    a = @NamedTuple{j::Int, n::Int, m::Int, a::Float64}[]
-    av = Float64[]
+    recap = @NamedTuple{j::Int, n::Int, m::Int, a::Float64}[]
+    a = Float64[]
     Zₐ = Polynomial[]
     clipped = !isassigned(Zᵢ, 1)
     # store the non-trivial coefficients
@@ -105,8 +107,8 @@ function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision)
             if clipped
                 Zᵢ[i] = Z(i-1, Model)
             end
-            push!(a, (; Zᵢ[i].inds..., a = aᵢ))
-            push!(av, aᵢ)
+            push!(recap, (; Zᵢ[i].inds..., a = aᵢ))
+            push!(a, aᵢ)
             push!(Zₐ, Zᵢ[i])
         end
     end
@@ -115,21 +117,21 @@ function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision)
         v = standardize(v, orders)
     end
     # create the fitted polynomial
-    ΔW = WavefrontError(a, v, n_max, orders, av, Zₐ)
+    ΔW = WavefrontError(recap, v, n_max, orders, a, Zₐ)
     return ΔW
 end
 
 # synthesis function
 function Λ(ΔW; finesse::Int)
-    (; i, v, n_max) = ΔW
-    finesse::Int = finesse ∈ 1:100 ? finesse : cld(100, √ length(i))
+    (; recap, v, n_max) = ΔW
+    finesse::Int = finesse ∈ 1:100 ? finesse : cld(100, √ length(recap))
     ρ, θ = polar(n_max, n_max; finesse)
     # construct the estimated wavefront error
     w = ΔW.(ρ', θ)
-    W_LaTeX = format_strings(i)
+    W_LaTeX = format_strings(recap)
     titles = (plot_title = W_LaTeX, window_title = "Estimated wavefront error")
     fig, axis, plot = zplot(ρ, θ, w; titles...)
-    WavefrontOutput(i, v, metrics(v, w), fig, axis, plot)
+    WavefrontOutput(recap, v, metrics(v, w), fig, axis, plot)
 end
 
 function metrics(v::FloatVec, w::FloatMat)
@@ -164,15 +166,17 @@ function show(io::IO, W::T) where {T <: WavefrontError}
     strip3 = map(-, displaysize(io), (3, 0))
     println(io, T, "(n_max = ", W.n_max, ")")
     println(io, "   ∑aᵢZᵢ(ρ, θ):")
-    show(IOContext(io, :limit => true, :displaysize => strip3), "text/plain", W.i)
+    show(IOContext(io, :limit => true, :displaysize => strip3),
+                   "text/plain", W.recap)
     print(io, "\n   --> ΔW(ρ, θ)")
 end
 
 function show(io::IO, W::T) where {T <: WavefrontOutput}
     strip3 = map(-, displaysize(io), (3, 0))
-    println(io, T, "(a, v, metrics, fig, axis, plot)")
+    println(io, T, "(recap, v, metrics, fig, axis, plot)")
     println(io, "Summary:")
-    show(IOContext(io, :limit => true, :displaysize => strip3), "text/plain", W.a)
+    show(IOContext(io, :limit => true, :displaysize => strip3),
+                   "text/plain", W.recap)
     println(io)
     show(IOContext(io, :compact => true), "text/plain", W.metrics)
 end

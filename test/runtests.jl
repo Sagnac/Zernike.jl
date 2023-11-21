@@ -75,7 +75,7 @@ v = reconstruct(r, t, OPD_vec, 8)[1]
     ΔW = W(z, 6, Model; precision = 0)
     @test ΔW(0.3, 0.7) ≈ Z62(0.3, 0.7)
     @test map_phase(r, t, OPD_vec) == (ρ, θ, OPD)
-    inds_a = getfield(W(OPD, 8, Model; precision = 7), :i)
+    inds_a = getfield(W(OPD, 8, Model; precision = 7), :recap)
     @testset "expansion coefficients" for i in inds_a
         @test i[:a] ≈ v[i[:j] + 1] atol = 1e-7
     end
@@ -94,15 +94,15 @@ end
     latex1, latex2, unicode = format_strings(Z62)
     @test typeof(latex1) == typeof(latex2) == LaTeXString
     @test unicode == "√(14)(15ρ⁶ − 20ρ⁴ + 6ρ²)cos(2θ)"
-    a = []
+    recap = []
     for i = 1:10
         j = i - 1
         m, n = get_mn(j)
-        push!(a, (; j, n, m, a = -float(i)))
+        push!(recap, (; j, n, m, a = -float(i)))
     end
     abbreviated = "ΔW ≈ -10.000Z_{3}^{3} - 9.000Z_{3}^{1} \
                         - 8.000Z_{3}^{-1} - 7.000Z_{3}^{-3}..."
-    @test format_strings(a) == latexstring(abbreviated)
+    @test format_strings(recap) == latexstring(abbreviated)
 end
 
 ΔW = W(OPD, 8, Model; precision = "full")
@@ -150,5 +150,5 @@ end
 
 @testset "elliptical" begin
     ΔW_e = P([0.0, 0.0, 1.0], 1.0, 0.0im, 0.0, (0.148, 0.0), Model)
-    @test getfield(ΔW_e, :i) == [(j = 2, n = 1, m = 1, a = 0.148)]
+    @test getfield(ΔW_e, :recap) == [(j = 2, n = 1, m = 1, a = 0.148)]
 end

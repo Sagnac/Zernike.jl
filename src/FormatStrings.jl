@@ -61,27 +61,27 @@ function format_strings(Z::Polynomial)
     return latexstring(Z_mn), Z_LaTeX, Z_Unicode
 end
 
-function format_strings(a::Vector)
+function format_strings(recap::Vector)
     W_LaTeX = "ΔW ≈ "
     function ζ(i, sub_index = 0)
-        aᵢ = a[i][:a]
+        aᵢ = recap[i][:a]
         t = @sprintf "%.3f" (sub_index ≠ 1 ? abs(aᵢ) : aᵢ)
-        t, "Z_{$(a[i][:n])}^{$(a[i][:m])}"
+        t, "Z_{$(recap[i][:n])}^{$(recap[i][:m])}"
     end
-    function η(index, a)
-        for i = 1:length(a)-1
-            W_LaTeX *= string(ζ(index[i], i)..., a[i+1][:a] > 0 ? " + " : " - ")
+    function η(index, recap)
+        for i = 1:length(recap)-1
+            W_LaTeX *= string(ζ(index[i], i)..., recap[i+1][:a] > 0 ? " + " : " - ")
         end
     end
-    if length(a) > 8
-        sorted_indices = sortperm(a; by = aᵢ -> abs(aᵢ[:a]), rev = true)
-        filter!(i -> a[i][:j] ∉ 0:2, sorted_indices)
-        subset_a = getindex(a, sorted_indices[1:4])
+    if length(recap) > 8
+        sorted_indices = sortperm(recap; by = recapᵢ -> abs(recapᵢ[:a]), rev = true)
+        filter!(i -> recap[i][:j] ∉ 0:2, sorted_indices)
+        subset_a = getindex(recap, sorted_indices[1:4])
         η(sorted_indices, subset_a)
         W_LaTeX *= string(ζ(sorted_indices[4])...) * "..."
     else
-        η(keys(a), a)
-        W_LaTeX *= string(ζ(lastindex(a))...)
+        η(keys(recap), recap)
+        W_LaTeX *= string(ζ(lastindex(recap))...)
     end
     return latexstring(W_LaTeX)
 end

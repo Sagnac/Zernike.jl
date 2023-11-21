@@ -84,7 +84,7 @@ It is also possible to input normalized Cartesian coordinates using the method w
 
 The function returns six values contained within a `WavefrontOutput` type, with fields:
 
-1. `a`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients rounded according to `precision`;
+1. `recap`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients rounded according to `precision`;
 2. `v`: full vector of Zernike wavefront error expansion coefficients;
 3. `metrics`: named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio;
 4. `fig`: the plotted Makie figure.
