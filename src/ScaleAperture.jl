@@ -16,9 +16,9 @@ function Π(v::Vector{T}, ε::T) where T <: Float64
     m = 0
     for i in eachindex(v)
         a = v[i]
-        Nmn = √radicand(m, n)
+        N_mn = √radicand(m, n)
         R0 = construct(n, n).R(ε)
-        v2[i] = a * Nmn * R0
+        v2[i] = a * N_mn * R0
         ii = i
         for n′ = n+2:2:n_max
             ii += 2n′
@@ -28,7 +28,7 @@ function Π(v::Vector{T}, ε::T) where T <: Float64
             R2 = construct(n+2, n′).R(ε)
             v2[i] += a * N * (R1 - R2)
         end
-        v2[i] /= Nmn
+        v2[i] /= N_mn
         if m == n
             n += 1
             m = -n
