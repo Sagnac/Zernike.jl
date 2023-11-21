@@ -88,6 +88,25 @@ v = reconstruct(r, t, OPD_vec, 8)[1]
     ΔW44_vector_phase = W(unrolled_coords..., vec(OPD_matrix), 4, Model)
     ΔW44_matrix_phase = W(ρ_rs, θ_rs, OPD_matrix, 4, Model)
     @test ΔW44_vector_phase.v == ΔW44_matrix_phase.v
+    a = rand(5)
+    named_orders = [(m = i[1], n = i[2]) for i in orders]
+    j_orders = [4, 12, 24, 25, 40]
+    W1 = WavefrontError(a)
+    W2 = WavefrontError(orders, a)
+    W3 = WavefrontError(named_orders, a)
+    W4 = WavefrontError(j_orders, a)
+    @test eltype(W1.recap) <: NamedTuple
+    @test W1.a == W1.v
+    @test isempty(W1.fit_to)
+    @test W1.n_max == 2
+    @testset "constructor equality" for i in (:recap, :v, :n_max, :fit_to, :a)
+        @test getfield(W2, i) == getfield(W3, i) == getfield(W4, i)
+    end
+    idx_orders = j_orders .+ 1
+    @test W2.v[idx_orders] == a
+    @test iszero(W2.v[setdiff(1:45, idx_orders)])
+    @test isempty(W2.fit_to)
+    @test W2.n_max == 8
 end
 
 @testset "format strings" begin
