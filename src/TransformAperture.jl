@@ -30,9 +30,9 @@ function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <
     _rotate_ = !iszero(ϕ)
     _elliptic_ = !isone(ω[1])
     if _scale_
-        ηₛ = zeros(Float64, len, len)
+        η_s = zeros(Float64, len, len)
     end
-    ηᵣ = _rotate_ ? zeros(ComplexF64, len, len) : I
+    η_r = _rotate_ ? zeros(ComplexF64, len, len) : I
     i = 0
     for m = -n_max:n_max
         μ = abs(m)
@@ -47,25 +47,25 @@ function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <
                 setindex!(R, γ[n-2s+1], remap[(m, n-2s)], i)
             end
             if _rotate_
-                ηᵣ[i,i] = ei(m * ϕ)
+                η_r[i,i] = ei(m * ϕ)
             end
             if _scale_
-                ηₛ[i,i] = ε ^ n
+                η_s[i,i] = ε ^ n
             end
         end
     end
     if _translate_ && _elliptic_
-        ηₛ, ηₑ = translate_ellipse(ε, δ, ω..., remap)
+        η_s, η_e = translate_ellipse(ε, δ, ω..., remap)
     elseif _translate_
-        ηₛ = translate(ε, δ, remap)
-        ηₑ = I
+        η_s = translate(ε, δ, remap)
+        η_e = I
     elseif _elliptic_
-        ηₑ = elliptical(ω..., remap)
+        η_e = elliptical(ω..., remap)
     else
-        ηₑ = I
+        η_e = I
     end
     # net transformation matrix
-    η = ηₑ * ηᵣ * ηₛ
+    η = η_e * η_r * η_s
     # complex Zernike expansion coefficients
     c = to_complex(v, order)
     # conversion matrix
@@ -89,8 +89,8 @@ macro translation_kernel()
     quote
         n′ = n - p - q
         m′ = m - p + q
-        t = b(k2,p) * b(k3,q) * ε^n′ * ρₜ^(p+q) * ei((p-q)θₜ)
-        ηₛ[remap[(m′, n′)], i] += t
+        t = b(k2,p) * b(k3,q) * ε^n′ * ρ^(p+q) * ei((p-q)θ)
+        η_s[remap[(m′, n′)], i] += t
     end |> esc
 end
 
@@ -98,44 +98,44 @@ macro elliptical_kernel()
     quote
         m′ = m - 2p + 2q
         t = 0.5^n * b(k2,p) * b(k3,q) * (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ei(2(p-q)φ)
-        ηₑ[remap[(m′, n)], i] += t
+        η_e[remap[(m′, n)], i] += t
     end |> esc
 end
 
 function translate(ε::Float64, δ::ComplexF64, remap::Dict)
-    ρₜ, θₜ = abs(δ), angle(δ)
+    ρ, θ = abs(δ), angle(δ)
     len = length(remap)
     n_max = get_n(len - 1)
-    ηₛ = zeros(ComplexF64, len, len)
+    η_s = zeros(ComplexF64, len, len)
     for m = -n_max:n_max, n = abs(m):2:n_max
         @init_kernel
         for p = 0:k2, q = 0:k3
             @translation_kernel
         end
     end
-    return ηₛ
+    return η_s
 end
 
 function elliptical(ξ::Float64, φ::Float64, remap::Dict)
     len = length(remap)
     n_max = get_n(len - 1)
-    ηₑ = zeros(ComplexF64, len, len)
+    η_e = zeros(ComplexF64, len, len)
     for m = -n_max:n_max, n = abs(m):2:n_max
         @init_kernel
         for p = 0:k2, q = 0:k3
             @elliptical_kernel
         end
     end
-    return ηₑ
+    return η_e
 end
 
 function translate_ellipse(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64,
                            remap::Dict)
-    ρₜ, θₜ = abs(δ), angle(δ)
+    ρ, θ = abs(δ), angle(δ)
     len = length(remap)
     n_max = get_n(len - 1)
-    ηₛ = zeros(ComplexF64, len, len)
-    ηₑ = zeros(ComplexF64, len, len)
+    η_s = zeros(ComplexF64, len, len)
+    η_e = zeros(ComplexF64, len, len)
     for m = -n_max:n_max, n = abs(m):2:n_max
         @init_kernel
         for p = 0:k2, q = 0:k3
@@ -143,7 +143,7 @@ function translate_ellipse(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64
             @elliptical_kernel
         end
     end
-    return ηₛ, ηₑ
+    return η_s, η_e
 end
 
 function to_complex(v::Vector{Float64}, order::Vector{Tuple{Int, Int, Int}})

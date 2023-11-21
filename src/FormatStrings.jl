@@ -10,7 +10,7 @@ function format_strings(Z::Polynomial)
     (; γ, ν) = Z.R
     μ = abs(m)
     k = length(γ) - 1
-    γₛ = [@sprintf "%d" abs(γᵢ) for γᵢ ∈ γ]
+    γ_s = [@sprintf "%d" abs(γᵢ) for γᵢ ∈ γ]
     UNICODE = ones(String, 3)
     LaTeX = ones(String, 3)
     # prefactor
@@ -32,18 +32,18 @@ function format_strings(Z::Polynomial)
     # polynomial terms
     ζ(i) = ν[i] == 1 ? "" : "^{$(ν[i])}"
     for i = 1:k
-        UNICODE[2] *= string(γₛ[i], "ρ", ω[i], γ[i+1] > 0 ? " + " : " \u2212 ")
-        LaTeX[2] *= string(γₛ[i], "\\rho", ζ(i), γ[i+1] > 0 ? " + " : " - ")
+        UNICODE[2] *= string(γ_s[i], "ρ", ω[i], γ[i+1] > 0 ? " + " : " \u2212 ")
+        LaTeX[2] *= string(γ_s[i], "\\rho", ζ(i), γ[i+1] > 0 ? " + " : " - ")
     end
     if ν[end] == 0
-        UNICODE[2] *= γₛ[end]
-        LaTeX[2] *= γₛ[end]
+        UNICODE[2] *= γ_s[end]
+        LaTeX[2] *= γ_s[end]
     elseif γ[end] == 1
         UNICODE[2] *= string("ρ", ω[end])
         LaTeX[2] *= string("\\rho", ν |> lastindex |> ζ)
     else
-        UNICODE[2] *= string(γₛ[end], "ρ", ω[end])
-        LaTeX[2] *= string(γₛ[end], "\\rho", ν |> lastindex |> ζ)
+        UNICODE[2] *= string(γ_s[end], "ρ", ω[end])
+        LaTeX[2] *= string(γ_s[end], "\\rho", ν |> lastindex |> ζ)
     end
     # angular term
     υ = μ == 1 ? "" : μ
