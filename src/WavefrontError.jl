@@ -23,15 +23,16 @@ function WavefrontError(a::FloatVec)
     v = a
     len = length(a)
     recap = Vector{NamedTuple}(undef, len)
-    Zⱼ = Vector{Polynomial}(undef, len)
+    Zᵢ = Vector{Polynomial}(undef, len)
     local n
-    for (j, a) ∈ pairs(a)
+    for (i, a) ∈ pairs(a)
+        j = i - 1
         m, n = get_mn(j)
-        recap[j] = (; j, n, m, a)
-        Zⱼ[j] = Z(j, Model)
+        recap[i] = (; j, n, m, a)
+        Zᵢ[i] = Z(j, Model)
     end
     n_max = n
-    return WavefrontError(recap, v, n_max, fit_to, a, Zⱼ)
+    return WavefrontError(recap, v, n_max, fit_to, a, Zᵢ)
 end
 
 function WavefrontError(orders::Vector{Tuple{Int, Int}}, a::FloatVec)
