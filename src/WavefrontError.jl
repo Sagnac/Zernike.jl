@@ -12,7 +12,7 @@ end
 struct WavefrontOutput
     recap::Recap
     v::Vector{Float64}
-    metrics::NamedTuple{(:PV, :RMS, :Strehl), Tuple{Float64, Float64, Float64}}
+    metrics::NamedTuple{(:pv, :rms, :strehl), Tuple{Float64, Float64, Float64}}
     fig::Makie.Figure
     axis::Axis3
     plot::Surface{Tuple{T, T, T}} where T <: Matrix{Float32}
@@ -137,13 +137,13 @@ end
 
 function metrics(v::FloatVec, w::FloatMat)
     # Peak-to-valley wavefront error
-    PV = maximum(w) - minimum(w)
+    pv = maximum(w) - minimum(w)
     # RMS wavefront error
     # where σ² is the variance (second central moment about the mean)
     # the mean is the first a00 piston term
     σ = sqrt(v' * v - v[1]^2)
-    Strehl_ratio = exp(-(2π * σ)^2)
-    return (PV = PV, RMS = σ, Strehl = Strehl_ratio)
+    strehl_ratio = exp(-(2π * σ)^2)
+    return (; pv, rms = σ, strehl = strehl_ratio)
 end
 
 # main interface function
