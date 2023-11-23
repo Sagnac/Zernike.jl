@@ -1,6 +1,5 @@
 import GLMakie: GLFW.GetPrimaryMonitor, GLFW.GetMonitorContentScale,
                 MonitorProperties, activate!
-import .Makie: plot!
 
 mutable struct PlotConfig
     size::Tuple{Float64, Float64}
