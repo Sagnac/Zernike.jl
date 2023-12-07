@@ -5,7 +5,7 @@ Generates Zernike polynomials, models wavefront errors, and plots them using Mak
 ![Zernike.jl](images/image.png)
 
 This package can be added from the Julia REPL by:
-```
+```julia
 using Pkg
 Pkg.add(url="https://github.com/Sagnac/Zernike.jl")
 ```
@@ -60,19 +60,19 @@ Estimates wavefront error by expressing optical aberrations as a linear combinat
 * `n_max`: maximum radial degree to fit to.
 
 Note that specifying `n_max` will fit using the full range of Zernike polynomials from `j = 0` to `j_max` corresponding to the last polynomial with degree `n_max`. If instead you only want to fit to a subset of Zernike polynomials you can specify a vector of `(m, n)` tuples in place of `n_max` using the method:
-```
+```julia
 wavefront(ρ, θ, OPD, orders::Vector{Tuple{Int, Int}})
 ```
 
 If your phase data is in the form of a floating-point matrix instead you can call the method:
-```
+```julia
 wavefront(OPD, fit_to; options...)
 ```
 
 This assumes the wavefront error was uniformly measured using polar coordinates; the matrix is expected to be a polar grid of regularly spaced periodic samples with the first element referring to the value at the origin. The first axis of the matrix (the rows) must correspond to the angular variable `θ` while the second axis (the columns) must correspond to the radial variable `ρ`.
 
 If instead your data is not equally spaced you can call:
-```
+```julia
 wavefront(ρ::Vector, θ::Vector, OPD::Matrix, fit_to; options...)
 ```
 under the aforementioned dimensional ordering assumption.
@@ -152,7 +152,7 @@ Plot options can be set by setting the `plotconfig` fields; see the docstring fo
 
 There exists a special method dispatch which avoids plotting and instead returns the `(ρ, θ)` functions as essentially closures. This is done by calling the 3 main functions with the `Model` type as the last positional argument. The pupil can then be evaluated using these functions with polar coordinates:
 
-```
+```julia
 Z40 = zernike(0, 4, Model)
 Z40(0.7, π/4)
 ```
@@ -186,7 +186,7 @@ For the `standardize` subset method the tuples in `orders` must be of the form `
 * If you're interested in precompiling the package into a system image in order to speed up load times please see the [precompile directory](precompile) (at the moment PrecompileTools or the like is not used);
 
 * If you're interested in only the full vector of Zernike expansion coefficients obtained through the least squares fit and want to avoid computing extra values and plotting the results you can call:
-```
+```julia
 Zernike.reconstruct(ρ, θ, OPD, n_max)[1]
 ```
 Similarly you can do this for the radial polynomial coefficients and the NA transformed wavefront error expansion coefficients by importing the functions `coefficients` and `transform_coefficients`, respectively.
