@@ -6,15 +6,13 @@ Plot a Zernike polynomial of azimuthal order `m` and radial degree `n`.
 
 The single index `j` begins at zero and follows the ANSI Z80.28-2004 / ISO 24157:2008 / Optica (OSA) standard.
 
-Returns five values contained within a `Zernike.Output` type, with fields:
+Returns a `Zernike.Output` type which contains (among other things):
 
-1. `fig`: the `Makie` figure;
-2. `axis`: the plot axis;
-3. `plot`: the surface plot object;
-4. `coeffs`: vector of radial polynomial coefficients;
-5. `latex`: `LaTeX` string of the Zernike polynomial.
+* `fig`: the `Makie` figure;
+* `coeffs`: vector of radial polynomial coefficients;
+* `latex`: `LaTeX` string of the Zernike polynomial.
 
-These can also be accessed through indexing and regular non-property destructuring.
+These `Output` fields can also be accessed through indexing and regular non-property destructuring.
 
 The coefficients belong to terms with exponent `n - 2(i - 1)` where `i` is the vector's index.
 

@@ -180,6 +180,7 @@ function show(io::IO, W::T) where {T <: WavefrontOutput}
                    "text/plain", W.recap)
     println(io)
     show(IOContext(io, :compact => true), "text/plain", W.metrics)
+    display(W.fig)
 end
 
 # extend getindex to allow indexing the output
