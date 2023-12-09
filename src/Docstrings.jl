@@ -12,8 +12,6 @@ Returns a `Zernike.Output` type which contains (among other things):
 * `coeffs`: vector of radial polynomial coefficients;
 * `latex`: `LaTeX` string of the Zernike polynomial.
 
-These `Output` fields can also be accessed through indexing and regular non-property destructuring.
-
 The coefficients belong to terms with exponent `n - 2(i - 1)` where `i` is the vector's index.
 
 The radial polynomial coefficients are computed using a fast and accurate algorithm suitable for high orders; it is based on a recursive relation presented by Honarvar & Paramesran (2013) doi:10.1364/OL.38.002487.

@@ -251,12 +251,6 @@ function show(io::IO, output::Output)
     display(output.fig)
 end
 
-# extend getindex to allow indexing the output
-getindex(Z::T, i) where {T <: Output} = getfield(Z, fieldnames(T)[i])
-
-# hook into iterate to allow non-property destructuring of the output
-iterate(Z::Output, i = 1) = (i > 5 ? nothing : (Z[i], i + 1))
-
 # methods
 Z(m::Int, n::Int, ::Type{Model}) = construct(m, n)
 

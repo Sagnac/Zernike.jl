@@ -177,7 +177,7 @@ For the `standardize` subset method the tuples in `orders` must be of the form `
 
 * If you resize the plot window, right clicking on the figure will resize / trim the plot automatically so that it fits within the window without extra space;
 
-* The values contained within the output types can also be accessed through numerical indexing and regular destructuring in addition to property destructuring and getting the fields directly;
+* The values contained within the `WavefrontOutput` type can also be accessed through numerical indexing and regular destructuring in addition to property destructuring and getting the fields directly;
 
 * The Zernike polynomials are currently only valid up to degree ~812 at which point the maximum coefficient approaches the maximum for double-precision floating-point numbers (~1e308);
 
