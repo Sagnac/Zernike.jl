@@ -105,9 +105,9 @@ function zplot(args...; window_title = "ZernikePlot", plot_title = window_title,
         :zticklabelsvisible,
         :zspinesvisible,
     )
-    label = Label(fig, "Pupil view"; fontsize = 0.76fontsize)
-    pupil = Toggle(fig; active = true)
-    fig[1,2] = grid!([label pupil]; tellheight = false, valign = :bottom)
+    pgrid = GridLayout(fig[1,2]; tellheight = false, valign = :bottom)
+    Label(pgrid[1,1], "Pupil view"; fontsize = 0.76fontsize)
+    pupil = Toggle(pgrid[2,1]; active = true)
     on(pupil.active; update = true) do active
         for property in zproperties
             getproperty(axis3, property)[] = !active
