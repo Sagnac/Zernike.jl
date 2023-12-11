@@ -50,7 +50,7 @@ struct Output
     coeffs::Vector{Float64}
     latex::LaTeXString
     unicode::String
-    inds::NamedTuple{(:j, :n, :m), Tuple{Int64, Int64, Int64}}
+    inds::String
     high_order::Bool
 end
 
@@ -227,11 +227,12 @@ function Z(m::Int, n::Int; finesse::Int = 100)
     Z = construct(m, n)
     (; γ) = Z.R
     Z_mn, Z_LaTeX, Z_Unicode = format_strings(Z)
-    window_title = "Zernike Polynomial: $(Z.inds)"
+    inds = replace(Z.inds |> string, ['(', ')'] => "")
+    window_title = "Zernike Polynomial: $inds"
     high_order = n ≥ 48
     titles = (; plot_title = Z.inds.j < 153 ? Z_LaTeX : Z_mn, window_title)
     fig, axis, plot = zplot(Z; m, n, finesse, high_order, titles...)
-    Output(fig, axis, plot, γ, Z_LaTeX, Z_Unicode, Z.inds, high_order)
+    Output(fig, axis, plot, γ, Z_LaTeX, Z_Unicode, inds, high_order)
 end
 
 # overload show to clean up the output
@@ -239,8 +240,7 @@ show(io::IO, Z::T) where {T <: Polynomial} = print(io, T, Z.inds, " --> Z(ρ, θ
 
 function show(io::IO, output::Output)
     (; coeffs, unicode, inds, high_order) = output
-    indices = replace(inds |> string, ['(', ')'] => "")
-    println(io, indices)
+    println(io, inds)
     if high_order
         println(io)
         @info "Coefficients are stored in the coeffs field \
