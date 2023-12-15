@@ -77,7 +77,7 @@ function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <
     return v2, n_max
 end
 
-macro init_kernel()
+macro init_kernel!()
     quote
         k2 = (n + m) ÷ 2
         k3 = (n - m) ÷ 2
@@ -85,7 +85,7 @@ macro init_kernel()
     end |> esc
 end
 
-macro translation_kernel()
+macro translation_kernel!()
     quote
         n′ = n - p - q
         m′ = m - p + q
@@ -94,7 +94,7 @@ macro translation_kernel()
     end |> esc
 end
 
-macro elliptical_kernel()
+macro elliptical_kernel!()
     quote
         m′ = m - 2p + 2q
         t = 0.5^n * b(k2,p) * b(k3,q) * (ξ+1)^(n-p-q) * (ξ-1)^(p+q) * ei(2(p-q)φ)
@@ -108,9 +108,9 @@ function translate(ε::Float64, δ::ComplexF64, remap::Dict)
     n_max = get_n(len - 1)
     η_s = zeros(ComplexF64, len, len)
     for m = -n_max:n_max, n = abs(m):2:n_max
-        @init_kernel
+        @init_kernel!
         for p = 0:k2, q = 0:k3
-            @translation_kernel
+            @translation_kernel!
         end
     end
     return η_s
@@ -121,9 +121,9 @@ function elliptical(ξ::Float64, φ::Float64, remap::Dict)
     n_max = get_n(len - 1)
     η_e = zeros(ComplexF64, len, len)
     for m = -n_max:n_max, n = abs(m):2:n_max
-        @init_kernel
+        @init_kernel!
         for p = 0:k2, q = 0:k3
-            @elliptical_kernel
+            @elliptical_kernel!
         end
     end
     return η_e
@@ -137,10 +137,10 @@ function translate_ellipse(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64
     η_s = zeros(ComplexF64, len, len)
     η_e = zeros(ComplexF64, len, len)
     for m = -n_max:n_max, n = abs(m):2:n_max
-        @init_kernel
+        @init_kernel!
         for p = 0:k2, q = 0:k3
-            @translation_kernel
-            @elliptical_kernel
+            @translation_kernel!
+            @elliptical_kernel!
         end
     end
     return η_s, η_e
