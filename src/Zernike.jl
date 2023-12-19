@@ -77,6 +77,12 @@ function (Z::Polynomial)(ρ, θ)
     N * R(ρ) * M(θ)
 end
 
+function polar()
+    ρ = range(0.0, 1.0, ϵ_max)
+    θ = range(0.0, 2π, ϵ_max)
+    return ρ, θ
+end
+
 function polar(m::Int, n::Int; finesse::Int = 100)
     m = abs(m)
     finesse = clamp(finesse, 1, 100)

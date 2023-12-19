@@ -299,3 +299,10 @@ Plot `Polynomial` and `WavefrontError` input function types as well as quantized
 See also [`plotconfig`](@ref)
 """
 zplot
+
+"""
+    metrics(ΔW::WavefrontError)
+
+Compute wavefront error metrics. Returns a named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio.
+"""
+metrics

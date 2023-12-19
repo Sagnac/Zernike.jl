@@ -173,6 +173,8 @@ For the `standardize` subset method the tuples in `orders` must be of the form `
 
 ## Additional Notes
 
+* `Zernike.metrics(ΔW::WavefrontError)` exists;
+
 * The `zplot` function can be invoked independently using `Polynomial` and `WavefrontError` function types as well as quantized wavefront errors;
 
 * If you resize the plot window, right clicking on the figure will resize / trim the plot automatically so that it fits within the window without extra space;

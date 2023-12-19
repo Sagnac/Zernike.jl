@@ -1,7 +1,8 @@
 using Test
 using Zernike
 using Zernike: Z, W, P, radicand, Φ, get_i, λ, coords, reconstruct, validate_length,
-               map_phase, format_strings, get_mn, LaTeXString, latexstring, J
+               map_phase, format_strings, get_mn, LaTeXString, latexstring, J,
+               metrics
 
 @testset "fringe" begin
     @test_throws "37" fringe_to_j(38)
@@ -107,6 +108,16 @@ v = reconstruct(r, t, OPD_vec, 8)[1]
     @test iszero(W2.v[setdiff(1:45, idx_orders)])
     @test isempty(W2.fit_to)
     @test W2.n_max == 8
+end
+
+@testset "metrics" begin
+    r = range(0.0, 1.0, 2^10)
+    w = [0.25r^2 for _ ∈ r, r ∈ r]
+    ΔW = W(w, 2, Model)
+    (; pv, rms, strehl) = metrics(ΔW)
+    @test pv ≈ 1/4 atol = 1e-2
+    @test rms ≈ 1/14 atol = 1e-2
+    @test strehl ≈ 0.8 atol = 1e-1
 end
 
 @testset "format strings" begin

@@ -133,13 +133,21 @@ function Λ(ΔW; finesse::Int)
     WavefrontOutput(recap, v, metrics(v, w), fig, axis, plot)
 end
 
+function metrics(ΔW::WavefrontError)
+    ρ, θ = polar()
+    w = ΔW.(ρ', θ)
+    metrics(ΔW.v, w)
+end
+
 function metrics(v::FloatVec, w::FloatMat)
     # Peak-to-valley wavefront error
-    pv = maximum(w) - minimum(w)
+    min_max = extrema(w)
+    pv = min_max[2] - min_max[1]
     # RMS wavefront error
     # where σ² is the variance (second central moment about the mean)
     # the mean is the first a00 piston term
-    σ = sqrt(v' * v - v[1]^2)
+    v2 = @view v[begin+1:end]
+    σ = sqrt(v2' * v2)
     strehl_ratio = exp(-(2π * σ)^2)
     return (; pv, rms = σ, strehl = strehl_ratio)
 end
