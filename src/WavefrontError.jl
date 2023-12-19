@@ -21,9 +21,8 @@ end
 function WavefrontError(a::FloatVec)
     fit_to = []
     v = a
-    len = length(a)
-    recap = Vector{NamedTuple}(undef, len)
-    Zᵢ = Vector{Polynomial}(undef, len)
+    recap = similar(a, NamedTuple)
+    Zᵢ = similar(a, Polynomial)
     local n
     for (i, a) ∈ pairs(a)
         j = i - 1
@@ -36,11 +35,10 @@ function WavefrontError(a::FloatVec)
 end
 
 function WavefrontError(orders::Vector{Tuple{Int, Int}}, a::FloatVec)
-    len = length(a)
-    len != length(orders) && throw(ArgumentError("Lengths must be equal."))
+    length(a) != length(orders) && throw(ArgumentError("Lengths must be equal."))
     fit_to = []
-    recap = Vector{NamedTuple}(undef, len)
-    Zᵢ = Vector{Polynomial}(undef, len)
+    recap = similar(a, NamedTuple)
+    Zᵢ = similar(a, Polynomial)
     local n
     for (idx, mn) ∈ pairs(orders)
         m, n = mn

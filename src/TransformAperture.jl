@@ -147,7 +147,7 @@ function translate_ellipse(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64
 end
 
 function to_complex(v::Vector{Float64}, order::Vector{Tuple{Int, Int, Int}})
-    c = Vector{Complex{Float64}}(undef, length(v)) 
+    c = similar(v, ComplexF64)
     for (i, j) in pairs(order)
         if j[3] < 0
             c[i] = complex(v[j[2]], v[j[1]]) / √2
@@ -162,7 +162,7 @@ end
 
 function to_real(c::Vector{Complex{Float64}}, order::Vector{Tuple{Int, Int, Int}})
     c2 = c[sortperm(order; by = first)]
-    v2 = Vector{Float64}(undef, length(c2))
+    v2 = similar(c2, Float64)
     for (i, j) in pairs(order)
         if j[3] < 0
             v2[j[1]] = (c2[j[1]] - c2[j[2]])  / √2 |> imag
@@ -179,7 +179,7 @@ function P(v::Vector{T}, ε::T, δ::Complex{T} = 0.0im,
            ϕ::T = 0.0, ω::Tuple{T, T} = (1.0, 0.0);
            precision = 3, finesse::Int = 101) where T <: Float64
     v2, n_max = S(v, ε, δ, ϕ, ω)
-    Zᵢ = Vector{Polynomial}(undef, length(v))
+    Zᵢ = similar(v, Polynomial)
     ΔW = Ψ(v2, Zᵢ, n_max; precision)
     Λ(ΔW; finesse)
 end
@@ -187,7 +187,7 @@ end
 function P(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T, T}, ::Type{Model};
            precision = 3) where T <: Float64
     v2, n_max = S(v, ε, δ, ϕ, ω)
-    Zᵢ = Vector{Polynomial}(undef, length(v))
+    Zᵢ = similar(v, Polynomial)
     Ψ(v2, Zᵢ, n_max; precision)
 end
 

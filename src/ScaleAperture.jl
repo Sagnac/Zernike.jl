@@ -10,8 +10,8 @@ https://www.jeos.org/index.php/jeos_rp/article/view/07012
 
 function Π(v::Vector{T}, ε::T) where T <: Float64
     !(0.0 ≤ ε ≤ 1.0) && error("Bounds: 0.0 ≤ ε ≤ 1.0\n")
-    len, n_max = validate_length(v)
-    v2 = Vector{Float64}(undef, len)
+    _, n_max = validate_length(v)
+    v2 = similar(v, Float64)
     n = 0
     m = 0
     for i in eachindex(v)
@@ -41,13 +41,13 @@ end
 
 function J(v::Vector{Float64}, ε::Float64; precision = 3, finesse::Int = 101)
     v2, n_max = Π(v, ε)
-    Zᵢ = Vector{Polynomial}(undef, length(v))
+    Zᵢ = similar(v, Polynomial)
     ΔW = Ψ(v2, Zᵢ, n_max; precision)
     Λ(ΔW; finesse)
 end
 
 function J(v::Vector{Float64}, ε::Float64, ::Type{Model}; precision = 3)
     v2, n_max = Π(v, ε)
-    Zᵢ = Vector{Polynomial}(undef, length(v))
+    Zᵢ = similar(v, Polynomial)
     Ψ(v2, Zᵢ, n_max; precision)
 end
