@@ -2,7 +2,7 @@ using Test
 using Zernike
 using Zernike: Z, W, P, radicand, Φ, get_i, λ, coords, reconstruct, validate_length,
                map_phase, format_strings, get_mn, LaTeXString, latexstring, J,
-               metrics
+               metrics, polar
 
 @testset "fringe" begin
     @test_throws "37" fringe_to_j(38)
@@ -151,7 +151,7 @@ end
 end
 
 δ = 0.15 + 0.15im
-ρ_t, θ_t = abs(δ), angle(δ)
+ρ_t, θ_t = polar(δ)
 θ1 = 0.68π
 φ = π - θ1 + θ_t
 ρ2 = √(ε^2 + ρ_t^2 - 2*ε*ρ_t*cos(φ))

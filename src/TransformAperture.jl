@@ -103,7 +103,7 @@ macro elliptical_kernel!()
 end
 
 function translate(ε::Float64, δ::ComplexF64, remap::Dict)
-    ρ, θ = abs(δ), angle(δ)
+    ρ, θ = polar(δ)
     len = length(remap)
     n_max = get_n(len - 1)
     η_s = zeros(ComplexF64, len, len)
@@ -131,7 +131,7 @@ end
 
 function translate_ellipse(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64,
                            remap::Dict)
-    ρ, θ = abs(δ), angle(δ)
+    ρ, θ = polar(δ)
     len = length(remap)
     n_max = get_n(len - 1)
     η_s = zeros(ComplexF64, len, len)

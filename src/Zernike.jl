@@ -95,6 +95,8 @@ function polar(m::Int, n::Int; finesse::Int = 100)
     return ρ, θ
 end
 
+polar(z::Complex) = abs(z), angle(z)
+
 function polar_mat(ρ, θ)
     ρᵪ = [ρⱼ * cos(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
     ρᵧ = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
