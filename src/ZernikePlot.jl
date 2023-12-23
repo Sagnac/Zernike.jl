@@ -119,7 +119,7 @@ function zplot(args...; window_title = "ZernikePlot", plot_title = window_title,
     end
     colsize!(fig.layout, 1, Aspect(1, 1.0))
     resize_to_layout!(fig)
-    onmouserightclick(_ -> resize_to_layout!(fig), addmouseevents!(fig.scene))
+    onmouserightup(_ -> resize_to_layout!(fig), addmouseevents!(fig.scene))
     activate!(; title = window_title, focus_on_show)
     return fig, axis3, plot
 end
