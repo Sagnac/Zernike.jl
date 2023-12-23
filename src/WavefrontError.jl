@@ -147,9 +147,9 @@ function metrics(v::FloatVec, w::FloatMat)
     # where σ² is the variance (second central moment about the mean)
     # the mean is the first a00 piston term
     v2 = @view v[begin+1:end]
-    σ = sqrt(v2' * v2)
-    strehl_ratio = exp(-(2π * σ)^2)
-    return (; pv, rms = σ, strehl = strehl_ratio)
+    σ² = v2' * v2
+    strehl_ratio = exp(-4π^2 * σ²)
+    return (; pv, rms = √σ², strehl = strehl_ratio)
 end
 
 # main interface function
