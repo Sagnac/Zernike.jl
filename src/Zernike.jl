@@ -182,19 +182,16 @@ end
 
 # This is the naive approach which implements the original explicit formula
 # for computing the polynomial coefficients.
-function fact(t::Float64)
-    prod(2.0:t)
-end
-
-function λ(μ, n, s, k)
-    t::Vector{Float64} = [
-        n - s;
-        s;
-        k - s;
-        k + μ - s
-    ]
-    τ = t .|> fact
-    (-1)^s * τ[1] / prod(τ[2:4])
+function canonical(μ::T, n::T, k::T) where T <: Int
+    γ = Vector{Float64}(undef, k + 1)
+    for s = 0:k
+        t1::Float64 = factorial(n - s)
+        t2::Float64 = factorial(s)
+        t3::Float64 = factorial(k - s)
+        t4::Float64 = factorial(k + μ - s)
+        γ[s+1] = (-1)^s * t1 / (t2 * t3 * t4)
+    end
+    return γ
 end
 
 # binds the indices and produces a specific polynomial function
@@ -206,6 +203,7 @@ function construct(m::Int, n::Int)
     end
     # upper bound for the sum (number of terms - 1 [indexing from zero])
     k = (n - μ) ÷ 2
+    # OSA single mode index
     j = get_j(m, n)
     # normalization constant following the orthogonality relation
     N = √radicand(m, n)
@@ -215,13 +213,16 @@ function construct(m::Int, n::Int)
     if μ == n
         λ = [zeros(n); 1.0]
         γ = [1.0]
+    elseif n < 21 && Int == Int64
+        γ = canonical(μ, n, k)
+        λ = zeros(n+1)
+        λ[ν.+1] = γ
     else
         λ = Φ(μ, n)[end]
         γ = Float64[λ[νᵢ+1] for νᵢ in ν]
     end
-    # γ = Float64[λ(μ, n, s, k) for s = 0:k]
     inds = (j = j, n = n, m = m)
-    # radial polynomial
+    # radial component
     R = RadialPolynomial(λ, γ, ν)
     # azimuthal / meridional component
     M = Sinusoid(m)

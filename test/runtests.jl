@@ -1,8 +1,8 @@
 using Test
 using Zernike
-using Zernike: Z, W, P, radicand, Φ, get_i, λ, coords, reconstruct, validate_length,
-               map_phase, format_strings, get_mn, LaTeXString, latexstring, J,
-               metrics, polar
+using Zernike: Z, W, P, radicand, Φ, get_i, canonical, coords, reconstruct,
+               validate_length, map_phase, format_strings, get_mn, LaTeXString,
+               latexstring, J, metrics, polar
 
 @testset "fringe" begin
     @test_throws "37" fringe_to_j(38)
@@ -27,6 +27,36 @@ end
     @test isequal(v, 1:15)
 end
 
+function compare_coefficients(j_max)
+    γ = Vector{Float64}[]
+    zλ = Vector{Vector{Float64}}(undef, j_max + 1)
+    Φλ = similar(zλ)
+    mn = Tuple{Int, Int}[]
+    kv = Int[]
+    for j = 0:j_max
+        m, n = get_mn(j)
+        μ = abs(m)
+        k = (n - μ) ÷ 2
+        if m ≥ 0
+            push!(mn, (m, n))
+            push!(kv, k)
+            push!(γ, canonical(μ, n, k))
+        end
+        i = j + 1
+        zλ[i] = zernike(m, n, Model).R.λ
+        Φλ[i] = Zernike.coefficients(μ, n)[end]
+    end
+    m_max, n_max = last(mn)
+    λ = Φ(m_max, n_max)
+    for (i, v) ∈ pairs(λ)
+        n = mn[i][2]
+        λ[i] = v[range(start = n + 1, step = -2, length = kv[i] + 1)]
+    end
+    @test get_i(m_max, n_max) == length(γ) == length(λ)
+    @test zλ == Φλ
+    γ == λ
+end
+
 @testset "radial coefficients" begin
     @test_throws "Bounds" Φ(-1, 1)
     @test_throws "Bounds" Φ(4, 0)
@@ -39,9 +69,11 @@ end
     end
     @test [get_i(m, n) for n = 0:800 for m = (n & 1):2:n] == 1:i
     γ = [20, -30, 12, -1]
-    @test [λ(0, 6, s, 3) for s = 0:3] == γ
+    @test canonical(0, 6, 3) == γ
     @test Φ(0, 6)[end][7:-2:1] == γ
     @test Z(0, 6, Model).R.γ == γ
+    j = 230
+    @test compare_coefficients(j)
 end
 
 Z62 = Z(2, 6, Model)
