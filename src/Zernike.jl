@@ -37,7 +37,7 @@ struct Sinusoid
 end
 
 struct Polynomial <: Phase
-    inds::NamedTuple{(:j, :n, :m), Tuple{Int64, Int64, Int64}}
+    inds::NamedTuple{(:j, :n, :m), Tuple{Int, Int, Int}}
     N::Float64
     R::RadialPolynomial
     M::Sinusoid
