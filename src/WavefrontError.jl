@@ -100,12 +100,11 @@ function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision::Int)
     recap = @NamedTuple{j::Int, n::Int, m::Int, a::Float64}[]
     a = Float64[]
     Zₐ = Polynomial[]
-    clipped = !isassigned(Zᵢ, 1)
     # store the non-trivial coefficients
     for (i, aᵢ) in pairs(v)
         aᵢ = round(aᵢ; digits = precision)
         if !iszero(aᵢ)
-            if clipped
+            if !isassigned(Zᵢ, i)
                 Zᵢ[i] = Z(i-1, Model)
             end
             push!(recap, (; Zᵢ[i].inds..., a = aᵢ))
