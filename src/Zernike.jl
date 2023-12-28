@@ -18,6 +18,8 @@ import Base: show, getindex, iterate, setproperty!, propertynames
 const ∑ = sum
 const ϵ_max = 2^10
 
+const finesse = 100
+
 # Type aliases
 const FloatVec = AbstractVector{<:AbstractFloat}
 const FloatMat = AbstractMatrix{<:AbstractFloat}
@@ -83,7 +85,7 @@ function polar()
     return ρ, θ
 end
 
-function polar(m::Int, n::Int; finesse::Int = 100)
+function polar(m::Int, n::Int; finesse = finesse)
     m = abs(m)
     finesse = clamp(finesse, 1, 100)
     ϵ_n = finesse * (ceil(Int, π * n) + 1)
@@ -232,7 +234,7 @@ function construct(m::Int, n::Int)
 end
 
 # main interface function
-function Z(m::Int, n::Int; finesse::Int = 100)
+function Z(m::Int, n::Int; finesse = finesse)
     Z = construct(m, n)
     (; γ) = Z.R
     Z_mn, Z_LaTeX, Z_Unicode = format_strings(Z)
@@ -266,9 +268,9 @@ end
 # methods
 Z(m::Int, n::Int, ::Type{Model}) = construct(m, n)
 
-Z(; m, n, finesse::Int = 100) = Z(m, n; finesse)
+Z(; m, n, finesse = finesse) = Z(m, n; finesse)
 
-Z(j::Int; finesse::Int = 100) = Z(get_mn(j)...; finesse)
+Z(j::Int; finesse = finesse) = Z(get_mn(j)...; finesse)
 
 Z(j::Int, ::Type{Model}) = construct(get_mn(j)...)
 

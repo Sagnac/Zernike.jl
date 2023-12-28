@@ -53,7 +53,7 @@ end
 propertynames(plotconfig::PlotConfig) = fieldnames(PlotConfig)..., :reset, :resize
 
 # specialized for Zernike polynomial and wavefront error functions
-function zernikeplot!(axis, Z; m = 10, n = 10, finesse = 100,
+function zernikeplot!(axis, Z; m = 10, n = 10, finesse = finesse,
                       high_order = false, colormap = plotconfig.colormap)
     if !(Z isa Observable)
         Z = Observable(Z)

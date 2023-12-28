@@ -39,14 +39,15 @@ function Π(v::Vector{T}, ε::T) where T <: Float64
     return v2, n_max
 end
 
-function J(v::Vector{Float64}, ε::Float64; precision = 3, finesse::Int = 101)
+function J(v::Vector{Float64}, ε::Float64;
+           precision = precision, finesse::Int = wavefront_finesse)
     v2, n_max = Π(v, ε)
     Zᵢ = similar(v, Polynomial)
     ΔW = Ψ(v2, Zᵢ, n_max; precision)
     Λ(ΔW; finesse)
 end
 
-function J(v::Vector{Float64}, ε::Float64, ::Type{Model}; precision = 3)
+function J(v::Vector{Float64}, ε::Float64, ::Type{Model}; precision = precision)
     v2, n_max = Π(v, ε)
     Zᵢ = similar(v, Polynomial)
     Ψ(v2, Zᵢ, n_max; precision)

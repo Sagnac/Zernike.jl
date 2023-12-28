@@ -175,9 +175,14 @@ function to_real(c::Vector{Complex{Float64}}, order::Vector{Tuple{Int, Int, Int}
     return v2
 end
 
-function P(v::Vector{T}, ε::T, δ::Complex{T} = 0.0im,
-           ϕ::T = 0.0, ω::Tuple{T, T} = (1.0, 0.0);
-           precision = 3, finesse::Int = 101) where T <: Float64
+function P(
+    v::Vector{T},
+    ε::T,
+    δ::Complex{T} = 0.0im,
+    ϕ::T = 0.0,
+    ω::Tuple{T, T} = (1.0, 0.0);
+    precision = precision, finesse::Int = wavefront_finesse
+) where T <: Float64
     v2, n_max = S(v, ε, δ, ϕ, ω)
     Zᵢ = similar(v, Polynomial)
     ΔW = Ψ(v2, Zᵢ, n_max; precision)
@@ -185,22 +190,23 @@ function P(v::Vector{T}, ε::T, δ::Complex{T} = 0.0im,
 end
 
 function P(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T, T}, ::Type{Model};
-           precision = 3) where T <: Float64
+           precision = precision) where T <: Float64
     v2, n_max = S(v, ε, δ, ϕ, ω)
     Zᵢ = similar(v, Polynomial)
     Ψ(v2, Zᵢ, n_max; precision)
 end
 
-function P(v::Vector{T}, ε::T, ::Type{Model}; precision = 3) where T <: Float64
+function P(v::Vector{T}, ε::T, ::Type{Model};
+           precision = precision) where T <: Float64
     P(v, ε, 0.0im, zero(T), (1.0, 0.0), Model; precision)
 end
 
 function P(v::Vector{T}, ε::T, δ::Complex{T}, ::Type{Model};
-           precision = 3) where T <: Float64
+           precision = precision) where T <: Float64
     P(v, ε, δ, zero(T), (1.0, 0.0), Model; precision)
 end
 
 function P(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ::Type{Model};
-           precision = 3) where T <: Float64
+           precision = precision) where T <: Float64
     P(v, ε, δ, ϕ, (1.0, 0.0), Model; precision)
 end

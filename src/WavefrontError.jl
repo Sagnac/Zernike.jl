@@ -1,5 +1,8 @@
 const Recap = Vector{NamedTuple{(:j, :n, :m, :a), Tuple{Int, Int, Int, Float64}}}
 
+const precision = 3
+const wavefront_finesse = 101
+
 struct WavefrontError <: Phase
     recap::Recap
     v::Vector{Float64}
@@ -93,7 +96,7 @@ end
 # filtering / sifting function
 function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision)
     if precision ≠ "full" && !isa(precision, Int)
-        precision = 3
+        precision = Zernike.precision
     end
     recap = @NamedTuple{j::Int, n::Int, m::Int, a::Float64}[]
     a = Float64[]
@@ -154,14 +157,14 @@ end
 
 # main interface function
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int;
-           precision = 3, finesse = 101)
+           precision = precision, finesse::Int = wavefront_finesse)
     v, Zᵢ = reconstruct(ρ, θ, OPD, n_max)
     ΔW = Ψ(v, Zᵢ, n_max; precision)
     Λ(ΔW; finesse)
 end
 
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, orders::Vector{Tuple{Int, Int}};
-           precision = 3, finesse = 101)
+           precision = precision, finesse::Int = wavefront_finesse)
     n_max = maximum(mn -> mn[2], orders; init = 0)
     v, Zᵢ = reconstruct(ρ, θ, OPD, orders)
     ΔW = Ψ(v, Zᵢ, n_max, orders; precision)
@@ -218,13 +221,13 @@ end
 
 # methods
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int, ::Type{Model};
-           precision = 3)
+           precision = precision)
     v, Zᵢ = reconstruct(ρ, θ, OPD, n_max)
     return Ψ(v, Zᵢ, n_max; precision)
 end
 
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
-           orders::Vector{Tuple{Int, Int}}, ::Type{Model}; precision = 3)
+           orders::Vector{Tuple{Int, Int}}, ::Type{Model}; precision = precision)
     n_max = maximum(mn -> mn[2], orders; init = 0)
     v, Zᵢ = reconstruct(ρ, θ, OPD, orders)
     return Ψ(v, Zᵢ, n_max, orders; precision)
@@ -262,7 +265,7 @@ function W(OPD::FloatMat, fit_to; options...)
     W(coords(OPD)..., vec(OPD), fit_to; options...)
 end
 
-function W(OPD::FloatMat, fit_to, ::Type{Model}; precision = 3)
+function W(OPD::FloatMat, fit_to, ::Type{Model}; precision = precision)
     W(coords(OPD)..., vec(OPD), fit_to, Model; precision)
 end
 
@@ -271,7 +274,7 @@ function W(ρ::FloatVec, θ::FloatVec, OPD::FloatMat, fit_to; options...)
 end
 
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatMat, fit_to,
-           ::Type{Model}; precision = 3)
+           ::Type{Model}; precision = precision)
     W(coords(ρ, θ)..., vec(OPD), fit_to, Model; precision)
 end
 
