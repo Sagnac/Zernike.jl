@@ -199,7 +199,9 @@ function show(io::IO, ::MIME"text/plain", W::WavefrontOutput)
 end
 
 # extend getindex to allow indexing the output
-getindex(W::T, i) where {T <: WavefrontOutput} = getfield(W, fieldnames(T)[i])
+getindex(W::T, i = 1) where {T <: WavefrontOutput} = getfield(W, fieldnames(T)[i])
+
+getindex(W::WavefrontError) = W.v
 
 # hook into iterate to allow non-property destructuring of the output
 iterate(W::WavefrontOutput, i = 1) = (i > 6 ? nothing : (W[i], i + 1))
