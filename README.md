@@ -138,8 +138,6 @@ Additionally, the wavefront error functions `wavefront(ρ, θ, OPD, n_max)` and 
 
 * `precision`: number of digits to use after the decimal point in computing the expansion coefficients. Results will be rounded according to this precision and any polynomials with zero-valued coefficients will be ignored when pulling in the Zernike functions while constructing the composite wavefront error; this means lower precision values yield faster results.
 
-If you want full 64-bit floating-point precision use `precision = "full"`.
-
 ----
 
 Plot options can be set by setting the `plotconfig` fields; see the docstring for more details.

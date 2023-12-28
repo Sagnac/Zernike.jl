@@ -2,7 +2,7 @@ using Test
 using Zernike
 using Zernike: Z, W, P, radicand, Φ, get_i, canonical, coords, reconstruct,
                validate_length, map_phase, format_strings, get_mn, LaTeXString,
-               latexstring, J, metrics, polar
+               latexstring, J, metrics, polar, max_precision
 
 @testset "fringe" begin
     @test_throws "37" fringe_to_j(38)
@@ -167,7 +167,7 @@ end
     @test format_strings(recap) == latexstring(abbreviated)
 end
 
-ΔW = W(OPD, 8, Model; precision = "full")
+ΔW = W(OPD, 8, Model; precision = max_precision)
 ε = 0.75
 
 @testset "scale" begin
@@ -175,8 +175,8 @@ end
     @test_throws "Bounds" J(v, 2.0, Model)
     @test_throws "Bounds" P(v, -1.0, Model)
     @test_throws "Bounds" P(v, 2.0, Model)
-    ΔW_J_s = J(v, ε, Model; precision = "full")
-    ΔW_P_s = P(v, ε, Model; precision = "full")
+    ΔW_J_s = J(v, ε, Model; precision = max_precision)
+    ΔW_P_s = P(v, ε, Model; precision = max_precision)
     @test ΔW_J_s.a ≈ ΔW_P_s.a
     @test ΔW(ε, π/2) ≈ ΔW_J_s(1.0, π/2)
     @test ΔW(ε, π/2) ≈ ΔW_P_s(1.0, π/2)
@@ -192,7 +192,7 @@ end
 @testset "translate" begin
     @test_throws "Bounds" P(v, -1.0, 0.3 + 0.0im)
     @test_throws "Bounds" P(v, 1.0, 0.1 + 0.0im)
-    ΔW_t = P(v, ε, δ, Model; precision = "full")
+    ΔW_t = P(v, ε, δ, Model; precision = max_precision)
     @test ΔW_t(1.0, θ1) ≈ ΔW(ρ2, θ2)
     @test ΔW_t(0.0, 0.0) ≈ ΔW(ρ_t, θ_t)
 end
@@ -204,9 +204,9 @@ end
 θ2 = asin(ε * sin(φ) / ρ2) + θ_t
 
 @testset "rotate" begin
-    ΔW_r1 = P(v, 1.0, 0.0im, ϕ, Model; precision = "full")
+    ΔW_r1 = P(v, 1.0, 0.0im, ϕ, Model; precision = max_precision)
     @test ΔW_r1(1.0, 0.0) ≈ ΔW(1.0, ϕ)
-    ΔW_r2 = P(v, ε, δ, ϕ, Model; precision = "full")
+    ΔW_r2 = P(v, ε, δ, ϕ, Model; precision = max_precision)
     @test ΔW_r2(1.0, θ1) ≈ ΔW(ρ2, θ2)
 end
 

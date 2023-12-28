@@ -1,6 +1,7 @@
 const Recap = Vector{NamedTuple{(:j, :n, :m, :a), Tuple{Int, Int, Int, Float64}}}
 
 const precision = 3
+const max_precision = 17
 const wavefront_finesse = 101
 
 struct WavefrontError <: Phase
@@ -10,6 +11,7 @@ struct WavefrontError <: Phase
     fit_to::Vector{Tuple{Int, Int}}
     a::Vector{Float64}
     Z::Vector{Polynomial}
+    precision::Int
 end
 
 struct WavefrontOutput
@@ -34,7 +36,7 @@ function WavefrontError(a::FloatVec)
         Zᵢ[i] = Z(j, Model)
     end
     n_max = n
-    return WavefrontError(recap, v, n_max, fit_to, a, Zᵢ)
+    return WavefrontError(recap, v, n_max, fit_to, a, Zᵢ, max_precision)
 end
 
 function WavefrontError(orders::Vector{Tuple{Int, Int}}, a::FloatVec)
@@ -52,7 +54,7 @@ function WavefrontError(orders::Vector{Tuple{Int, Int}}, a::FloatVec)
     end
     n_max = n
     v = standardize(a, orders)
-    return WavefrontError(recap, v, n_max, fit_to, a, Zᵢ)
+    return WavefrontError(recap, v, n_max, fit_to, a, Zᵢ, max_precision)
 end
 
 function WavefrontError(orders::Vector{NamedTuple{(:m, :n), Tuple{Int, Int}}},
@@ -94,17 +96,14 @@ function reconstruct(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
 end
 
 # filtering / sifting function
-function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision)
-    if precision ≠ "full" && !isa(precision, Int)
-        precision = Zernike.precision
-    end
+function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision::Int)
     recap = @NamedTuple{j::Int, n::Int, m::Int, a::Float64}[]
     a = Float64[]
     Zₐ = Polynomial[]
     clipped = !isassigned(Zᵢ, 1)
     # store the non-trivial coefficients
     for (i, aᵢ) in pairs(v)
-        aᵢ = precision == "full" ? aᵢ : round(aᵢ; digits = precision)
+        aᵢ = round(aᵢ; digits = precision)
         if !iszero(aᵢ)
             if clipped
                 Zᵢ[i] = Z(i-1, Model)
@@ -119,7 +118,7 @@ function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision)
         v = standardize(v, orders)
     end
     # create the fitted polynomial
-    ΔW = WavefrontError(recap, v, n_max, orders, a, Zₐ)
+    ΔW = WavefrontError(recap, v, n_max, orders, a, Zₐ, precision)
     return ΔW
 end
 
@@ -157,14 +156,14 @@ end
 
 # main interface function
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int;
-           precision = precision, finesse::Int = wavefront_finesse)
+           precision::Int = precision, finesse::Int = wavefront_finesse)
     v, Zᵢ = reconstruct(ρ, θ, OPD, n_max)
     ΔW = Ψ(v, Zᵢ, n_max; precision)
     Λ(ΔW; finesse)
 end
 
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, orders::Vector{Tuple{Int, Int}};
-           precision = precision, finesse::Int = wavefront_finesse)
+           precision::Int = precision, finesse::Int = wavefront_finesse)
     n_max = maximum(mn -> mn[2], orders; init = 0)
     v, Zᵢ = reconstruct(ρ, θ, OPD, orders)
     ΔW = Ψ(v, Zᵢ, n_max, orders; precision)
@@ -221,13 +220,14 @@ end
 
 # methods
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int, ::Type{Model};
-           precision = precision)
+           precision::Int = precision)
     v, Zᵢ = reconstruct(ρ, θ, OPD, n_max)
     return Ψ(v, Zᵢ, n_max; precision)
 end
 
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
-           orders::Vector{Tuple{Int, Int}}, ::Type{Model}; precision = precision)
+           orders::Vector{Tuple{Int, Int}}, ::Type{Model};
+           precision::Int = precision)
     n_max = maximum(mn -> mn[2], orders; init = 0)
     v, Zᵢ = reconstruct(ρ, θ, OPD, orders)
     return Ψ(v, Zᵢ, n_max, orders; precision)
@@ -265,7 +265,7 @@ function W(OPD::FloatMat, fit_to; options...)
     W(coords(OPD)..., vec(OPD), fit_to; options...)
 end
 
-function W(OPD::FloatMat, fit_to, ::Type{Model}; precision = precision)
+function W(OPD::FloatMat, fit_to, ::Type{Model}; precision::Int = precision)
     W(coords(OPD)..., vec(OPD), fit_to, Model; precision)
 end
 
@@ -274,7 +274,7 @@ function W(ρ::FloatVec, θ::FloatVec, OPD::FloatMat, fit_to; options...)
 end
 
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatMat, fit_to,
-           ::Type{Model}; precision = precision)
+           ::Type{Model}; precision::Int = precision)
     W(coords(ρ, θ)..., vec(OPD), fit_to, Model; precision)
 end
 

@@ -107,8 +107,6 @@ Return the wavefront error function `ΔW(ρ, θ)` corresponding to an `n_max` fi
 
 * `precision`: number of digits to use after the decimal point in computing the expansion coefficients. Results will be rounded according to this precision and any polynomials with zero-valued coefficients will be ignored when pulling in the Zernike functions while constructing the composite wavefront error; this means lower precision values yield faster results.
 
-\u2063\u2063\u2063\u2063 If you want full 64-bit floating-point precision use `precision = "full"`.
-
 * `finesse`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 2^20 (~ 1 million).
 """
 W
@@ -146,8 +144,6 @@ Return the wavefront error function `ΔW(ρ, θ)` corresponding to the input tra
     transform(v, ε, [δ], [ϕ], [ω]; [precision = 3], [finesse::Int])
 
 * `precision`: number of digits to use after the decimal point in computing the expansion coefficients. Results will be rounded according to this precision and any polynomials with zero-valued coefficients will be ignored when pulling in the Zernike functions while constructing the composite wavefront error; this means lower precision values yield faster results.
-
-\u2063\u2063\u2063\u2063 If you want full 64-bit floating-point precision use `precision = "full"`.
 
 * `finesse`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 2^20 (~ 1 million).
 
@@ -199,7 +195,8 @@ Fields:
 * `n_max`: maximum radial degree fit to;
 * `fit_to`: vector of `(m, n)` tuples specifying the polynomials used for the fit;
 * `a`: vector of the Zernike expansion coefficients corresponding to each polynomial present;
-* `Z`: the respective Zernike polynomial functions.
+* `Z`: the respective Zernike polynomial functions;
+* `precision`: the precision with which the `a` & `Z` values were determined.
 
 The `fit_to` field is an empty vector if the default full range up to `n_max` (`0:j_max`) was used with no `orders` specified. Note that these orders could differ from the polynomials determined after the fit; they are simply what was passed to the fitting function and may refer to polynomials not present in the reconstruction if after filtering the corresponding coefficients are zero.
 
