@@ -169,24 +169,33 @@ function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, orders::Vector{Tuple{Int, 
 end
 
 # overload show to clean up the output
-function show(io::IO, W::T) where {T <: WavefrontError}
+show(io::IO, W::T) where {T <: WavefrontError} = print(io, T, ": n_max = ", W.n_max)
+
+function show(io::IO, ::MIME"text/plain", W::WavefrontError)
+    show(io, W)
+    haskey(io, :typeinfo) ? (return) : println(io)
     strip3 = map(-, displaysize(io), (3, 0))
-    println(io, T, "(n_max = ", W.n_max, ")")
-    println(io, "   ∑aᵢZᵢ(ρ, θ):")
+    println(io, "    ∑aᵢZᵢ(ρ, θ):")
     show(IOContext(io, :limit => true, :displaysize => strip3),
-                   "text/plain", W.recap)
-    print(io, "\n   --> ΔW(ρ, θ)")
+         "text/plain", W.recap)
+    print(io, "\n    --> ΔW(ρ, θ)")
 end
 
 function show(io::IO, W::T) where {T <: WavefrontOutput}
+    print(io, repr("text/plain", methods(T)[end]) |> IOBuffer |> readline)
+end
+
+function show(io::IO, ::MIME"text/plain", W::WavefrontOutput)
+    show(io, W)
+    haskey(io, :typeinfo) && return
     strip3 = map(-, displaysize(io), (3, 0))
-    println(io, T, "(recap, v, metrics, fig, axis, plot)")
-    println(io, "Summary:")
+    println(io, "\nSummary:")
     show(IOContext(io, :limit => true, :displaysize => strip3),
-                   "text/plain", W.recap)
+         "text/plain", W.recap)
     println(io)
     show(IOContext(io, :compact => true), "text/plain", W.metrics)
     display(W.fig)
+    return
 end
 
 # extend getindex to allow indexing the output

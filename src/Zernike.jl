@@ -236,7 +236,7 @@ function Z(m::Int, n::Int; finesse::Int = 100)
     Z = construct(m, n)
     (; γ) = Z.R
     Z_mn, Z_LaTeX, Z_Unicode = format_strings(Z)
-    inds = replace(Z.inds |> string, ['(', ')'] => "")
+    inds = chop(string(Z.inds); head = 1)
     window_title = "Zernike Polynomial: $inds"
     high_order = n ≥ 48
     titles = (; plot_title = Z.inds.j < 153 ? Z_LaTeX : Z_mn, window_title)
@@ -247,17 +247,20 @@ end
 # overload show to clean up the output
 show(io::IO, Z::T) where {T <: Polynomial} = print(io, T, Z.inds, " --> Z(ρ, θ)")
 
-function show(io::IO, output::Output)
-    (; coeffs, unicode, inds, high_order) = output
-    println(io, inds)
-    if high_order
+show(io::IO, output::Output) = print(io, output.inds)
+
+function show(io::IO, ::MIME"text/plain", output::Output)
+    show(io, output)
+    haskey(io, :typeinfo) ? (return) : println(io)
+    if output.high_order
         println(io)
         @info "Coefficients are stored in the coeffs field \
-               of the current output." coeffs
+               of the current output." output.coeffs
     else
-        print(io, "Z = ", unicode)
+        print(io, "Z = ", output.unicode)
     end
     display(output.fig)
+    return
 end
 
 # methods
