@@ -171,6 +171,8 @@ For the `standardize` subset method the tuples in `orders` must be of the form `
 
 ## Additional Notes
 
+* Arithmetric between `Polynomial`s and `WavefrontError`s is defined; in addition, the `Superposition(W)` and `Product(W)` constructors (where `W` is a `Vector{WavefrontError}`) serve as direct methods for creating composite functions which group evaluate a specified expansion set when an updated set of coefficients is not required;
+
 * `Zernike.metrics(ΔW::WavefrontError)` exists;
 
 * The `zplot` function can be invoked independently using `Polynomial` and `WavefrontError` function types as well as quantized wavefront errors;

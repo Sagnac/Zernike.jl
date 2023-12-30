@@ -1,9 +1,9 @@
 using Zernike
-using Zernike: Z, W, P
+using Zernike: Z, W, P, ϵ_fit
 
 # uniform sampling over the unit disk
-ρ = range(0.0, 1.0, 21)
-OPD = stack(2sinc.(5ρ) for i = 1:21; dims = 1)
+ρ = range(0.0, 1.0, ϵ_fit)
+OPD = stack(2sinc.(5ρ) for i = 1:ϵ_fit; dims = 1)
 (; fig, coeffs, latex) = Z(0, 4)
 wait(display(fig))
 recap_a, v, metrics1, fig, axis, plot = W(OPD, 8)

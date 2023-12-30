@@ -7,7 +7,7 @@
 
 module Zernike
 
-export zernike, wavefront, transform, Model, WavefrontError,
+export zernike, wavefront, transform, Model, WavefrontError, Superposition, Product,
        noll_to_j, fringe_to_j, standardize, standardize!,
        Observable, plotconfig, zplot
 
@@ -16,7 +16,9 @@ import .Makie: latexstring, LaTeXString
 import Base: show, getindex, iterate, setproperty!, propertynames
 
 const ∑ = sum
+const ∏ = prod
 const ϵ_max = 2^10
+const ϵ_fit = 21
 
 const finesse = 100
 
@@ -59,6 +61,7 @@ end
 include("RadialCoefficients.jl")
 include("FormatStrings.jl")
 include("WavefrontError.jl")
+include("Arithmetic.jl")
 include("ZernikePlot.jl")
 include("ScaleAperture.jl")
 include("TransformAperture.jl")
@@ -79,9 +82,9 @@ function (Z::Polynomial)(ρ, θ)
     N * R(ρ) * M(θ)
 end
 
-function polar()
-    ρ = range(0.0, 1.0, ϵ_max)
-    θ = range(0.0, 2π, ϵ_max)
+function polar(ϵ::Int = ϵ_fit)
+    ρ = range(0.0, 1.0, ϵ)'
+    θ = range(0.0, 2π, ϵ)
     return ρ, θ
 end
 
@@ -273,6 +276,8 @@ Z(; m, n, finesse = finesse) = Z(m, n; finesse)
 Z(j::Int; finesse = finesse) = Z(get_mn(j)...; finesse)
 
 Z(j::Int, ::Type{Model}) = construct(get_mn(j)...)
+
+const piston = Z(0, 0, Model)
 
 # aliases for the API namespace
 const zernike = Z

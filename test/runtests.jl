@@ -2,7 +2,7 @@ using Test
 using Zernike
 using Zernike: Z, W, P, radicand, Φ, get_i, canonical, coords, reconstruct,
                validate_length, map_phase, format_strings, get_mn, LaTeXString,
-               latexstring, J, metrics, polar, max_precision
+               latexstring, J, metrics, polar, max_precision, (..)
 
 @testset "fringe" begin
     @test_throws "37" fringe_to_j(38)
@@ -150,6 +150,132 @@ end
     @test pv ≈ 1/4 atol = 1e-2
     @test rms ≈ 1/14 atol = 1e-2
     @test strehl ≈ 0.8 atol = 1e-1
+end
+
+@testset "arithmetic" begin
+    orders = collect(0:27)
+    j = [splice!(orders, rand(orders |> eachindex)) for i = 1:8]
+    Z = zernike.(j, Model)
+    Z1, Z2 = Z
+    W1 = Z1 + Z2
+    W2 = Z1 - Z2
+    ρ, θ = rand(0.2..0.7, 2)
+    i1 = j[1] + 1
+    i2 = j[2] + 1
+    @test W1 isa WavefrontError && W2 isa WavefrontError
+    @test Set(Z.j for Z ∈ W1.recap ∪ W2.recap) == Set(j[1:2])
+    @test W1.a == [1.0, 1.0]
+    @test W2.a == [1.0, -1.0]
+    @test W1.v[i1] == W1.v[i2] == 1.0
+    @test W2.v[i1] == 1.0 && W2.v[i2] == -1.0
+    @test sum(W1.v) == 2.0
+    @test sum(W2.v) == 0.0
+    @test Z1(ρ, θ) + Z2(ρ, θ) ≈ W1(ρ, θ)
+    @test Z1(ρ, θ) - Z2(ρ, θ) ≈ W2(ρ, θ)
+    a = rand(7)
+    W3 = WavefrontError(j[1:4], a[1:4])
+    W4 = WavefrontError(j[5:7], a[5:7])
+    W5 = Z1 + W4
+    W6 = Z2 - W4
+    W4_v = W4.v
+    v1 = zeros(length(W5.v))
+    v1[eachindex(W4_v)] = W4_v
+    v1[i1] += 1.0
+    v2 = zeros(length(W6.v))
+    v2[eachindex(W4_v)] = -W4_v
+    v2[i2] += 1.0
+    @test W5 isa WavefrontError && W6 isa WavefrontError
+    @test Set(Z.j for Z ∈ W5.recap) == Set(j[[1; 5:7]])
+    @test Set(Z.j for Z ∈ W6.recap) == Set(j[[2; 5:7]])
+    @test W5.v == v1
+    @test W6.v == v2
+    @test Z1(ρ, θ) + W4(ρ, θ) ≈ W5(ρ, θ)
+    @test Z2(ρ, θ) - W4(ρ, θ) ≈ W6(ρ, θ)
+    W7 = W3 + W4
+    W8 = W3 - W4
+    v3 = W3.v
+    v4 = W4.v
+    lens = (length(v3), length(v4))
+    longest, which_long = lens[2] > lens[1] ? (v4, 2) : (v3, 1)
+    which_short = which_long ⊻ 3
+    tail = longest[lens[which_short]+1:end]
+    v5 = map(+, v3, v4)
+    v5 = [v5; tail]
+    v6 = map(-, v3, v4)
+    v6 = [v6; ~(2 * which_long - 4) * tail]
+    @test v5 == W7.v
+    @test v6 == W8.v
+    @test W3(ρ, θ) + W4(ρ, θ) ≈ W7(ρ, θ)
+    @test W3(ρ, θ) - W4(ρ, θ) ≈ W8(ρ, θ)
+    b = rand()
+    S1 = Superposition(b, [W3, W4])
+    S2 = Z1 - S1
+    @test S2 isa Superposition
+    S_v = [W.v for W ∈ S2.W]
+    Z1_v = convert(WavefrontError, Z1)[]
+    @test -b * W3.v ∈ S_v && -b * W4.v ∈ S_v && Z1_v ∈ S_v
+    S3 = S1 + W5
+    @test S3 isa Superposition
+    S_v = [W.v for W ∈ S3.W]
+    @test S_v == [b * W3.v, b * W4.v, W5.v]
+    S4 = S1 + S2
+    @test S4.b == 1.0
+    @test Z1(ρ, θ) - S1(ρ, θ) ≈ S2(ρ, θ)
+    @test S1(ρ, θ) + W5(ρ, θ) ≈ S3(ρ, θ)
+    @test S1(ρ, θ) + S2(ρ, θ) ≈ S4(ρ, θ) ≈ Z1(ρ, θ)
+    W9 = a[1] * Z1
+    W10 = a[2] * W3
+    S5 = b * sum([W3, W4])
+    @test W9.v[i1] == a[1] == sum(W9.v)
+    @test W10.v == a[2] * W3.v
+    @test S5.b == b
+    @test a[1] * Z1(ρ, θ) ≈ W9(ρ, θ)
+    @test a[2] * W3(ρ, θ) ≈ W10(ρ, θ)
+    @test S1(ρ, θ) ≈ S5(ρ, θ) ≈ b * (W3(ρ, θ) + W4(ρ, θ))
+    ρ, θ = polar()
+    p1 = @. Z1(ρ, θ) * Z2(ρ, θ)
+    len = length(p1)
+    function MAE(w, p1 = p1)
+        p2 = w.(ρ, θ)
+        sum(abs.(p2 .- p1)) / len
+    end
+    W11 = convert(WavefrontError, Z1)
+    W12 = convert(WavefrontError, Z2)
+    S6 = Superposition([W11])
+    S7 = Superposition([W12])
+    P1 = Product([W11])
+    P2 = Product([W12])
+    P = Vector{WavefrontError}(undef, 10)
+    P[1] = (Z1 * Z2)::WavefrontError
+    P[2] = (Z1 * W12)::WavefrontError
+    P[3] = (Z1 * S7)::WavefrontError
+    P[4] = (Z1 * P2)::WavefrontError
+    P[5] = (W11 * W12)::WavefrontError
+    P[6] = (W11 * S7)::WavefrontError
+    P[7] = (W11 * P2)::WavefrontError
+    P[8] = (S6 * S7)::WavefrontError
+    P[9] = (S6 * P2)::WavefrontError
+    P[10] = (P1 * P2)::WavefrontError
+    mae_ϵ = 0.01
+    mae = MAE(P[1])
+    @test mae < mae_ϵ
+    for p ∈ P[2:end]
+        @test MAE(p) == mae
+    end
+    for i = 3:2:7
+        Z1 = Z[i]
+        Z2 = Z[i+1]
+        p1 = @. Z1(ρ, θ) * Z2(ρ, θ)
+        w = Z1 * Z2
+        @test MAE(w, p1) < mae_ϵ
+    end
+    @test (b * P1).b == b
+    P3 = P1 + P2
+    @test P3.v ≈ W1.v
+    @test (Z1 + Z1).v ≈ (2Z1).v
+    @test Z1.(ρ, θ) .+ a[1] ≈ (Z1 + a[1]).(ρ, θ)
+    n = rand(2:5)
+    @test MAE(Z1 ^ n, Z1.(ρ, θ) .^ n) < mae_ϵ
 end
 
 @testset "format strings" begin

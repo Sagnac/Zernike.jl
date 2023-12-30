@@ -27,7 +27,7 @@ function WavefrontError(recap, v, n_max, fit_to, a, Z, precision)
     WavefrontError{Polynomial}(recap, v, n_max, fit_to, a, Z, precision)
 end
 
-function WavefrontError(a::FloatVec)
+function WavefrontError(a::FloatVec; precision = max_precision)
     fit_to = []
     v = a
     recap = similar(a, NamedTuple)
@@ -40,10 +40,11 @@ function WavefrontError(a::FloatVec)
         Zᵢ[i] = Z(j, Model)
     end
     n_max = n
-    return WavefrontError(recap, v, n_max, fit_to, a, Zᵢ, max_precision)
+    return WavefrontError(recap, v, n_max, fit_to, a, Zᵢ, precision)
 end
 
-function WavefrontError(orders::Vector{Tuple{Int, Int}}, a::FloatVec)
+function WavefrontError(orders::Vector{Tuple{Int, Int}}, a::FloatVec;
+                        precision = max_precision)
     length(a) != length(orders) && throw(ArgumentError("Lengths must be equal."))
               allunique(orders) || throw(ArgumentError("Orders must be unique."))
     fit_to = []
@@ -59,7 +60,7 @@ function WavefrontError(orders::Vector{Tuple{Int, Int}}, a::FloatVec)
     end
     n_max = n
     v = standardize(a, orders)
-    return WavefrontError(recap, v, n_max, fit_to, a, Zᵢ, max_precision)
+    return WavefrontError(recap, v, n_max, fit_to, a, Zᵢ, precision)
 end
 
 function WavefrontError(orders::Vector{NamedTuple{(:m, :n), Tuple{Int, Int}}},
@@ -73,7 +74,7 @@ end
 
 function (ΔW::WavefrontError)(ρ, θ)
     (; a, Z) = ΔW
-    ∑(aᵢ * Z[i](ρ, θ) for (i, aᵢ) ∈ pairs(a))
+    ∑(aᵢ * Z[i](ρ, θ) for (i, aᵢ) ∈ pairs(a); init = 0.0)
 end
 
 function fit(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, Zᵢ::Vector{Polynomial})
@@ -105,9 +106,11 @@ function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision::Int)
     recap = @NamedTuple{j::Int, n::Int, m::Int, a::Float64}[]
     a = Float64[]
     Zₐ = Polynomial[]
+    converted = (-1, -1) ∈ orders
+    effective_precision = converted ? max_precision : precision
     # store the non-trivial coefficients
     for (i, aᵢ) in pairs(v)
-        aᵢ = round(aᵢ; digits = precision)
+        aᵢ = round(aᵢ; digits = effective_precision)
         if !iszero(aᵢ)
             if !isassigned(Zᵢ, i)
                 Zᵢ[i] = Z(i-1, Model)
@@ -118,7 +121,7 @@ function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision::Int)
         end
     end
     # pad the output coefficient vector if needed
-    if !isempty(orders)
+    if !isempty(orders) && !converted
         v = standardize(v, orders)
     end
     # create the fitted polynomial
@@ -140,8 +143,8 @@ function Λ(ΔW; finesse::Int)
 end
 
 function metrics(ΔW::WavefrontError)
-    ρ, θ = polar()
-    w = ΔW.(ρ', θ)
+    ρ, θ = polar(ϵ_max)
+    w = ΔW.(ρ, θ)
     metrics(ΔW.v, w)
 end
 
