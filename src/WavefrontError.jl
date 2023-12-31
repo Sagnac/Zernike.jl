@@ -172,29 +172,29 @@ end
 # overload show to clean up the output
 show(io::IO, W::T) where {T <: WavefrontError} = print(io, T, ": n_max = ", W.n_max)
 
-function show(io::IO, ::MIME"text/plain", W::WavefrontError)
+function show(io::IO, m::MIME"text/plain", W::WavefrontError)
     show(io, W)
     haskey(io, :typeinfo) ? (return) : println(io)
     strip3 = map(-, displaysize(io), (3, 0))
     println(io, "    ∑aᵢZᵢ(ρ, θ):")
-    show(IOContext(io, :limit => true, :displaysize => strip3),
-         "text/plain", W.recap)
+    show(IOContext(io, :limit => true, :displaysize => strip3), m, W.recap)
     print(io, "\n    --> ΔW(ρ, θ)")
 end
 
 function show(io::IO, W::T) where {T <: WavefrontOutput}
-    print(io, repr("text/plain", methods(T)[end]) |> IOBuffer |> readline)
+    print(io, T, "(")
+    join(io, fieldnames(T), ", ")
+    print(io, ")")
 end
 
-function show(io::IO, ::MIME"text/plain", W::WavefrontOutput)
+function show(io::IO, m::MIME"text/plain", W::WavefrontOutput)
     show(io, W)
     haskey(io, :typeinfo) && return
     strip3 = map(-, displaysize(io), (3, 0))
     println(io, "\nSummary:")
-    show(IOContext(io, :limit => true, :displaysize => strip3),
-         "text/plain", W.recap)
+    show(IOContext(io, :limit => true, :displaysize => strip3), m, W.recap)
     println(io)
-    show(IOContext(io, :compact => true), "text/plain", W.metrics)
+    show(IOContext(io, :compact => true), m, W.metrics)
     display(W.fig)
     return
 end

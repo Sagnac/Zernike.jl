@@ -238,7 +238,7 @@ function Z(m::Int, n::Int; finesse = finesse)
     Z = construct(m, n)
     (; γ) = Z.R
     Z_mn, Z_LaTeX, Z_Unicode = format_strings(Z)
-    inds = chop(string(Z.inds); head = 1)
+    inds = chop(string(Z.inds); head = 1, tail = 1)
     window_title = "Zernike Polynomial: $inds"
     high_order = n ≥ 48
     titles = (; plot_title = Z.inds.j < 153 ? Z_LaTeX : Z_mn, window_title)
