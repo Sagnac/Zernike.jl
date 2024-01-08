@@ -41,6 +41,7 @@ end
 
 function WavefrontError(orders::Vector{Tuple{Int, Int}}, a::FloatVec)
     length(a) != length(orders) && throw(ArgumentError("Lengths must be equal."))
+              allunique(orders) || throw(ArgumentError("Orders must be unique."))
     fit_to = []
     recap = similar(a, NamedTuple)
     Zᵢ = similar(a, Polynomial)
