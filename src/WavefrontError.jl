@@ -17,10 +17,10 @@ end
 struct WavefrontOutput
     recap::Recap
     v::Vector{Float64}
-    metrics::NamedTuple{(:pv, :rms, :strehl), Tuple{Float64, Float64, Float64}}
+    metrics::NamedTuple{(:pv, :rms, :strehl), NTuple{3, Float64}}
     fig::Makie.Figure
     axis::Axis3
-    plot::Surface{Tuple{T, T, T}} where T <: Matrix{Float32}
+    plot::Surface{NTuple{3, Matrix{Float32}}}
 end
 
 function WavefrontError(a::FloatVec)

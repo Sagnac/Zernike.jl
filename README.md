@@ -101,7 +101,7 @@ Available transformations are scaling, translation, & rotation for circular and 
 * `ε::Float64`: scaling factor `{0 ≤ ε ≤ 1}`;
 * `δ::ComplexF64`: translational complex coordinates (displacement of the pupil center in the complex plane);
 * `ϕ::Float64`: rotation of the pupil in radians `(mod 2π)`, defined positive counter-clockwise from the horizontal x-axis;
-* `ω::Tuple{Float64,Float64}`: elliptical pupil transform parameters; 2-tuple where `ω[1]` is the ratio of the minor radius to the major radius of the ellipse and `ω[2]` is the angle defined positive counter-clockwise from the horizontal coordinate axis of the exit pupil to the minor axis of the ellipse.
+* `ω::NTuple{2, Float64}`: elliptical pupil transform parameters; 2-tuple where `ω[1]` is the ratio of the minor radius to the major radius of the ellipse and `ω[2]` is the angle defined positive counter-clockwise from the horizontal coordinate axis of the exit pupil to the minor axis of the ellipse.
 
 The order the transformations are applied is:<br>
 scaling --> translation --> rotation --> elliptical transform.

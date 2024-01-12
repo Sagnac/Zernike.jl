@@ -18,8 +18,8 @@ function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <
     !(0.0 ≤ ε + abs(δ) ≤ 1.0) && error("Bounds: 0.0 ≤ ε + |δ| ≤ 1.0\n")
     !(0.0 < ω[1] ≤ 1.0) && error("Bounds: 0.0 < ω[1] ≤ 1.0\n")
     len, n_max = validate_length(v)
-    remap = Dict{Tuple{Int, Int}, Int}()
-    order = Tuple{Int, Int, Int}[]
+    remap = Dict{NTuple{2, Int}, Int}()
+    order = NTuple{3, Int}[]
     # normalization factors for complex Zernike polynomials
     N = zeros(Float64, len, len)
     # radial coefficient block-diagonal matrix
@@ -146,7 +146,7 @@ function translate_ellipse(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64
     return η_s, η_e
 end
 
-function to_complex(v::Vector{Float64}, order::Vector{Tuple{Int, Int, Int}})
+function to_complex(v::Vector{Float64}, order::Vector{NTuple{3, Int}})
     c = similar(v, ComplexF64)
     for (i, j) in pairs(order)
         if j[3] < 0
@@ -160,7 +160,7 @@ function to_complex(v::Vector{Float64}, order::Vector{Tuple{Int, Int, Int}})
     return c
 end
 
-function to_real(c::Vector{Complex{Float64}}, order::Vector{Tuple{Int, Int, Int}})
+function to_real(c::Vector{Complex{Float64}}, order::Vector{NTuple{3, Int}})
     c2 = c[sortperm(order; by = first)]
     v2 = similar(c2, Float64)
     for (i, j) in pairs(order)

@@ -39,7 +39,7 @@ struct Sinusoid
 end
 
 struct Polynomial <: Phase
-    inds::NamedTuple{(:j, :n, :m), Tuple{Int, Int, Int}}
+    inds::NamedTuple{(:j, :n, :m), NTuple{3, Int}}
     N::Float64
     R::RadialPolynomial
     M::Sinusoid
@@ -48,7 +48,7 @@ end
 struct Output
     fig::Makie.Figure
     axis::Axis3
-    plot::Surface{Tuple{T, T, T}} where T <: Matrix{Float32}
+    plot::Surface{NTuple{3, Matrix{Float32}}}
     coeffs::Vector{Float64}
     latex::LaTeXString
     unicode::String
