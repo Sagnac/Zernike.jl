@@ -97,6 +97,10 @@ r, t = coords(OPD)
 OPD_vec = vec(OPD)
 v = reconstruct(r, t, OPD_vec, 8)[1]
 
+function sample(collection, n) # w/o replacement
+    [splice!(collection, rand(collection |> eachindex)) for i = 1:n]
+end
+
 @testset "wavefront error" begin
     @test_throws "number" validate_length(ones(5))
     @test_throws "length" W(zeros(2), zeros(2), zeros(3), 4)
@@ -140,6 +144,17 @@ v = reconstruct(r, t, OPD_vec, 8)[1]
     @test iszero(W2.v[setdiff(1:45, idx_orders)])
     @test isempty(W2.fit_to)
     @test W2.n_max == 8
+    @testset "coords" begin
+        u, v = sample(collect(4:18), 2)
+        θ = rand(u)
+        ρ = rand(v)
+        ρ1 = ones(u) * ρ' |> vec
+        θ1 = θ * ones(v)' |> vec
+        ρ2 = repeat(range(0.0, 1.0, v); inner = u)
+        θ2 = repeat(range(0.0, 2π, u); outer = v)
+        @test (ρ1, θ1) == coords(ρ, θ)
+        @test (ρ2, θ2) == coords(rand(u, v))
+    end
 end
 
 @testset "metrics" begin
@@ -154,7 +169,7 @@ end
 
 @testset "arithmetic" begin
     orders = collect(0:27)
-    j = [splice!(orders, rand(orders |> eachindex)) for i = 1:8]
+    j = sample(orders, 8)
     Z = zernike.(j, Model)
     Z1, Z2 = Z
     W1 = Z1 + Z2

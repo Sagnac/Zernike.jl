@@ -17,6 +17,9 @@ import Base: show, getindex, iterate, setproperty!, propertynames
 
 const ∑ = sum
 const ∏ = prod
+
+⊗(x, y) = kron(x, y)
+
 const ϵ_max = 2^10
 const ϵ_fit = 21
 
@@ -82,10 +85,15 @@ function (Z::Polynomial)(ρ, θ)
     N * R(ρ) * M(θ)
 end
 
-function polar(ϵ::Int = ϵ_fit)
-    ρ = range(0.0, 1.0, ϵ)'
-    θ = range(0.0, 2π, ϵ)
+function polar((u, v)::NTuple{2, Int})
+    θ = range(0.0, 2π, u)
+    ρ = range(0.0, 1.0, v)
     return ρ, θ
+end
+
+function polar(ϵ::Int = ϵ_fit)
+    ρ, θ = polar((ϵ, ϵ))
+    return ρ', θ
 end
 
 function polar(m::Int, n::Int; finesse = finesse)

@@ -253,18 +253,13 @@ end
 split_data(data::FloatMat) = (data[:, i] for i = 1:3)
 
 # extract pupil coordinates
-function coords(OPD::FloatMat)
-    u, v = size(OPD)
-    ρ = repeat(range(0.0, 1.0, v); inner = u)
-    θ = repeat(range(0.0, 2π, u); outer = v)
-    return ρ, θ
-end
-
 function coords(ρ::FloatVec, θ::FloatVec)
-    ρ2 = ones(length(θ)) * ρ' |> vec
-    θ2 = θ * ones(length(ρ))' |> vec
+    ρ2 = ρ ⊗ ones(length(θ))
+    θ2 = ones(length(ρ)) ⊗ θ
     return ρ2, θ2
 end
+
+coords(OPD::FloatMat) = coords(polar(size(OPD))...)
 
 # assumes dim(θ) x dim(ρ) matrix polar mapping
 # W(OPD', fit_to, etc.) for dim(ρ) x dim(θ) matrix
