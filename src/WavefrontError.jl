@@ -4,13 +4,13 @@ const precision = 3
 const max_precision = 17
 const wavefront_finesse = 101
 
-struct WavefrontError <: Phase
+struct WavefrontError{T <: Polynomial} <: Phase
     recap::Recap
     v::Vector{Float64}
     n_max::Int
     fit_to::Vector{Tuple{Int, Int}}
     a::Vector{Float64}
-    Z::Vector{Polynomial}
+    Z::Vector{T}
     precision::Int
 end
 
@@ -21,6 +21,10 @@ struct WavefrontOutput
     fig::Makie.Figure
     axis::Axis3
     plot::Surface{NTuple{3, Matrix{Float32}}}
+end
+
+function WavefrontError(recap, v, n_max, fit_to, a, Z, precision)
+    WavefrontError{Polynomial}(recap, v, n_max, fit_to, a, Z, precision)
 end
 
 function WavefrontError(a::FloatVec)
