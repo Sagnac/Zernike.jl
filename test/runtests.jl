@@ -3,6 +3,7 @@ using Zernike
 using Zernike: Z, W, P, radicand, Φ, get_i, canonical, coords, reconstruct,
                validate_length, map_phase, format_strings, get_mn, LaTeXString,
                latexstring, J, metrics, polar, max_precision, (..)
+using StatsBase: mean, sample
 
 @testset "fringe" begin
     @test_throws "37" fringe_to_j(38)
@@ -97,10 +98,6 @@ r, t = coords(OPD)
 OPD_vec = vec(OPD)
 v = reconstruct(r, t, OPD_vec, 8)[1]
 
-function sample(collection, n) # w/o replacement
-    [splice!(collection, rand(collection |> eachindex)) for i = 1:n]
-end
-
 @testset "wavefront error" begin
     @test_throws "number" validate_length(ones(5))
     @test_throws "length" W(zeros(2), zeros(2), zeros(3), 4)
@@ -145,7 +142,7 @@ end
     @test isempty(W2.fit_to)
     @test W2.n_max == 8
     @testset "coords" begin
-        u, v = sample(collect(4:18), 2)
+        u, v = sample(4:18, 2, replace = false)
         θ = rand(u)
         ρ = rand(v)
         ρ1 = ones(u) * ρ' |> vec
@@ -168,8 +165,7 @@ end
 end
 
 @testset "arithmetic" begin
-    orders = collect(0:27)
-    j = sample(orders, 8)
+    j = sample(0:27, 8, replace = false)
     Z = zernike.(j, Model)
     Z1, Z2 = Z
     W1 = Z1 + Z2
@@ -249,10 +245,9 @@ end
     @test S1(ρ, θ) ≈ S5(ρ, θ) ≈ b * (W3(ρ, θ) + W4(ρ, θ))
     ρ, θ = polar()
     p1 = @. Z1(ρ, θ) * Z2(ρ, θ)
-    len = length(p1)
     function MAE(w, p1 = p1)
         p2 = w.(ρ, θ)
-        sum(abs.(p2 .- p1)) / len
+        mean(abs.(p2 .- p1))
     end
     W11 = convert(WavefrontError, Z1)
     W12 = convert(WavefrontError, Z2)
