@@ -27,7 +27,7 @@ end
 
 ∏(v::Vector{<:Phase}) = Product(v)
 
-factorial(Z::Polynomial) = Product([zernike(j, Model) for j = 0:Z.inds.j])
+factorial(z::Polynomial) = Product([Z(j) for j = 0:z.inds.j])
 
 φ1::Phase + φ2::Phase = add_subtract(+, φ1, φ2)
 φ1::Phase - φ2::Phase = add_subtract(-, φ1, φ2)
@@ -64,10 +64,10 @@ function convert(::Type{<:Superposition}, W::WavefrontError)
     Superposition([W])
 end
 
-function convert(::Type{<:WavefrontError}, W::Product)
-    OPD = W.(polar()...)
-    n_max, precision = params(W)
-    wavefront(OPD, n_max, Model; precision)
+function convert(::Type{<:WavefrontError}, ΔW::Product)
+    OPD = ΔW.(polar()...)
+    n_max, precision = params(ΔW)
+    W(OPD, n_max; precision)
 end
 
 promote_rule(::Type{<:WavefrontError}, ::Type{Polynomial}) = WavefrontError
@@ -136,7 +136,7 @@ function multiply(φ1::T, φ2::T) where T <: Phase
     φ3 = @. φ1(ρ, θ) * φ2(ρ, θ)
     n_max = φ1.n_max + φ2.n_max
     precision = max(φ1.precision, φ2.precision)
-    wavefront(φ3, n_max, Model; precision)
+    W(φ3, n_max; precision)
 end
 
 multiply(ΔW1::MixedPhase, ΔW2::MixedPhase) = wavefront_expansion(*, ΔW1, ΔW2)
@@ -146,7 +146,7 @@ function exponentiate(φ::Phase, n::Integer)
     ρ, θ = polar()
     φ_n = @. φ(ρ, θ) ^ n
     n_max = φ.n_max * n
-    wavefront(φ_n, n_max, Model; φ.precision)
+    W(φ_n, n_max; φ.precision)
 end
 
 function params(ΔW::MixedPhase)
@@ -160,7 +160,7 @@ function wavefront_expansion(f, φ1::MixedPhase, φ2::MixedPhase)
     n2, p2 = params(φ2)
     n_max = (f == *) ? n1 + n2 : max(n1, n2)
     precision = max(p1, p2)
-    wavefront(φ3, n_max, Model; precision)
+    W(φ3, n_max; precision)
 end
 
 function show(io::IO, W::T) where {T <: MixedPhase}

@@ -17,15 +17,15 @@ function Π(v::Vector{T}, ε::T) where T <: Float64
     for i in eachindex(v)
         a = v[i]
         N_mn = √radicand(m, n)
-        R0 = construct(n, n).R(ε)
+        R0 = Z(n, n).R(ε)
         v2[i] = a * N_mn * R0
         ii = i
         for n′ = n+2:2:n_max
             ii += 2n′
             a = v[ii]
             N = √radicand(m, n′)
-            R1 = construct(n, n′).R(ε)
-            R2 = construct(n+2, n′).R(ε)
+            R1 = Z(n, n′).R(ε)
+            R2 = Z(n+2, n′).R(ε)
             v2[i] += a * N * (R1 - R2)
         end
         v2[i] /= N_mn
@@ -39,7 +39,7 @@ function Π(v::Vector{T}, ε::T) where T <: Float64
     return v2, n_max
 end
 
-function J(v::Vector{Float64}, ε::Float64;
+function scale(v::Vector{Float64}, ε::Float64;
            precision::Int = precision, finesse::Int = wavefront_finesse)
     v2, n_max = Π(v, ε)
     Zᵢ = similar(v, Polynomial)
@@ -47,7 +47,7 @@ function J(v::Vector{Float64}, ε::Float64;
     Λ(ΔW; finesse)
 end
 
-function J(v::Vector{Float64}, ε::Float64, ::Type{Model}; precision::Int = precision)
+function J(v::Vector{Float64}, ε::Float64; precision::Int = precision)
     v2, n_max = Π(v, ε)
     Zᵢ = similar(v, Polynomial)
     Ψ(v2, Zᵢ, n_max; precision)

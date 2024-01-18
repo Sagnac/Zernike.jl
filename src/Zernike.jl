@@ -7,7 +7,8 @@
 
 module Zernike
 
-export zernike, wavefront, transform, Model, WavefrontError, Superposition, Product,
+export zernike, wavefront, transform, Z, W, P, WavefrontError,
+       Superposition, Product,
        noll_to_j, fringe_to_j, standardize, standardize!,
        Observable, plotconfig, zplot
 
@@ -30,8 +31,6 @@ const FloatVec = AbstractVector{<:AbstractFloat}
 const FloatMat = AbstractMatrix{<:AbstractFloat}
 
 abstract type Phase end
-
-struct Model end
 
 struct RadialPolynomial
     λ::Vector{Float64}
@@ -208,7 +207,7 @@ function canonical(μ::T, n::T, k::T) where T <: Int
 end
 
 # binds the indices and produces a specific polynomial function
-function construct(m::Int, n::Int)
+function Z(m::Int, n::Int)
     μ = abs(m)
     # validate
     if n < 0 || μ > n || isodd(n - μ)
@@ -240,20 +239,19 @@ function construct(m::Int, n::Int)
     # azimuthal / meridional component
     M = Sinusoid(m)
     # Zernike polynomial
-    Z = Polynomial(inds, N, R, M)
-    return Z
+    return Polynomial(inds, N, R, M)
 end
 
 # main interface function
-function Z(m::Int, n::Int; finesse = finesse)
-    Z = construct(m, n)
-    (; γ) = Z.R
-    Z_mn, Z_LaTeX, Z_Unicode = format_strings(Z)
-    inds = chop(string(Z.inds); head = 1, tail = 1)
+function zernike(m::Int, n::Int; finesse = finesse)
+    Z_ = Z(m, n)
+    (; γ) = Z_.R
+    Z_mn, Z_LaTeX, Z_Unicode = format_strings(Z_)
+    inds = chop(string(Z_.inds); head = 1, tail = 1)
     window_title = "Zernike Polynomial: $inds"
     high_order = n ≥ 48
-    titles = (; plot_title = Z.inds.j < 153 ? Z_LaTeX : Z_mn, window_title)
-    fig, axis, plot = zplot(Z; m, n, finesse, high_order, titles...)
+    titles = (; plot_title = Z_.inds.j < 153 ? Z_LaTeX : Z_mn, window_title)
+    fig, axis, plot = zplot(Z_; m, n, finesse, high_order, titles...)
     Output(fig, axis, plot, γ, Z_LaTeX, Z_Unicode, inds, high_order)
 end
 
@@ -277,21 +275,15 @@ function show(io::IO, ::MIME"text/plain", output::Output)
 end
 
 # methods
-Z(m::Int, n::Int, ::Type{Model}) = construct(m, n)
+zernike(; m, n, finesse = finesse) = zernike(m, n; finesse)
 
-Z(; m, n, finesse = finesse) = Z(m, n; finesse)
+zernike(j::Int; finesse = finesse) = zernike(get_mn(j)...; finesse)
 
-Z(j::Int; finesse = finesse) = Z(get_mn(j)...; finesse)
+Z(j::Int) = Z(get_mn(j)...)
 
-Z(j::Int, ::Type{Model}) = construct(get_mn(j)...)
-
-const piston = Z(0, 0, Model)
+const piston = Z(0, 0)
 
 # aliases for the API namespace
-const zernike = Z
-const wavefront = W
-const transform = P
-const scale = J
 const coefficients = Φ
 const transform_coefficients = S
 

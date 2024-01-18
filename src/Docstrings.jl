@@ -16,21 +16,24 @@ The coefficients belong to terms with exponent `n - 2(i - 1)` where `i` is the v
 
 The radial polynomial coefficients are computed using a fast and accurate algorithm suitable for high orders; it is based on a recursive relation presented by Honarvar & Paramesran (2013) doi:10.1364/OL.38.002487.
 
-See also [`wavefront`](@ref), [`transform`](@ref).
+See also [`Z`](@ref), [`wavefront`](@ref), [`transform`](@ref).
 
 ----
-
-# Positional argument options:
-
-    zernike(m, n, ::Type{Model})
-
-Return the Zernike polynomial function `Z(ρ, θ)` corresponding to indices `m` and `n`.
 
 # Keyword argument options:
 
     zernike(m, n; [finesse::Int = 100])
 
 `finesse`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 1 million.
+"""
+zernike
+
+"""
+    Z(m, n)
+
+Return the Zernike `Polynomial` function `Z(ρ, θ)` corresponding to indices `m` and `n`.
+
+See also [`zernike`](@ref), [`W`](@ref), [`P`](@ref).
 """
 Z
 
@@ -63,7 +66,7 @@ Returns six values contained within a `WavefrontOutput` type, with fields:
 
 These can also be accessed through indexing and regular non-property destructuring.
 
-See also [`zernike`](@ref), [`transform`](@ref).
+See also [`W`](@ref), [`zernike`](@ref), [`transform`](@ref).
 
 ----
 
@@ -95,12 +98,6 @@ Fitting method accepting normalized Cartesian coordinate data.
 
 ----
 
-# Positional argument options:
-
-    wavefront(ρ, θ, OPD, n_max, ::Type{Model})
-
-Return the wavefront error function `ΔW(ρ, θ)` corresponding to an `n_max` fit.
-
 # Keyword argument options:
 
     wavefront(ρ, θ, OPD, n_max; [precision = 3], [finesse::Int])
@@ -108,6 +105,15 @@ Return the wavefront error function `ΔW(ρ, θ)` corresponding to an `n_max` fi
 * `precision`: number of digits to use after the decimal point in computing the expansion coefficients. Results will be rounded according to this precision and any polynomials with zero-valued coefficients will be ignored when pulling in the Zernike functions while constructing the composite wavefront error; this means lower precision values yield faster results.
 
 * `finesse`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 2^20 (~ 1 million).
+"""
+wavefront
+
+"""
+    W(ρ, θ, OPD, n_max)
+
+Return the `WavefrontError` function `ΔW(ρ, θ)` corresponding to an `n_max` fit.
+
+See also [`wavefront`](@ref), [`Z`](@ref), [`P`](@ref).
 """
 W
 
@@ -129,15 +135,9 @@ Available transformations are scaling, translation, & rotation for circular and 
 The order the transformations are applied is:\\
 scaling --> translation --> rotation --> elliptical transform.
 
-See also [`zernike`](@ref), [`wavefront`](@ref).
+See also [`P`](@ref), [`zernike`](@ref), [`wavefront`](@ref).
 
 ----
-
-# Positional argument options:
-
-    transform(v, ε, [δ], [ϕ], [ω], ::Type{Model})
-
-Return the wavefront error function `ΔW(ρ, θ)` corresponding to the input transform parameters.
 
 # Keyword argument options:
 
@@ -162,6 +162,15 @@ For translation the shift must be within the bounds of the scaling applied such 
 For elliptical pupils (usually the result of measuring the wavefront off-axis), the major radius is defined such that it equals the radius of the circle and so `ω[1]` is the fraction of the circular pupil covered by the minor radius (this is approximated well by a cosine projection factor for angles up to 40 degrees); `ω[2]` is then the direction of the stretching applied under transformation in converting the ellipse to a circle before fitting the expansion coefficients.
 
 The transformed expansion coefficients are computed using a fast and accurate algorithm suitable for high orders; it is based on a formulation presented by Lundström & Unsbo (2007) doi:10.1364/JOSAA.24.000569.
+"""
+transform
+
+"""
+    P(v, ε, [δ], [ϕ], [ω])
+
+Return the `WavefrontError` function `ΔW(ρ, θ)` corresponding to the input transform parameters.
+
+See also [`transform`](@ref), [`Z`](@ref), [`W`](@ref).
 """
 P
 

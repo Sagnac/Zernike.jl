@@ -1,6 +1,6 @@
 using Test
 using Zernike
-using Zernike: Z, W, P, radicand, Φ, get_i, canonical, coords, reconstruct,
+using Zernike: radicand, Φ, get_i, canonical, coords, reconstruct,
                validate_length, map_phase, format_strings, get_mn, LaTeXString,
                latexstring, J, metrics, polar, max_precision, (..)
 using StatsBase: mean, sample
@@ -44,7 +44,7 @@ function compare_coefficients(j_max)
             push!(γ, canonical(μ, n, k))
         end
         i = j + 1
-        zλ[i] = zernike(m, n, Model).R.λ
+        zλ[i] = Z(m, n).R.λ
         Φλ[i] = Zernike.coefficients(μ, n)[end]
     end
     m_max, n_max = last(mn)
@@ -62,7 +62,7 @@ end
     @test_throws "Bounds" Φ(-1, 1)
     @test_throws "Bounds" Φ(4, 0)
     @test_throws "Bounds" Φ(2, 5)
-    @test Z(4, 4, Model).R.γ == [1.0]
+    @test Z(4, 4).R.γ == [1.0]
     @test get_i(101, 101) == length(Φ(101, 101))
     i = 0
     for n = 0:800, m = (n % 2):2:n
@@ -72,12 +72,12 @@ end
     γ = [20, -30, 12, -1]
     @test canonical(0, 6, 3) == γ
     @test Φ(0, 6)[end][7:-2:1] == γ
-    @test Z(0, 6, Model).R.γ == γ
+    @test Z(0, 6).R.γ == γ
     j = 230
     @test compare_coefficients(j)
 end
 
-Z62 = Z(2, 6, Model)
+Z62 = Z(2, 6)
 
 @testset "zernike polynomials" begin
     @test_throws "j" Z(-1)
@@ -86,7 +86,7 @@ Z62 = Z(2, 6, Model)
     @test_throws "Bounds" Z(0, 3)
     polynomial(ρ, θ) = √14 * (15ρ^6 - 20ρ^4 + 6ρ^2)cos(2θ)
     @test Z62(0.3, 0.7) ≈ polynomial(0.3, 0.7)
-    (; R) = Z(0, 30, Model)
+    (; R) = Z(0, 30)
     @test R(1.0) ≈ sum(R.γ) ≈ sum(R.λ) ≈ 1.0
 end
 
@@ -106,21 +106,21 @@ v = reconstruct(r, t, OPD_vec, 8)[1]
     v_full = standardize(v_sub, orders)
     @test length(v_full) == 45
     @test getindex(v_full, [5, 13, 25, 26, 41]) == v_sub
-    ΔW = W(z, 6, Model; precision = 0)
+    ΔW = W(z, 6; precision = 0)
     @test ΔW(0.3, 0.7) ≈ Z62(0.3, 0.7)
     @test map_phase(r, t, OPD_vec) == (ρ, θ, OPD)
-    inds_a = getfield(W(OPD, 8, Model; precision = 7), :recap)
+    inds_a = getfield(W(OPD, 8; precision = 7), :recap)
     @testset "expansion coefficients" for i in inds_a
         @test i[:a] ≈ v[i[:j] + 1] atol = 1e-7
     end
-    Z44 = Z(4, 4, Model)
+    Z44 = Z(4, 4)
     ρ_rs = rand(2^8)
     θ_rs = 2π * rand(2^8)
     OPD_matrix = 7.0 * Z44.(ρ_rs', θ_rs)
     OPD_coords = [(i, j) for j in θ_rs, i in ρ_rs]
     unrolled_coords = (vec(getindex.(OPD_coords, i)) for i = 1:2)
-    ΔW44_vector_phase = W(unrolled_coords..., vec(OPD_matrix), 4, Model)
-    ΔW44_matrix_phase = W(ρ_rs, θ_rs, OPD_matrix, 4, Model)
+    ΔW44_vector_phase = W(unrolled_coords..., vec(OPD_matrix), 4)
+    ΔW44_matrix_phase = W(ρ_rs, θ_rs, OPD_matrix, 4)
     @test ΔW44_vector_phase.v == ΔW44_matrix_phase.v
     a = rand(5)
     named_orders = [(m = i[1], n = i[2]) for i in orders]
@@ -157,7 +157,7 @@ end
 @testset "metrics" begin
     r = range(0.0, 1.0, 2^10)
     w = [0.25r^2 for _ ∈ r, r ∈ r]
-    ΔW = W(w, 2, Model)
+    ΔW = W(w, 2)
     (; pv, rms, strehl) = metrics(ΔW)
     @test pv ≈ 1/4 atol = 1e-2
     @test rms ≈ 1/14 atol = 1e-2
@@ -166,8 +166,8 @@ end
 
 @testset "arithmetic" begin
     j = sample(0:27, 8, replace = false)
-    Z = zernike.(j, Model)
-    Z1, Z2 = Z
+    z = Z.(j)
+    Z1, Z2 = z
     W1 = Z1 + Z2
     W2 = Z1 - Z2
     ρ, θ = rand(0.2..0.7, 2)
@@ -273,8 +273,8 @@ end
         @test MAE(p) == mae
     end
     for i = 3:2:7
-        Z1 = Z[i]
-        Z2 = Z[i+1]
+        Z1 = z[i]
+        Z2 = z[i+1]
         p1 = @. Z1(ρ, θ) * Z2(ρ, θ)
         w = Z1 * Z2
         @test MAE(w, p1) < mae_ϵ
@@ -303,16 +303,16 @@ end
     @test format_strings(recap) == latexstring(abbreviated)
 end
 
-ΔW = W(OPD, 8, Model; precision = max_precision)
+ΔW = W(OPD, 8; precision = max_precision)
 ε = 0.75
 
 @testset "scale" begin
-    @test_throws "Bounds" J(v, -1.0, Model)
-    @test_throws "Bounds" J(v, 2.0, Model)
-    @test_throws "Bounds" P(v, -1.0, Model)
-    @test_throws "Bounds" P(v, 2.0, Model)
-    ΔW_J_s = J(v, ε, Model; precision = max_precision)
-    ΔW_P_s = P(v, ε, Model; precision = max_precision)
+    @test_throws "Bounds" J(v, -1.0)
+    @test_throws "Bounds" J(v, 2.0)
+    @test_throws "Bounds" P(v, -1.0)
+    @test_throws "Bounds" P(v, 2.0)
+    ΔW_J_s = J(v, ε; precision = max_precision)
+    ΔW_P_s = P(v, ε; precision = max_precision)
     @test ΔW_J_s.a ≈ ΔW_P_s.a
     @test ΔW(ε, π/2) ≈ ΔW_J_s(1.0, π/2)
     @test ΔW(ε, π/2) ≈ ΔW_P_s(1.0, π/2)
@@ -328,7 +328,7 @@ end
 @testset "translate" begin
     @test_throws "Bounds" P(v, -1.0, 0.3 + 0.0im)
     @test_throws "Bounds" P(v, 1.0, 0.1 + 0.0im)
-    ΔW_t = P(v, ε, δ, Model; precision = max_precision)
+    ΔW_t = P(v, ε, δ; precision = max_precision)
     @test ΔW_t(1.0, θ1) ≈ ΔW(ρ2, θ2)
     @test ΔW_t(0.0, 0.0) ≈ ΔW(ρ_t, θ_t)
 end
@@ -340,13 +340,13 @@ end
 θ2 = asin(ε * sin(φ) / ρ2) + θ_t
 
 @testset "rotate" begin
-    ΔW_r1 = P(v, 1.0, 0.0im, ϕ, Model; precision = max_precision)
+    ΔW_r1 = P(v, 1.0, 0.0im, ϕ; precision = max_precision)
     @test ΔW_r1(1.0, 0.0) ≈ ΔW(1.0, ϕ)
-    ΔW_r2 = P(v, ε, δ, ϕ, Model; precision = max_precision)
+    ΔW_r2 = P(v, ε, δ, ϕ; precision = max_precision)
     @test ΔW_r2(1.0, θ1) ≈ ΔW(ρ2, θ2)
 end
 
 @testset "elliptical" begin
-    ΔW_e = P([0.0, 0.0, 1.0], 1.0, 0.0im, 0.0, (0.148, 0.0), Model)
+    ΔW_e = P([0.0, 0.0, 1.0], 1.0, 0.0im, 0.0, (0.148, 0.0))
     @test getfield(ΔW_e, :recap) == [(j = 2, n = 1, m = 1, a = 0.148)]
 end

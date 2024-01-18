@@ -144,16 +144,25 @@ Plot options can be set by setting the `plotconfig` fields; see the docstring fo
 
 ----
 
-## Model functions
+## `Z`, `W`, `P` functions
 
-There exists a special method dispatch which avoids plotting and instead returns the `(ρ, θ)` functions as essentially closures. This is done by calling the 3 main functions with the `Model` type as the last positional argument. The pupil can then be evaluated using these functions with polar coordinates:
+Analogs:
+```
+Z: zernike
+W: wavefront
+P: transform
+```
+
+These methods avoid plotting and instead return `(ρ, θ)` functions as essentially closures, but packaged within `Polynomial` and `WavefrontError` types. The pupil can then be evaluated using these functions with polar coordinates:
 
 ```julia
-Z40 = zernike(0, 4, Model)
+Z40 = Z(0, 4)
 Z40(0.7, π/4)
 ```
 
 For wavefront reconstruction this is equivalent to `ΔW(ρ, θ)` = `∑aᵢZᵢ(ρ, θ)` where `aᵢ` and `Zᵢ` were determined from the fitting process according to `precision`.
+
+Arithmetric between these types is defined; in addition, the `Superposition(W)` and `Product(W)` constructors (where `W` is a `Vector{WavefrontError}`) serve as direct methods for creating composite functions which group evaluate a specified expansion set when an updated set of coefficients is not required.
 
 ## Single-Index Ordering Schemes
 
@@ -170,8 +179,6 @@ The `standardize` fringe method expects unnormalized coefficients; the input coe
 For the `standardize` subset method the tuples in `orders` must be of the form `(m, n)` associated with the respective coefficients at each index in `v_sub`.
 
 ## Additional Notes
-
-* Arithmetric between `Polynomial`s and `WavefrontError`s is defined; in addition, the `Superposition(W)` and `Product(W)` constructors (where `W` is a `Vector{WavefrontError}`) serve as direct methods for creating composite functions which group evaluate a specified expansion set when an updated set of coefficients is not required;
 
 * `Zernike.metrics(ΔW::WavefrontError)` exists;
 

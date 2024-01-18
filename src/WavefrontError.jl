@@ -37,7 +37,7 @@ function WavefrontError(a::FloatVec; precision = max_precision)
         j = i - 1
         m, n = get_mn(j)
         recap[i] = (; j, n, m, a)
-        Zᵢ[i] = Z(j, Model)
+        Zᵢ[i] = Z(j)
     end
     n_max = n
     return WavefrontError(recap, v, n_max, fit_to, a, Zᵢ, precision)
@@ -56,7 +56,7 @@ function WavefrontError(orders::Vector{Tuple{Int, Int}}, a::FloatVec;
         aᵢ = a[idx]
         j = get_j(m, n)
         recap[idx] = (; j, n, m, a = aᵢ)
-        Zᵢ[idx] = Z(m, n, Model)
+        Zᵢ[idx] = Z(m, n)
     end
     n_max = n
     v = standardize(a, orders)
@@ -89,14 +89,14 @@ end
 
 function reconstruct(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int)
     j_max = get_j(n_max, n_max)
-    Zᵢ = Polynomial[Z(j, Model) for j = 0:j_max]
+    Zᵢ = Polynomial[Z(j) for j = 0:j_max]
     v = fit(ρ, θ, OPD, Zᵢ)
     return v, Zᵢ
 end
 
 function reconstruct(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
                      orders::Vector{Tuple{Int, Int}})
-    Zᵢ = Polynomial[construct(mn...) for mn ∈ orders]
+    Zᵢ = Polynomial[Z(mn...) for mn ∈ orders]
     v = fit(ρ, θ, OPD, Zᵢ)
     return v, Zᵢ
 end
@@ -113,7 +113,7 @@ function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision::Int)
         aᵢ = round(aᵢ; digits = effective_precision)
         if !iszero(aᵢ)
             if !isassigned(Zᵢ, i)
-                Zᵢ[i] = Z(i-1, Model)
+                Zᵢ[i] = Z(i-1)
             end
             push!(recap, (; Zᵢ[i].inds..., a = aᵢ))
             push!(a, aᵢ)
@@ -125,12 +125,11 @@ function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision::Int)
         v = standardize(v, orders)
     end
     # create the fitted polynomial
-    ΔW = WavefrontError(recap, v, n_max, orders, a, Zₐ, precision)
-    return ΔW
+    return WavefrontError(recap, v, n_max, orders, a, Zₐ, precision)
 end
 
 # synthesis function
-function Λ(ΔW; finesse::Int)
+function Λ(ΔW::WavefrontError; finesse::Int)
     (; recap, v, n_max) = ΔW
     finesse::Int = finesse ∈ 1:100 ? finesse : cld(100, √ length(recap))
     ρ, θ = polar(n_max, n_max; finesse)
@@ -162,15 +161,16 @@ function metrics(v::FloatVec, w::FloatMat)
 end
 
 # main interface function
-function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int;
-           precision::Int = precision, finesse::Int = wavefront_finesse)
+function wavefront(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int;
+                   precision::Int = precision, finesse::Int = wavefront_finesse)
     v, Zᵢ = reconstruct(ρ, θ, OPD, n_max)
     ΔW = Ψ(v, Zᵢ, n_max; precision)
     Λ(ΔW; finesse)
 end
 
-function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, orders::Vector{Tuple{Int, Int}};
-           precision::Int = precision, finesse::Int = wavefront_finesse)
+function wavefront(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
+                   orders::Vector{Tuple{Int, Int}};
+                   precision::Int = precision, finesse::Int = wavefront_finesse)
     n_max = maximum(mn -> mn[2], orders; init = 0)
     v, Zᵢ = reconstruct(ρ, θ, OPD, orders)
     ΔW = Ψ(v, Zᵢ, n_max, orders; precision)
@@ -226,26 +226,26 @@ function standardize(v_sub::FloatVec, orders::Vector{Tuple{Int, Int}})
 end
 
 # methods
-function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int, ::Type{Model};
+function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int;
            precision::Int = precision)
     v, Zᵢ = reconstruct(ρ, θ, OPD, n_max)
     return Ψ(v, Zᵢ, n_max; precision)
 end
 
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
-           orders::Vector{Tuple{Int, Int}}, ::Type{Model};
+           orders::Vector{Tuple{Int, Int}};
            precision::Int = precision)
     n_max = maximum(mn -> mn[2], orders; init = 0)
     v, Zᵢ = reconstruct(ρ, θ, OPD, orders)
     return Ψ(v, Zᵢ, n_max, orders; precision)
 end
 
-W(; r, t, OPD, fit_to, options...) = W(r, t, OPD, fit_to; options...)
+wavefront(; r, t, OPD, fit_to, options...) = wavefront(r, t, OPD, fit_to; options...)
 
-function W(x::FloatVec, y::FloatVec, OPD::FloatVec; fit_to, options...)
+function wavefront(x::FloatVec, y::FloatVec, OPD::FloatVec; fit_to, options...)
     ρ = hypot.(x, y)
     θ = atan.(y, x)
-    W(ρ, θ, OPD, fit_to; options...)
+    wavefront(ρ, θ, OPD, fit_to; options...)
 end
 
 # [ρ θ OPD] input format
@@ -263,21 +263,21 @@ coords(OPD::FloatMat) = coords(polar(size(OPD))...)
 
 # assumes dim(θ) x dim(ρ) matrix polar mapping
 # W(OPD', fit_to, etc.) for dim(ρ) x dim(θ) matrix
-function W(OPD::FloatMat, fit_to; options...)
-    W(coords(OPD)..., vec(OPD), fit_to; options...)
+function wavefront(OPD::FloatMat, fit_to; options...)
+    wavefront(coords(OPD)..., vec(OPD), fit_to; options...)
 end
 
-function W(OPD::FloatMat, fit_to, ::Type{Model}; precision::Int = precision)
-    W(coords(OPD)..., vec(OPD), fit_to, Model; precision)
+function W(OPD::FloatMat, fit_to; precision::Int = precision)
+    W(coords(OPD)..., vec(OPD), fit_to; precision)
 end
 
-function W(ρ::FloatVec, θ::FloatVec, OPD::FloatMat, fit_to; options...)
-    W(coords(ρ, θ)..., vec(OPD), fit_to; options...)
+function wavefront(ρ::FloatVec, θ::FloatVec, OPD::FloatMat, fit_to; options...)
+    wavefront(coords(ρ, θ)..., vec(OPD), fit_to; options...)
 end
 
-function W(ρ::FloatVec, θ::FloatVec, OPD::FloatMat, fit_to,
-           ::Type{Model}; precision::Int = precision)
-    W(coords(ρ, θ)..., vec(OPD), fit_to, Model; precision)
+function W(ρ::FloatVec, θ::FloatVec, OPD::FloatMat, fit_to;
+           precision::Int = precision)
+    W(coords(ρ, θ)..., vec(OPD), fit_to; precision)
 end
 
 # reverse transform;
