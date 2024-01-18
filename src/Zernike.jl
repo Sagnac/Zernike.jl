@@ -50,6 +50,7 @@ struct Polynomial <: Phase
 end
 
 struct Output
+    Z::Polynomial
     fig::Makie.Figure
     axis::Axis3
     plot::Surface{NTuple{3, Matrix{Float32}}}
@@ -83,6 +84,8 @@ function (Z::Polynomial)(ρ, θ)
     (; N, R, M) = Z
     N * R(ρ) * M(θ)
 end
+
+(Z::Output)(ρ, θ) = Z.Z(ρ, θ)
 
 function polar((u, v)::NTuple{2, Int})
     θ = range(0.0, 2π, u)
@@ -252,7 +255,7 @@ function zernike(m::Int, n::Int; finesse = finesse)
     high_order = n ≥ 48
     titles = (; plot_title = Z_.inds.j < 153 ? Z_LaTeX : Z_mn, window_title)
     fig, axis, plot = zplot(Z_; m, n, finesse, high_order, titles...)
-    Output(fig, axis, plot, γ, Z_LaTeX, Z_Unicode, inds, high_order)
+    Output(Z_, fig, axis, plot, γ, Z_LaTeX, Z_Unicode, inds, high_order)
 end
 
 # overload show to clean up the output

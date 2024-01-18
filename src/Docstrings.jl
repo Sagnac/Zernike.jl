@@ -8,6 +8,7 @@ The single index `j` begins at zero and follows the ANSI Z80.28-2004 / ISO 24157
 
 Returns a `Zernike.Output` type which contains (among other things):
 
+* `Z`: the `Polynomial` function `Z(ρ, θ)`;
 * `fig`: the `Makie` figure;
 * `coeffs`: vector of radial polynomial coefficients;
 * `latex`: `LaTeX` string of the Zernike polynomial.
@@ -55,14 +56,15 @@ Estimates wavefront error by expressing optical aberrations as a linear combinat
 
 # Return values
 
-Returns six values contained within a `WavefrontOutput` type, with fields:
+Returns seven values contained within a `WavefrontOutput` type, with fields:
 
 1. `recap`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients rounded according to `precision`;
 2. `v`: full vector of Zernike wavefront error expansion coefficients;
 3. `metrics`: named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio;
-4. `fig`: the plotted `Makie` figure.
-5. `axis`: the plot axis;
-6. `plot`: the surface plot object.
+4. `W`: the `WavefrontError` function `ΔW(ρ, θ)`;
+5. `fig`: the plotted `Makie` figure;
+6. `axis`: the plot axis;
+7. `plot`: the surface plot object.
 
 These can also be accessed through indexing and regular non-property destructuring.
 
