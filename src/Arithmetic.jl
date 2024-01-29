@@ -142,7 +142,6 @@ end
 multiply(ΔW1::MixedPhase, ΔW2::MixedPhase) = wavefront_expansion(*, ΔW1, ΔW2)
 
 function exponentiate(φ::Phase, n::Integer)
-    n < 0 && bounds("Exponentiation is not defined for negative integers.", n)
     φ::WavefrontError = φ
     ρ, θ = polar()
     φ_n = @. φ(ρ, θ) ^ n
