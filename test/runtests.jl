@@ -6,7 +6,7 @@ using Zernike: radicand, Φ, get_i, canonical, coords, reconstruct,
 using StatsBase: mean, sample
 
 @testset "fringe" begin
-    @test_throws "37" fringe_to_j(38)
+    @test_throws DomainError fringe_to_j(38)
     fringe = [1, 3, 2, 6, 4, 5, 11, 8, 7, 10, 18, 13, 9, 12, 17]
     @test fringe_to_j.(fringe) == 0:14
     v_fringe = collect(1.0:18.0)
@@ -18,7 +18,7 @@ using StatsBase: mean, sample
 end
 
 @testset "noll" begin
-    @test_throws "index" noll_to_j(-1)
+    @test_throws DomainError noll_to_j(-1)
     noll = [1, 3, 2, 5, 4, 6, 9, 7, 8, 10, 15, 13, 11, 12, 14]
     @test noll_to_j.(noll) == 0:14
     v = zeros(15)
@@ -59,9 +59,9 @@ function compare_coefficients(j_max)
 end
 
 @testset "radial coefficients" begin
-    @test_throws "Bounds" Φ(-1, 1)
-    @test_throws "Bounds" Φ(4, 0)
-    @test_throws "Bounds" Φ(2, 5)
+    @test_throws DomainError Φ(-1, 1)
+    @test_throws DomainError Φ(4, 0)
+    @test_throws DomainError Φ(2, 5)
     @test Z(4, 4).R.γ == [1.0]
     @test get_i(101, 101) == length(Φ(101, 101))
     i = 0
@@ -80,10 +80,10 @@ end
 Z62 = Z(2, 6)
 
 @testset "zernike polynomials" begin
-    @test_throws "j" Z(-1)
-    @test_throws "Bounds" Z(1, -1)
-    @test_throws "Bounds" Z(-5, 3)
-    @test_throws "Bounds" Z(0, 3)
+    @test_throws DomainError Z(-1)
+    @test_throws DomainError Z(1, -1)
+    @test_throws DomainError Z(-5, 3)
+    @test_throws DomainError Z(0, 3)
     polynomial(ρ, θ) = √14 * (15ρ^6 - 20ρ^4 + 6ρ^2)cos(2θ)
     @test Z62(0.3, 0.7) ≈ polynomial(0.3, 0.7)
     (; R) = Z(0, 30)
@@ -307,10 +307,10 @@ end
 ε = 0.75
 
 @testset "scale" begin
-    @test_throws "Bounds" J(v, -1.0)
-    @test_throws "Bounds" J(v, 2.0)
-    @test_throws "Bounds" P(v, -1.0)
-    @test_throws "Bounds" P(v, 2.0)
+    @test_throws DomainError J(v, -1.0)
+    @test_throws DomainError J(v, 2.0)
+    @test_throws DomainError P(v, -1.0)
+    @test_throws DomainError P(v, 2.0)
     ΔW_J_s = J(v, ε; precision = max_precision)
     ΔW_P_s = P(v, ε; precision = max_precision)
     @test ΔW_J_s.a ≈ ΔW_P_s.a
@@ -326,8 +326,8 @@ end
 θ2 = asin(ε * sin(φ) / ρ2) + θ_t
 
 @testset "translate" begin
-    @test_throws "Bounds" P(v, -1.0, 0.3 + 0.0im)
-    @test_throws "Bounds" P(v, 1.0, 0.1 + 0.0im)
+    @test_throws DomainError P(v, -1.0, 0.3 + 0.0im)
+    @test_throws DomainError P(v, 1.0, 0.1 + 0.0im)
     ΔW_t = P(v, ε, δ; precision = max_precision)
     @test ΔW_t(1.0, θ1) ≈ ΔW(ρ2, θ2)
     @test ΔW_t(0.0, 0.0) ≈ ΔW(ρ_t, θ_t)
@@ -347,6 +347,8 @@ end
 end
 
 @testset "elliptical" begin
+    @test_throws DomainError P(v, ε, δ, ϕ, (-1.0, 0.0))
+    @test_throws DomainError P(v, ε, δ, ϕ, (2.0, 0.0))
     ΔW_e = P([0.0, 0.0, 1.0], 1.0, 0.0im, 0.0, (0.148, 0.0))
     @test getfield(ΔW_e, :recap) == [(j = 2, n = 1, m = 1, a = 0.148)]
 end

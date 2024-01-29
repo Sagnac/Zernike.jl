@@ -14,15 +14,15 @@ get_i(m_max, n_max) = ((n_max + 2)n_max + 1) ÷ 4 + (m_max + iseven(n_max) + 1) 
 
 function Φ(m_max::Int, n_max::Int)
     if m_max < 0 || n_max < 0 || m_max > n_max || isodd(n_max - m_max)
-        error(
+        bounds(
             """
-            In method: Φ(m_max, n_max)
             Bounds:
             m_max ≥ 0
             n_max ≥ 0
             m_max ≤ n_max
-            n_max - m_max even
-            """
+            n_max - m_max ≡ 0 (mod 2)
+            """,
+            m_max, n_max,
         )
     end
     i = 0

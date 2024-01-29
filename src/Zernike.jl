@@ -61,6 +61,9 @@ struct Output
     high_order::Bool
 end
 
+bounds(msg::String, val) = throw(DomainError(val, msg))
+bounds(msg::String, vals...) = bounds(msg, vals)
+
 include("RadialCoefficients.jl")
 include("FormatStrings.jl")
 include("WavefrontError.jl")
@@ -127,7 +130,7 @@ get_j(m::Int, n::Int) = ((n + 2)n + m) ÷ 2
 
 function get_mn(j::Int)
     if j < 0
-        error("j must be ≥ 0\n")
+        bounds("j must be ≥ 0\n", j)
     end
     n = get_n(j)
     m = get_m(j, n)
@@ -136,7 +139,7 @@ end
 
 function noll_to_j(noll::Int)
     if noll < 1
-        error("Noll index must be ≥ 1\n")
+        bounds("Noll index must be ≥ 1\n", noll)
     end
     n::Int = trunc(√(2noll - 1) + 0.5) - 1
     n_mod_2 = isodd(n)
@@ -151,7 +154,7 @@ function standardize!(noll::Vector)
 end
 
 function fringe_to_j(fringe::Int)
-    fringe ∉ 1:37 && error("Invalid Fringe index. fringe ∈ 1:37\n")
+    fringe ∉ 1:37 && bounds("Invalid Fringe index. fringe ∈ 1:37\n", fringe)
     if fringe == 37
         return get_j(0, 12)
     end
@@ -214,7 +217,7 @@ function Z(m::Int, n::Int)
     μ = abs(m)
     # validate
     if n < 0 || μ > n || isodd(n - μ)
-        error("Bounds:\nn ≥ 0\n|m| ≤ n\nn - |m| even\n")
+        bounds("Bounds:\nn ≥ 0\n|m| ≤ n\nn - |m| ≡ 0 (mod 2)\n", m, n)
     end
     # upper bound for the sum (number of terms - 1 [indexing from zero])
     k = (n - μ) ÷ 2
