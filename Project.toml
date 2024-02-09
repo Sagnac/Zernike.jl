@@ -17,7 +17,7 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 test = ["Test", "StatsBase"]
 
 [compat]
-julia = "1.9"
+julia = "1.11"
 LinearAlgebra = "1.9"
 Printf = "1.9"
 ShiftedArrays = "2.0.0"

@@ -17,7 +17,7 @@ The coefficients belong to terms with exponent `n - 2(i - 1)` where `i` is the v
 
 The radial polynomial coefficients are computed using a fast and accurate algorithm suitable for high orders; it is based on a recursive relation presented by Honarvar & Paramesran (2013) doi:10.1364/OL.38.002487.
 
-See also [`Z`](@ref), [`wavefront`](@ref), [`transform`](@ref).
+See also [`Z`](@ref), [`wavefront`](@ref), [`transform`](@ref), [`coefficients`](@ref).
 
 ----
 
@@ -68,7 +68,7 @@ Returns seven values contained within a `WavefrontOutput` type, with fields:
 
 These can also be accessed through indexing and regular non-property destructuring.
 
-See also [`W`](@ref), [`zernike`](@ref), [`transform`](@ref).
+See also [`W`](@ref), [`zernike`](@ref), [`transform`](@ref), [`reconstruct`](@ref).
 
 ----
 
@@ -137,7 +137,7 @@ Available transformations are scaling, translation, & rotation for circular and 
 The order the transformations are applied is:\\
 scaling --> translation --> rotation --> elliptical transform.
 
-See also [`P`](@ref), [`zernike`](@ref), [`wavefront`](@ref).
+See also [`P`](@ref), [`zernike`](@ref), [`wavefront`](@ref), [`transform_coefficients`](@ref).
 
 ----
 
@@ -314,3 +314,74 @@ zplot
 Compute wavefront error metrics. Returns a named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio.
 """
 metrics
+
+"""
+    coefficients(m_max, n_max)
+
+Compute the `Zernike` radial polynomial coefficients using an algorithm based on `Honarvar & Paramesran's` recursive relation suitable for high orders.
+
+Returns a vector of coefficient vectors for each unique radial polynomial up to Zernike indices `m_max`, `n_max`. The coefficient vector elements correspond to radial degree `n` in ascending order.
+
+`m_max` and `n_max` must be of type `Int` and must meet the following additional requirements:
+
+    m_max ≥ 0
+    n_max ≥ 0
+    m_max ≤ n_max
+    n_max - m_max ≡ 0 (mod 2).
+"""
+coefficients
+
+"""
+    transform_coefficients(v, ε, δ, ϕ, ω)
+
+Directly compute `Zernike` wavefront error expansion coefficients under pupil transformations. The argument types are the same as in `transform`.
+
+Returns a 2-tuple with the new coefficient vector and order `n_max`.
+
+See also [`transform`](@ref).
+"""
+transform_coefficients
+
+"""
+    reconstruct(ρ::Vector, θ::Vector, OPD::Vector, fit_to::Union{Int, Vector{Tuple{Int, Int}}})
+    reconstruct(ρ::Vector, θ::Vector, OPD::Matrix, fit_to)
+    reconstruct(OPD::Matrix, fit_to)
+
+Fit wavefront errors in terms of Zernike polynomials without computing extra results or plotting the wavefront error.
+
+Returns a 2-tuple with the full vector of expansion coefficients and the corresponding Zernike polynomials.
+
+See also [`wavefront`](@ref).
+"""
+reconstruct
+
+"""
+    scale(v, ε; precision, finesse)
+
+Scale the pupil over a wavefront using an algorithm based on `Janssen & Dirksen's` formula and plot the result.
+
+`v` is the set of Zernike wavefront error expansion coefficients and `ε` is the scaling factor.
+
+See also [`transform`](@ref), [`J`](@ref).
+"""
+scale
+
+"""
+    J(v, ε; precision)
+
+Scale the pupil over a wavefront using an algorithm based on `Janssen & Dirksen's` formula and return a new `WavefrontError`.
+
+`v` is the set of Zernike wavefront error expansion coefficients and `ε` is the scaling factor.
+
+See also [`P`](@ref), [`scale`](@ref).
+"""
+J
+
+"""
+    map_phase(ρ, θ, OPD)
+
+Reverse dimensional coordinate transform with respect to the main wavefront error method. Returns the OPD as a matrix along with the corresponding unique coordinate vectors. Assumes uniform sampling.
+
+See also [`wavefront`](@ref).
+"""
+map_phase
