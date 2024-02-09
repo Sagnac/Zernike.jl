@@ -259,10 +259,6 @@ function wavefront(x::FloatVec, y::FloatVec, OPD::FloatVec; fit_to, options...)
     wavefront(ρ, θ, OPD, fit_to; options...)
 end
 
-# [ρ θ OPD] input format
-# W(split_data(data)..., fit_to, etc.)
-split_data(data::FloatMat) = (data[:, i] for i = 1:3)
-
 # extract pupil coordinates
 function coords(ρ::FloatVec, θ::FloatVec)
     ρ2 = ρ ⊗ ones(length(θ))
