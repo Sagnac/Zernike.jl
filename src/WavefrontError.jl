@@ -104,6 +104,14 @@ function reconstruct(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
     return v, Zᵢ
 end
 
+function reconstruct(OPD::FloatMat, fit_to)
+    reconstruct(coords(OPD)..., vec(OPD), fit_to)
+end
+
+function reconstruct(ρ::FloatVec, θ::FloatVec, OPD::FloatMat, fit_to)
+    reconstruct(coords(ρ, θ)..., vec(OPD), fit_to)
+end
+
 # filtering / sifting function
 function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision::Int)
     recap = @NamedTuple{j::Int, n::Int, m::Int, a::Float64}[]
