@@ -164,9 +164,9 @@ function metrics(v::FloatVec, w::FloatMat)
     pv = min_max[2] - min_max[1]
     # RMS wavefront error
     # where σ² is the variance (second central moment about the mean)
-    # the mean is the first a00 piston term
-    v2 = @view v[begin+1:end]
-    σ² = v2' * v2
+    # and the mean is the first a00 piston term
+    a = @view v[begin+1:end]
+    σ² = a'a
     strehl_ratio = exp(-4π^2 * σ²)
     return (; pv, rms = √σ², strehl = strehl_ratio)
 end
