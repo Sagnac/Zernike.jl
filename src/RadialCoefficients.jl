@@ -20,9 +20,9 @@ function Φ(m_max::Int, n_max::Int)
             m_max ≥ 0
             n_max ≥ 0
             m_max ≤ n_max
-            n_max - m_max ≡ 0 (mod 2)
+            n_max ≡ m_max (mod 2)
             """,
-            m_max, n_max,
+            m_max, n_max
         )
     end
     i = 0

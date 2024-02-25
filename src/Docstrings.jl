@@ -327,7 +327,7 @@ Returns a vector of coefficient vectors for each unique radial polynomial up to 
     m_max ≥ 0
     n_max ≥ 0
     m_max ≤ n_max
-    n_max - m_max ≡ 0 (mod 2).
+    n_max ≡ m_max (mod 2).
 """
 coefficients
 

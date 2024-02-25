@@ -219,7 +219,15 @@ function Z(m::Int, n::Int)
     μ = abs(m)
     # validate
     if n < 0 || μ > n || isodd(n - μ)
-        bounds("Bounds:\nn ≥ 0\n|m| ≤ n\nn - |m| ≡ 0 (mod 2)\n", m, n)
+        bounds(
+            """
+            Bounds:
+            n ≥ 0
+            |m| ≤ n
+            n ≡ m (mod 2)
+            """,
+            m, n
+        )
     end
     # upper bound for the sum (number of terms - 1 [indexing from zero])
     k = (n - μ) ÷ 2
