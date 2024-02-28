@@ -9,7 +9,7 @@ https://www.jeos.org/index.php/jeos_rp/article/view/07012
 =#
 
 function Π(v::Vector{T}, ε::T) where T <: Float64
-    !(0.0 ≤ ε ≤ 1.0) && bounds("Bounds: 0.0 ≤ ε ≤ 1.0\n", ε)
+    @domain(0.0 ≤ ε ≤ 1.0, ε)
     _, n_max = validate_length(v)
     v2 = similar(v, Float64)
     n = 0

@@ -13,18 +13,16 @@ import ShiftedArrays: circshift as shift
 get_i(m_max, n_max) = ((n_max + 2)n_max + 1) ÷ 4 + (m_max + iseven(n_max) + 1) ÷ 2
 
 function Φ(m_max::Int, n_max::Int)
-    if m_max < 0 || n_max < 0 || m_max > n_max || isodd(n_max - m_max)
-        bounds(
-            """
-            Bounds:
-            m_max ≥ 0
-            n_max ≥ 0
-            m_max ≤ n_max
-            n_max ≡ m_max (mod 2)
-            """,
-            m_max, n_max
-        )
-    end
+    @domain(m_max ≥ 0 && n_max ≥ 0 && m_max ≤ n_max && iseven(n_max - m_max),
+        """
+        \nDomain:
+        m_max ≥ 0
+        n_max ≥ 0
+        m_max ≤ n_max
+        n_max ≡ m_max (mod 2)
+        """,
+        m_max, n_max
+    )
     i = 0
     λ = Vector{Vector{Float64}}(undef, get_i(m_max, n_max))
     for n = 0:n_max

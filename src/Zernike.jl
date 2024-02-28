@@ -63,8 +63,23 @@ struct Output
     high_order::Bool
 end
 
-bounds(msg::String, val) = throw(DomainError(val, msg))
-bounds(msg::String, vals...) = bounds(msg, vals)
+macro domain(ex, msg::String, val)
+    esc(:($ex ? nothing : throw(DomainError($val, $msg))))
+end
+
+macro domain(ex, msg::String, vals...)
+    esc(:(@domain($ex, $msg, ($(vals...),))))
+end
+
+macro domain(ex, val)
+    esc(:(@domain($ex, $(string("\nDomain:\n", ex, "\n")), $val)))
+end
+
+macro domain(ex, vals...)
+    esc(:(
+        @domain($ex, join($(string.(vals)) .* " = " .* string.(($(vals...),)), ", "))
+    ))
+end
 
 include("RadialCoefficients.jl")
 include("FormatStrings.jl")
@@ -131,18 +146,14 @@ get_m(j::Int, n::Int) = 2j - (n + 2)n
 get_j(m::Int, n::Int) = ((n + 2)n + m) ÷ 2
 
 function get_mn(j::Int)
-    if j < 0
-        bounds("j must be ≥ 0\n", j)
-    end
+    @domain(j ≥ 0, j)
     n = get_n(j)
     m = get_m(j, n)
     return m, n
 end
 
 function noll_to_j(noll::Int)
-    if noll < 1
-        bounds("Noll index must be ≥ 1\n", noll)
-    end
+    @domain(noll ≥ 1, noll)
     n::Int = trunc(√(2noll - 1) + 0.5) - 1
     n_mod_2 = isodd(n)
     m::Int = 2((2noll - (n + 1)n + 1 + n_mod_2) ÷ 4) - n_mod_2
@@ -156,7 +167,7 @@ function standardize!(noll::Vector)
 end
 
 function fringe_to_j(fringe::Int)
-    fringe ∉ 1:37 && bounds("Invalid Fringe index. fringe ∈ 1:37\n", fringe)
+    @domain(fringe ∈ 1:37, fringe)
     if fringe == 37
         return get_j(0, 12)
     end
@@ -218,17 +229,15 @@ end
 function Z(m::Int, n::Int)
     μ = abs(m)
     # validate
-    if n < 0 || μ > n || isodd(n - μ)
-        bounds(
-            """
-            Bounds:
-            n ≥ 0
-            |m| ≤ n
-            n ≡ m (mod 2)
-            """,
-            m, n
-        )
-    end
+    @domain(n ≥ 0 && μ ≤ n && iseven(n - μ),
+        """
+        \nDomain:
+        n ≥ 0
+        |m| ≤ n
+        n ≡ m (mod 2)
+        """,
+        m, n
+    )
     # upper bound for the sum (number of terms - 1 [indexing from zero])
     k = (n - μ) ÷ 2
     # OSA single mode index

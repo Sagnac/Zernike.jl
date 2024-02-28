@@ -14,11 +14,9 @@ const b = binomial
 const ei = cis # ei(x) = exp(im*x)
 
 function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <: Float64
-    !(0.0 ≤ ε ≤ 1.0) && bounds("Bounds: 0.0 ≤ ε ≤ 1.0\n", ε)
-    if !(0.0 ≤ ε + abs(δ) ≤ 1.0)
-        bounds("Bounds: 0.0 ≤ ε + |δ| ≤ 1.0\n", "ε = $ε, δ = $δ")
-    end
-    !(0.0 < ω[1] ≤ 1.0) && bounds("Bounds: 0.0 < ω[1] ≤ 1.0\n", ω[1])
+    @domain(0.0 ≤ ε ≤ 1.0, ε)
+    @domain(0.0 ≤ ε + abs(δ) ≤ 1.0, ε, δ)
+    @domain(0.0 < ω[1] ≤ 1.0, ω[1])
     len, n_max = validate_length(v)
     remap = Dict{NTuple{2, Int}, Int}()
     order = NTuple{3, Int}[]
