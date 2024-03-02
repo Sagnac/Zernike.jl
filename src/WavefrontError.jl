@@ -135,6 +135,7 @@ function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision::Int)
     if !isempty(orders) && !converted
         v = standardize(v, orders)
     end
+    isempty(recap) && push!(recap, (; piston.inds..., a = 0.0))
     # create the fitted polynomial
     return WavefrontError(recap, v, n_max, orders, a, Zₐ, precision)
 end
