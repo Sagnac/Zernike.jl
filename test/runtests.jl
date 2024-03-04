@@ -326,7 +326,7 @@ end
 θ2 = asin(ε * sin(φ) / ρ2) + θ_t
 
 @testset "translate" begin
-    @test_throws DomainError P(v, -1.0, 0.3 + 0.0im)
+    @test_throws DomainError P(v, 0.8, 0.1 + 0.4im)
     @test_throws DomainError P(v, 1.0, 0.1 + 0.0im)
     ΔW_t = P(v, ε, δ; precision = max_precision)
     @test ΔW_t(1.0, θ1) ≈ ΔW(ρ2, θ2)
