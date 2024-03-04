@@ -12,7 +12,7 @@ export zernike, wavefront, transform, Z, W, P, WavefrontError,
        noll_to_j, fringe_to_j, standardize, standardize!,
        Observable, plotconfig, zplot
 
-public metrics, coefficients, transform_coefficients, reconstruct, scale, J
+# public metrics, coefficients, transform_coefficients, reconstruct, scale, J
 
 using GLMakie
 import .Makie: latexstring, LaTeXString
