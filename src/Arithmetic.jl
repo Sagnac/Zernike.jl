@@ -167,3 +167,12 @@ function show(io::IO, W::T) where {T <: MixedPhase}
     println(io, T, "\nW field:")
     show(io, "text/plain", W.W)
 end
+
+function show(io::IO, m::MIME"text/plain", W::T) where {T <: MixedPhase}
+    if haskey(io, :typeinfo)
+        print(summary(W.W))
+        return
+    else
+        show(io, W)
+    end
+end
