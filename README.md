@@ -196,6 +196,6 @@ For the `standardize` subset method the tuples in `orders` must be of the form `
 
 * If you're interested in only the full vector of Zernike expansion coefficients obtained through the least squares fit and want to avoid computing extra values and plotting the results you can call:
 ```julia
-Zernike.reconstruct(ρ, θ, OPD, n_max)[1]
+Zernike.wavefront_coefficients(ρ, θ, OPD, n_max)
 ```
-Similarly you can do this for the radial polynomial coefficients and the NA transformed wavefront error expansion coefficients by importing the functions `coefficients` and `transform_coefficients`, respectively.
+Similarly you can do this for the radial polynomial coefficients and the NA transformed wavefront error expansion coefficients by importing the functions `radial_coefficients` and `transform_coefficients`, respectively.

@@ -45,7 +45,7 @@ function compare_coefficients(j_max)
         end
         i = j + 1
         zλ[i] = Z(m, n).R.λ
-        Φλ[i] = Zernike.coefficients(μ, n)[end]
+        Φλ[i] = Zernike.radial_coefficients(μ, n)
     end
     m_max, n_max = last(mn)
     λ = Φ(m_max, n_max)

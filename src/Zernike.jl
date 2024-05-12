@@ -12,7 +12,8 @@ export zernike, wavefront, transform, Z, W, P, WavefrontError,
        noll_to_j, fringe_to_j, standardize, standardize!,
        Observable, plotconfig, zplot
 
-# public metrics, coefficients, transform_coefficients, reconstruct, scale, J
+# public radial_coefficients, wavefront_coefficients, transform_coefficients,
+       # metrics, scale, J
 
 using GLMakie
 import .Makie: latexstring, LaTeXString
@@ -309,7 +310,8 @@ Z(j::Int) = Z(get_mn(j)...)
 const piston = Z(0, 0)
 
 # aliases for the API namespace
-const coefficients = Φ
-const transform_coefficients = S
+radial_coefficients(x...) = Φ(x...)[end]
+wavefront_coefficents(x...) = reconstruct(x...)[1]
+transform_coefficients(x...) = S(x...)[1]
 
 end
