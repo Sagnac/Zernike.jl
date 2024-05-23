@@ -16,7 +16,7 @@ export zernike, wavefront, transform, Z, W, P, WavefrontError,
        # metrics, scale, J
 
 using GLMakie
-import .Makie: latexstring, LaTeXString
+import .Makie: latexstring, LaTeXString, FigureAxisPlot
 import Base: show, getindex, iterate, setproperty!, propertynames
 
 const ∑ = sum
