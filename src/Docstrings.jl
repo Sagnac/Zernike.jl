@@ -186,7 +186,7 @@ Fields:
 * `inds`: named tuple containing the Zernike polynomial indices;
 * `N`: normalization factor;
 * `R`: `RadialPolynomial` callable type: function `R(ρ)`;
-* `M`: `Sinusoid` callable type: function `M(θ)`.
+* `M`: `Harmonic` callable type: function `M(θ)`.
 
 See also [`Zernike.WavefrontError`](@ref).
 """

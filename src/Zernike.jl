@@ -41,7 +41,7 @@ struct RadialPolynomial
     ν::Vector{Int}
 end
 
-struct Sinusoid
+struct Harmonic
     m::Int
 end
 
@@ -49,7 +49,7 @@ struct Polynomial <: Phase
     inds::NamedTuple{(:j, :n, :m), NTuple{3, Int}}
     N::Float64
     R::RadialPolynomial
-    M::Sinusoid
+    M::Harmonic
 end
 
 struct Output
@@ -96,7 +96,7 @@ function (R::RadialPolynomial)(ρ)
     evalpoly(ρ, λ)
 end
 
-function (M::Sinusoid)(θ)
+function (M::Harmonic)(θ)
     (; m) = M
     m < 0 ? -sin(m * θ) : cos(m * θ)
 end
@@ -263,7 +263,7 @@ function Z(m::Int, n::Int)
     # radial component
     R = RadialPolynomial(λ, γ, ν)
     # azimuthal / meridional component
-    M = Sinusoid(m)
+    M = Harmonic(m)
     # Zernike polynomial
     return Polynomial(inds, N, R, M)
 end
