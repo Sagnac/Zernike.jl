@@ -158,7 +158,7 @@ function wavefront_expansion(f, φ1::MixedPhase, φ2::MixedPhase)
     φ3 = @. f(φ1(ρ, θ), φ2(ρ, θ))
     n1, p1 = params(φ1)
     n2, p2 = params(φ2)
-    n_max = (f == *) ? n1 + n2 : max(n1, n2)
+    n_max = (f ≡ *) ? n1 + n2 : max(n1, n2)
     precision = max(p1, p2)
     W(φ3, n_max; precision)
 end
