@@ -76,11 +76,11 @@ promote_rule(::Type{<:Superposition}, ::Type{<:WavefrontError}) = Superposition
 promote_rule(::Type{Polynomial}, ::Type{<:Product}) = WavefrontError
 promote_rule(::Type{<:WavefrontError}, ::Type{<:Product}) = WavefrontError
 
-function add_subtract(f, φ1::Phase, φ2::Phase)
+function add_subtract(f::F, φ1::Phase, φ2::Phase) where F
     add_subtract(f, promote(φ1, φ2)...)
 end
 
-function add_subtract(f, W1::T, W2::T) where T <: WavefrontError
+function add_subtract(f::F, W1::T, W2::T) where {F, T <: WavefrontError}
     v1 = W1.v
     v2 = W2.v
     len1 = length(v1)
@@ -99,22 +99,24 @@ function add_subtract(f, W1::T, W2::T) where T <: WavefrontError
     Ψ(v3, Z3, n_max, orders; precision)
 end
 
-function add_subtract(f, Z1::T, Z2::T) where T <: Polynomial
+function add_subtract(f::F, Z1::T, Z2::T) where {F, T <: Polynomial}
     Z1.inds.j == Z2.inds.j && return 2 * Z1
     orders = [(Z.inds.m, Z.inds.n) for Z ∈ (Z1, Z2)]
     a = [1.0, f(1.0)]
     WavefrontError(orders, a)
 end
 
-function add_subtract(f, ΔW1::T, ΔW2::T) where T <: Superposition
+function add_subtract(f::F, ΔW1::T, ΔW2::T) where {F, T <: Superposition}
     Superposition([ΔW1.b * ΔW1.W; f(ΔW2.b) * ΔW2.W])
 end
 
-function add_subtract(f, ΔW1::T, ΔW2::T) where T <: Product
+function add_subtract(f::F, ΔW1::T, ΔW2::T) where {F, T <: Product}
     wavefront_expansion(f, ΔW1, ΔW2)
 end
 
-add_subtract(f, ΔW1::MixedPhase, ΔW2::MixedPhase) = wavefront_expansion(f, ΔW1, ΔW2)
+function add_subtract(f::F, ΔW1::MixedPhase, ΔW2::MixedPhase) where F
+    wavefront_expansion(f, ΔW1, ΔW2)
+end
 
 function multiply(α::Float64, W::WavefrontError)
     (; v) = W
@@ -153,7 +155,7 @@ function params(ΔW::MixedPhase)
     return (maximum(W -> getfield(W, i), ΔW.W) for i = (:n_max, :precision))
 end
 
-function wavefront_expansion(f, φ1::MixedPhase, φ2::MixedPhase)
+function wavefront_expansion(f::F, φ1::MixedPhase, φ2::MixedPhase) where F
     ρ, θ = polar()
     φ3 = @. f(φ1(ρ, θ), φ2(ρ, θ))
     n1, p1 = params(φ1)
