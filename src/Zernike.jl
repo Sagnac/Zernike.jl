@@ -140,7 +140,7 @@ function polar_mat(ρ, θ)
 end
 
 # radial order
-get_n(j::Int)::Int = cld(-3 + √(9 + 8j), 2)
+get_n(j::Int) = ceil(Int, (-3 + √(9 + 8j)) / 2)
 # azimuthal frequency
 get_m(j::Int, n::Int) = 2j - (n + 2)n
 # ISO / ANSI / OSA standard single mode-ordering index
@@ -172,7 +172,7 @@ function fringe_to_j(fringe::Int)
     if fringe == 37
         return get_j(0, 12)
     end
-    d = trunc(√(fringe - 1)) + 1
+    d = trunc(Int, √(fringe - 1)) + 1
     d2 = d^2 - fringe
     m::Int = (d2 + 1) ÷ 2
     m = flipsign(m, isodd(d2) ? -1 : 1)

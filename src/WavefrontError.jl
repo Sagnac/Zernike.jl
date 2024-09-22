@@ -143,7 +143,7 @@ end
 # synthesis function
 function Λ(ΔW::WavefrontError; finesse::Int)
     (; recap, v, n_max) = ΔW
-    finesse::Int = finesse ∈ 1:100 ? finesse : cld(100, √ length(recap))
+    finesse = finesse ∈ 1:100 ? finesse : ceil(Int, 100 / √ length(recap))
     ρ, θ = polar(n_max, n_max; finesse)
     # construct the estimated wavefront error
     w = ΔW.(ρ', θ)
