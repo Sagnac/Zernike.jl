@@ -251,7 +251,7 @@ function Z(m::Int, n::Int)
     if μ == n
         λ = [zeros(n); 1.0]
         γ = [1.0]
-    elseif n < 21 && Int == Int64
+    elseif n < 21 && Int ≡ Int64
         γ = canonical(μ, n, k)
         λ = zeros(n+1)
         λ[ν.+1] = γ
