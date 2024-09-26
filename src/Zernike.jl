@@ -8,12 +8,11 @@
 module Zernike
 
 export zernike, wavefront, transform, Z, W, P, WavefrontError,
-       Superposition, Product,
        noll_to_j, fringe_to_j, standardize, standardize!,
        Observable, plotconfig, zplot
 
 # public radial_coefficients, wavefront_coefficients, transform_coefficients,
-       # metrics, scale, J
+       # metrics, scale, J, Superposition, Product
 
 using GLMakie
 import .Makie: latexstring, LaTeXString, FigureAxisPlot

@@ -2,7 +2,8 @@ using Test
 using Zernike
 using Zernike: radicand, Φ, get_i, canonical, coords, reconstruct,
                validate_length, map_phase, format_strings, get_mn, LaTeXString,
-               latexstring, J, metrics, polar, max_precision, (..)
+               latexstring, J, metrics, polar, max_precision, Superposition, Product,
+               (..)
 using StatsBase: mean, sample
 
 @testset "fringe" begin
