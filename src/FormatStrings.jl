@@ -10,7 +10,7 @@ function format_strings(Z::Polynomial)
     (; γ, ν) = Z.R
     μ = abs(m)
     k = length(γ) - 1
-    γ_s = [@sprintf "%d" abs(γᵢ) for γᵢ ∈ γ]
+    γ_s = [@sprintf("%d", abs(γᵢ)) for γᵢ ∈ γ]
     UNICODE = ones(String, 3)
     LaTeX = ones(String, 3)
     # prefactor
@@ -65,7 +65,7 @@ function format_strings(recap::Vector)
     W_LaTeX = "ΔW ≈ "
     function ζ(i, sub_index = 0)
         aᵢ = recap[i][:a]
-        t = @sprintf "%.3f" (sub_index ≠ 1 ? abs(aᵢ) : aᵢ)
+        t = @sprintf("%.3f", sub_index ≠ 1 ? abs(aᵢ) : aᵢ)
         t, "Z_{$(recap[i][:n])}^{$(recap[i][:m])}"
     end
     function η(index, recap)
