@@ -11,8 +11,11 @@ export zernike, wavefront, transform, Z, W, P, WavefrontError,
        noll_to_j, fringe_to_j, standardize, standardize!,
        Observable, plotconfig, zplot
 
-# public radial_coefficients, wavefront_coefficients, transform_coefficients,
-       # metrics, scale, J, Superposition, Product
+const public_names = "public \
+    radial_coefficients, wavefront_coefficients, transform_coefficients, \
+    metrics, scale, J, Superposition, Product"
+
+VERSION >= v"1.11.0-DEV.469" && eval(Meta.parse(public_names))
 
 using GLMakie
 import .Makie: latexstring, LaTeXString, FigureAxisPlot
