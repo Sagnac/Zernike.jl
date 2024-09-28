@@ -90,17 +90,18 @@ include("ScaleAperture.jl")
 include("TransformAperture.jl")
 include("Docstrings.jl")
 
-function (R::RadialPolynomial)(ρ)
+function (R::RadialPolynomial)(ρ::Real)
     (; λ) = R
+    @domain(0 ≤ ρ ≤ 1, ρ)
     evalpoly(ρ, λ)
 end
 
-function (M::Harmonic)(θ)
+function (M::Harmonic)(θ::Real)
     (; m) = M
     m < 0 ? -sin(m * θ) : cos(m * θ)
 end
 
-function (Z::Polynomial)(ρ, θ)
+function (Z::Polynomial)(ρ::Real, θ::Real)
     (; N, R, M) = Z
     N * R(ρ) * M(θ)
 end
