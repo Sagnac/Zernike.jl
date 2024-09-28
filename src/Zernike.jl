@@ -309,9 +309,19 @@ Z(j::Int) = Z(get_mn(j)...)
 
 const piston = Z(0, 0)
 
-# aliases for the API namespace
+# API namespace
 radial_coefficients(x...) = Φ(x...)[end]
+
 wavefront_coefficents(x...) = reconstruct(x...)[1]
-transform_coefficients(x...) = S(x...)[1]
+
+function transform_coefficients(
+    v::Vector{Float64},
+    ε::Float64,
+    δ::ComplexF64         =     0.0im,
+    ϕ::Float64            =       0.0,
+    ω::NTuple{2, Float64} = (1.0, 0.0)
+)
+    return S(v, ε, δ, ϕ, ω)[1]
+end
 
 end
