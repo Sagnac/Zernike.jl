@@ -21,7 +21,7 @@ struct WavefrontOutput
     W::WavefrontError
     fig::Makie.Figure
     axis::Axis3
-    plot::Surface{NTuple{3, Matrix{Float32}}}
+    plot::SurfacePlot
 end
 
 function WavefrontError(recap, v, n_max, fit_to, a, Z, precision)

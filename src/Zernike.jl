@@ -35,6 +35,8 @@ const finesse = 100
 const FloatVec = AbstractVector{<:AbstractFloat}
 const FloatMat = AbstractMatrix{<:AbstractFloat}
 
+const SurfacePlot = Surface{Tuple{Matrix{Float64}, Matrix{Float64}, Matrix{Float32}}}
+
 abstract type Phase end
 
 struct RadialPolynomial
@@ -58,7 +60,7 @@ struct Output
     Z::Polynomial
     fig::Makie.Figure
     axis::Axis3
-    plot::Surface{NTuple{3, Matrix{Float32}}}
+    plot::SurfacePlot
     coeffs::Vector{Float64}
     latex::LaTeXString
     unicode::String
