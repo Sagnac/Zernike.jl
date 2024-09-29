@@ -180,6 +180,8 @@ The `standardize` fringe method expects unnormalized coefficients; the input coe
 
 For the `standardize` subset method the tuples in `orders` must be of the form `(m, n)` associated with the respective coefficients at each index in `v_sub`.
 
+In addition, the functions `get_j(m, n)` & `get_mn(j)` allow you to convert between the single and double indices.
+
 ## Additional Notes
 
 * `Zernike.metrics(ΔW::WavefrontError)` exists;

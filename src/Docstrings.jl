@@ -216,6 +216,24 @@ See also [`Zernike.Polynomial`](@ref).
 WavefrontError
 
 """
+    get_j(m::Int, n::Int)
+
+Return the single mode-ordering index `j` corresponding to azimuthal & radial indices `(m, n)`.
+
+See also [`get_mn`](@ref), [`noll_to_j`](@ref), [`fringe_to_j`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
+"""
+get_j
+
+"""
+    get_mn(j::Int)
+
+Return the azimuthal & radial indices `(m, n)` given the single mode-ordering index `j`.
+
+See also [`get_j`](@ref), [`noll_to_j`](@ref), [`fringe_to_j`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
+"""
+get_mn
+
+"""
     noll_to_j(noll::Int)
 
 Convert Noll indices to ANSI standard indices.

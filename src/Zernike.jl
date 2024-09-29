@@ -8,7 +8,7 @@
 module Zernike
 
 export zernike, wavefront, transform, Z, W, P, WavefrontError,
-       noll_to_j, fringe_to_j, standardize, standardize!,
+       get_j, get_mn, noll_to_j, fringe_to_j, standardize, standardize!,
        Observable, plotconfig, zplot
 
 const public_names = "public \
@@ -86,6 +86,20 @@ macro domain(ex, vals...)
     ))
 end
 
+macro domain_check()
+    quote
+        @domain(n ≥ 0 && μ ≤ n && iseven(n - μ),
+            """
+            \nDomain:
+            n ≥ 0
+            |m| ≤ n
+            n ≡ m (mod 2)
+            """,
+            m, n
+        )
+    end |> esc
+end
+
 include("RadialCoefficients.jl")
 include("FormatStrings.jl")
 include("WavefrontError.jl")
@@ -146,10 +160,16 @@ end
 
 # radial order
 get_n(j::Int) = ceil(Int, (-3 + √(9 + 8j)) / 2)
+
 # azimuthal frequency
 get_m(j::Int, n::Int) = 2j - (n + 2)n
+
 # ISO / ANSI / OSA standard single mode-ordering index
-get_j(m::Int, n::Int) = ((n + 2)n + m) ÷ 2
+function get_j(m::Int, n::Int)
+    μ = abs(m)
+    @domain_check
+    return ((n + 2)n + m) ÷ 2
+end
 
 function get_mn(j::Int)
     @domain(j ≥ 0, j)
@@ -235,15 +255,7 @@ end
 function Z(m::Int, n::Int)
     μ = abs(m)
     # validate
-    @domain(n ≥ 0 && μ ≤ n && iseven(n - μ),
-        """
-        \nDomain:
-        n ≥ 0
-        |m| ≤ n
-        n ≡ m (mod 2)
-        """,
-        m, n
-    )
+    @domain_check
     # upper bound for the sum (number of terms - 1 [indexing from zero])
     k = (n - μ) ÷ 2
     # OSA single mode index
