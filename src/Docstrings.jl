@@ -322,6 +322,18 @@ Plot `Polynomial` and `WavefrontError` input function types as well as quantized
 * `finesse`::**Int**: `{1 ≤ finesse ≤ 100}`: (used to determine matrix size);
 * `high_order`::**Bool**: whether to apply a logarithmic transform (default: `false`).
 
+Plots can be updated on demand by passing an `Observable` and changing its value.
+
+For example:
+
+```julia
+w = Observable(WavefrontError([0.0, -1.0, 1.0]))
+zplot(w)
+
+# update
+w[] = WavefrontError([0.0, 1.0, 1.0])
+```
+
 See also [`plotconfig`](@ref)
 """
 zplot
