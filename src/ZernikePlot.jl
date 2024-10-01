@@ -95,6 +95,7 @@ function zplot(args...; window_title = "ZernikePlot", plot_title = window_title,
     fig = Figure(; size)
     axis3 = Axis3(fig[1,1]; axis3attributes...)
     plot = zernikeplot!(axis3, args...; kwargs...)
+    on(_ -> resize_to_layout!(fig), plot[3])
     # hacky way to produce a top-down heatmap-style view without generating
     # another plot with a different set of data
     # accomplished by adding a toggle which changes the perspective on demand
