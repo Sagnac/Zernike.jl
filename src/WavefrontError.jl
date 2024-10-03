@@ -219,13 +219,7 @@ function show(io::IO, m::MIME"text/plain", W::WavefrontOutput)
     return
 end
 
-# extend getindex to allow indexing the output
-getindex(W::T, i = 1) where {T <: WavefrontOutput} = getfield(W, fieldnames(T)[i])
-
 getindex(W::WavefrontError) = W.v
-
-# hook into iterate to allow non-property destructuring of the output
-iterate(W::WavefrontOutput, i = 1) = (i > 7 ? nothing : (W[i], i + 1))
 
 # pads a subset Zernike expansion coefficient vector to standard length
 function standardize(v_sub::FloatVec, orders::Vector{Tuple{Int, Int}})

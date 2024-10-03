@@ -58,15 +58,13 @@ Estimates wavefront error by expressing optical aberrations as a linear combinat
 
 Returns seven values contained within a `WavefrontOutput` type, with fields:
 
-1. `recap`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients rounded according to `precision`;
-2. `v`: full vector of Zernike wavefront error expansion coefficients;
-3. `metrics`: named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio;
-4. `W`: the `WavefrontError` function `ΔW(ρ, θ)`;
-5. `fig`: the plotted `Makie` figure;
-6. `axis`: the plot axis;
-7. `plot`: the surface plot object.
-
-These can also be accessed through indexing and regular non-property destructuring.
+* `recap`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients rounded according to `precision`;
+* `v`: full vector of Zernike wavefront error expansion coefficients;
+* `metrics`: named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio;
+* `W`: the `WavefrontError` function `ΔW(ρ, θ)`;
+* `fig`: the plotted `Makie` figure;
+* `axis`: the plot axis;
+* `plot`: the surface plot object.
 
 See also [`W`](@ref), [`zernike`](@ref), [`transform`](@ref), [`reconstruct`](@ref).
 

@@ -190,8 +190,6 @@ In addition, the functions `get_j(m, n)` & `get_mn(j)` allow you to convert betw
 
 * If you resize the plot window, right clicking on the figure will resize / trim the plot automatically so that it fits within the window without extra space;
 
-* The values contained within the `WavefrontOutput` type can also be accessed through numerical indexing and regular destructuring in addition to property destructuring and getting the fields directly;
-
 * The Zernike polynomials are currently only valid up to degree ~812 at which point the maximum coefficient approaches the maximum for double-precision floating-point numbers (~1e308);
 
 * If you're interested in precompiling the package into a system image in order to speed up load times please see the [precompile directory](precompile) (at the moment PrecompileTools or the like is not used);
