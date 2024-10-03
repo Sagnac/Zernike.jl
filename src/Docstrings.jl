@@ -181,6 +181,8 @@ P
 
 Callable type: function `Z(ρ, θ)` bound to a given set of Zernike indices `m` and `n`.
 
+The single argument method `Zₘₙ(ρ)` will radially evaluate the polynomial with angle zero.
+
 Fields:
 
 * `inds`: named tuple containing the Zernike polynomial indices;
@@ -198,6 +200,8 @@ Polynomial
 Callable type: function `ΔW(ρ, θ)` bound to a given set of Zernike polynomial functions `Zᵢ(ρ, θ)` and their corresponding expansion coefficients `aᵢ`.
 
 Specifically, `ΔW(ρ, θ)` = `∑aᵢZᵢ(ρ, θ)`
+
+The single argument method `ΔW(ρ)` will radially evaluate the polynomials with angle zero.
 
 Fields:
 

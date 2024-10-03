@@ -120,7 +120,7 @@ function (M::Harmonic)(θ::Real)
     m < 0 ? -sin(m * θ) : cos(m * θ)
 end
 
-function (Z::Polynomial)(ρ::Real, θ::Real)
+function (Z::Polynomial)(ρ::Real, θ::Real = 0)
     (; N, R, M) = Z
     N * R(ρ) * M(θ)
 end
