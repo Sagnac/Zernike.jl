@@ -188,6 +188,8 @@ Fields:
 * `R`: `RadialPolynomial` callable type: function `R(ρ)`;
 * `M`: `Harmonic` callable type: function `M(θ)`.
 
+This type can be indexed (zero-based) to return a specific radial coefficient corresponding to the term with exponent `i`. Calling `getindex` without an explicit index will return the full vector of coefficients.
+
 See also [`Zernike.WavefrontError`](@ref).
 """
 Polynomial
@@ -212,6 +214,8 @@ Fields:
 * `precision`: the precision with which the `a` & `Z` values were determined.
 
 The `fit_to` field is an empty vector if the default full range up to `n_max` (`0:j_max`) was used with no `orders` specified. Note that these orders could differ from the polynomials determined after the fit; they are simply what was passed to the fitting function and may refer to polynomials not present in the reconstruction if after filtering the corresponding coefficients are zero.
+
+This type can be indexed (zero-based) to return a specific Zernike expansion coefficient corresponding to the Zernike polynomial of index `j`. Calling `getindex` without an explicit index will return the full vector of coefficients.
 
 See also [`Zernike.Polynomial`](@ref).
 """

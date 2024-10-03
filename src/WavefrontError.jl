@@ -221,6 +221,8 @@ end
 
 getindex(W::WavefrontError) = W.v
 
+getindex(W::WavefrontError, j::Int) = W.v[j+1]
+
 # pads a subset Zernike expansion coefficient vector to standard length
 function standardize(v_sub::FloatVec, orders::Vector{Tuple{Int, Int}})
     j = [get_j(mn...) for mn in orders]
