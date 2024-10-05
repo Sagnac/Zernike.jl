@@ -7,8 +7,8 @@
 
 module Zernike
 
-export zernike, wavefront, transform, Z, W, P, WavefrontError,
-       get_j, get_mn, noll_to_j, fringe_to_j, standardize, standardize!,
+export zernike, wavefront, transform, Z, W, P, WavefrontError, get_j, get_mn,
+       noll_to_j, j_to_noll, fringe_to_j, j_to_fringe, standardize, standardize!,
        Observable, plotconfig, zplot
 
 const public_names = "public \
@@ -86,7 +86,7 @@ macro domain(ex, vals...)
     ))
 end
 
-macro domain_check()
+macro domain_check_mn()
     quote
         @domain(n ≥ 0 && μ ≤ n && iseven(n - μ),
             """
@@ -98,6 +98,10 @@ macro domain_check()
             m, n
         )
     end |> esc
+end
+
+macro domain_check_j()
+    esc(:(@domain(j ≥ 0, j)))
 end
 
 include("RadialCoefficients.jl")
@@ -167,12 +171,12 @@ get_m(j::Int, n::Int) = 2j - (n + 2)n
 # ISO / ANSI / OSA standard single mode-ordering index
 function get_j(m::Int, n::Int)
     μ = abs(m)
-    @domain_check
+    @domain_check_mn
     return ((n + 2)n + m) ÷ 2
 end
 
 function get_mn(j::Int)
-    @domain(j ≥ 0, j)
+    @domain_check_j
     n = get_n(j)
     m = get_m(j, n)
     return m, n
@@ -185,6 +189,14 @@ function noll_to_j(noll::Int)
     m::Int = 2((2noll - (n + 1)n + 1 + n_mod_2) ÷ 4) - n_mod_2
     m = flipsign(m, iseven(noll) ? 1 : -1)
     get_j(m, n)
+end
+
+function j_to_noll(j::Int)
+    @domain_check_j
+    m, n = get_mn(j)
+    i = n % 4 ∈ 0:1
+    k = m > 0 && i || m < 0 && !i ? 0 : 1
+    (n + 1)n ÷ 2 + abs(m) + k
 end
 
 function standardize!(noll::Vector)
@@ -203,6 +215,23 @@ function fringe_to_j(fringe::Int)
     m = flipsign(m, isodd(d2) ? -1 : 1)
     n::Int = 2(d - 1) - abs(m)
     get_j(m, n)
+end
+
+function j_to_fringe(j::Int)
+    @domain_check_j
+    mn = get_mn(j)
+    mn == (0, 12) && return 37
+    m, n = mn
+    μ = abs(m)
+    fringe = ((μ + n) ÷ 2 + 1)^2 - 2μ + fld(1 - sign(m), 2)
+    @domain(fringe ∈ 1:36,
+        """
+        \nPolynomial does not have a Fringe representation.
+        Call fringe_to_j.(1:37) for valid polynomial indices.
+        """,
+        j
+    )
+    return fringe
 end
 
 function standardize(fringe::Vector)
@@ -255,7 +284,7 @@ end
 function Z(m::Int, n::Int)
     μ = abs(m)
     # validate
-    @domain_check
+    @domain_check_mn
     # upper bound for the sum (number of terms - 1 [indexing from zero])
     k = (n - μ) ÷ 2
     # OSA single mode index

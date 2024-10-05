@@ -168,11 +168,13 @@ Arithmetric between these types is defined; in addition, the `Zernike.Superposit
 
 ## Single-Index Ordering Schemes
 
-This package uses the ANSI Z80.28-2004 standard sequential ordering scheme where applicable, but provides several functions for converting from two other ordering methods, namely Noll and Fringe. The following methods are available:
+This package uses the ANSI Z80.28-2004 standard sequential ordering scheme where applicable, but provides several functions for converting between two other ordering methods, namely Noll and Fringe. The following methods are available:
 
 * `noll_to_j(noll::Int)`: converts Noll indices to ANSI standard indices;
+* `j_to_noll(j::Int)`: converts ANSI standard indices to Noll indices;
 * `standardize!(noll::Vector)`: re-orders a Noll specified Zernike expansion coefficient vector according to the ANSI standard; this requires a full ordered vector up to `n_max`;
 * `fringe_to_j(fringe::Int)`: converts Fringe indices to ANSI standard indices; only indices 1:37 are valid;
+* `j_to_fringe(j::Int)`: converts ANSI standard indices to Fringe indices;
 * `standardize(fringe::Vector)`: formats a Fringe specified Zernike expansion coefficient vector according to the ANSI standard;
 * `standardize(v_sub::Vector, orders::Vector{Tuple{Int, Int}})`: pads a subset Zernike expansion coefficient vector to the full standard length up to `n_max` (`1:j_max+1`).
 

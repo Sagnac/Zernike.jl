@@ -226,7 +226,7 @@ WavefrontError
 
 Return the single mode-ordering index `j` corresponding to azimuthal & radial indices `(m, n)`.
 
-See also [`get_mn`](@ref), [`noll_to_j`](@ref), [`fringe_to_j`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
+See also [`get_mn`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
 """
 get_j
 
@@ -235,7 +235,7 @@ get_j
 
 Return the azimuthal & radial indices `(m, n)` given the single mode-ordering index `j`.
 
-See also [`get_j`](@ref), [`noll_to_j`](@ref), [`fringe_to_j`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
+See also [`get_j`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
 """
 get_mn
 
@@ -244,9 +244,18 @@ get_mn
 
 Convert Noll indices to ANSI standard indices.
 
-See also [`fringe_to_j`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
+See also [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
 """
 noll_to_j
+
+"""
+    j_to_noll(j::Int)
+
+Convert ANSI standard indices to Noll indices.
+
+See also [`noll_to_j`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
+"""
+j_to_noll
 
 """
     standardize!(noll::Vector)
@@ -255,7 +264,7 @@ Re-order a Noll specified Zernike expansion coefficient vector according to the 
 
 This requires a full ordered vector up to `n_max`.
 
-See also [`standardize`](@ref), [`noll_to_j`](@ref), [`fringe_to_j`](@ref).
+See also [`standardize`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
 """
 standardize!
 
@@ -266,9 +275,20 @@ Convert Fringe indices to ANSI standard indices.
 
 Only indices 1:37 are valid.
 
-See also [`noll_to_j`](@ref), [`standardize`](@ref), [`standardize!`](@ref).
+See also [`j_to_fringe`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref) [`standardize`](@ref), [`standardize!`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
 """
 fringe_to_j
+
+"""
+    j_to_fringe(j::Int)
+
+Convert ANSI standard indices to Fringe indices.
+
+Call fringe_to_j.(1:37) to return valid indices.
+
+See also [`fringe_to_j`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref) [`standardize`](@ref), [`standardize!`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
+"""
+j_to_fringe
 
 """
     standardize(fringe::Vector)
@@ -277,7 +297,7 @@ Format a Fringe specified Zernike expansion coefficient vector according to the 
 
 This function expects unnormalized coefficients; the input coefficients will be re-ordered and normalized in line with the orthonormal standard. As Fringe is a 37 polynomial subset of the full set of Zernike polynomials any coefficients in the standard order missing a counterpart in the input vector will be set to zero.
 
-See also [`standardize!`](@ref), [`fringe_to_j`](@ref), [`noll_to_j`](@ref).
+See also [`standardize!`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
 
 ----
 

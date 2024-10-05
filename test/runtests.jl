@@ -15,6 +15,8 @@ using StatsBase: mean, sample
                   N * v ≈ o
               end
     @test compare |> all
+    @test_throws DomainError j_to_fringe(21) # Z(-6, 6) ∉ Fringe
+    @test j_to_fringe.(fringe_to_j.(1:37)) == 1:37
 end
 
 @testset "noll" begin
@@ -26,6 +28,7 @@ end
     @test !isequal(v, 1:15)
     standardize!(v)
     @test isequal(v, 1:15)
+    @test noll_to_j.(j_to_noll.(0:1000)) == 0:1000
 end
 
 function compare_coefficients(j_max)
