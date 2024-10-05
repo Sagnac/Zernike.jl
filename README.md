@@ -164,7 +164,9 @@ Z40(0.7, π/4)
 
 For wavefront reconstruction this is equivalent to `ΔW(ρ, θ)` = `∑aᵢZᵢ(ρ, θ)` where `aᵢ` and `Zᵢ` were determined from the fitting process according to `precision`.
 
-Arithmetric between these types is defined; in addition, the `Zernike.Superposition(W)` and `Zernike.Product(W)` constructors (where `W` is a `Vector{WavefrontError}`) serve as direct methods for creating composite functions which group evaluate a specified expansion set when an updated set of coefficients is not required.
+Arithmetric between these types is defined using the usual operators such that wavefront error approximations essentially form a commutative ring expressed in a Zernike basis.
+
+In addition, the `Zernike.Superposition(W)` and `Zernike.Product(W)` constructors (where `W` is a `Vector{WavefrontError}`) serve as direct methods for creating composite functions which group evaluate a specified expansion set when an updated set of coefficients is not required.
 
 ## Single-Index Ordering Schemes
 
@@ -188,7 +190,7 @@ In addition, the functions `get_j(m, n)` & `get_mn(j)` allow you to convert betw
 
 * `Zernike.metrics(ΔW::WavefrontError)` exists;
 
-* The `zplot` function can be invoked independently using `Polynomial` and `WavefrontError` function types as well as quantized wavefront errors;
+* The `zplot` function can be invoked independently using `Polynomial` and `WavefrontError` function types, quantized wavefront errors, as well as `Observable`s of each; the plot will update each time the `Observable` changes;
 
 * If you resize the plot window, right clicking on the figure will resize / trim the plot automatically so that it fits within the window without extra space;
 
