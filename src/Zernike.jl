@@ -9,7 +9,7 @@ module Zernike
 
 export zernike, wavefront, transform, Z, W, P, WavefrontError, get_j, get_mn,
        noll_to_j, j_to_noll, fringe_to_j, j_to_fringe, standardize, standardize!,
-       Observable, plotconfig, zplot
+       Observable, plotconfig, zplot, reduce_wave
 
 const public_names = "public \
     radial_coefficients, wavefront_coefficients, transform_coefficients, \

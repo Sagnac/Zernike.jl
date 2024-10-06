@@ -2,7 +2,7 @@ using Test
 using Zernike
 using Zernike: radicand, Φ, get_i, canonical, coords, reconstruct, validate_length,
                map_phase, format_strings, LaTeXString, latexstring, J, metrics,
-               polar, max_precision, Superposition, Product, (..)
+               polar, max_precision, Superposition, Product, sieve, (..)
 using StatsBase: mean, sample
 
 @testset "fringe" begin
@@ -356,4 +356,10 @@ end
     @test_throws DomainError P(v, ε, δ, ϕ, (2.0, 0.0))
     ΔW_e = P([0.0, 0.0, 1.0], 1.0, 0.0im, 0.0, (0.148, 0.0))
     @test getfield(ΔW_e, :recap) == [(j = 2, n = 1, m = 1, a = 0.148)]
+end
+
+@testset "precision" begin
+    W2 = reduce_wave(ΔW, 7)
+    @test W2 == W(OPD, 8; precision = 7)
+    @test round.(sieve(W2.v, 1e-7); digits = 7) == standardize(W2)
 end

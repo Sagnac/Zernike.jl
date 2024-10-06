@@ -223,6 +223,29 @@ getindex(W::WavefrontError) = W.v
 
 getindex(W::WavefrontError, j::Int) = W.v[j+1]
 
+# reduces precision
+function reduce_wave(W::WavefrontError, precision::Int)
+    @domain(precision < W.precision, precision)
+    recap, a, Zᵢ = map(copy, (W.recap, W.a, W.Z))
+    for i ∈ (reverse ∘ eachindex)(a)
+        aᵢ = round(a[i]; digits = precision)
+        if iszero(aᵢ)
+            deleteat!(recap, i)
+            deleteat!(a, i)
+            deleteat!(Zᵢ, i)
+        else
+            (; j, n, m) = recap[i]
+            recap[i] = (; j, n, m, a = aᵢ)
+            a[i] = aᵢ
+        end
+    end
+    return WavefrontError(recap, W.v, W.n_max, W.fit_to, a, Zᵢ, precision)
+end
+
+function sieve(v::Vector{Float64}, threshold::Float64)
+    map(a -> abs(a) < threshold ? 0.0 : a, v)
+end
+
 # pads a subset Zernike expansion coefficient vector to standard length
 function standardize(v_sub::FloatVec, orders::Vector{Tuple{Int, Int}})
     j = [get_j(mn...) for mn in orders]
@@ -232,6 +255,8 @@ function standardize(v_sub::FloatVec, orders::Vector{Tuple{Int, Int}})
     v_padded[j.+1] .= v_sub
     return v_padded
 end
+
+standardize(W::WavefrontError) = standardize(W.a, [(i.m, i.n) for i ∈ W.recap])
 
 # methods
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int;

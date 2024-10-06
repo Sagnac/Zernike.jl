@@ -441,3 +441,10 @@ Reverse dimensional coordinate transform with respect to the main wavefront erro
 See also [`wavefront`](@ref).
 """
 map_phase
+
+"""
+    reduce_wave(W::WavefrontError, precision::Int)
+
+Reduces `WavefrontError` precision.
+"""
+reduce_wave
