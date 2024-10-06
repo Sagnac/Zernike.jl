@@ -331,9 +331,10 @@ See also [`zplot`](@ref)
 plotconfig
 
 """
-    zplot(args..., kwargs...)
+    zplot(P; kwargs...)
+    zplot(ρ, θ, w; kwargs...)
 
-Plot `Polynomial` and `WavefrontError` input function types as well as quantized wavefront errors; for the latter `args...` must be a collection of discretized `ρ`, `θ`, `w` samples where the radial variable objects refer to either ranges or vectors and the wavefront error `w` is a matrix.
+Plot `Polynomial` and `WavefrontError` input function types `P` as well as quantized wavefront errors; for the latter the arguments must be a collection of discretized `ρ`, `θ`, `w` samples where the polar variable objects refer to either ranges or vectors and the wavefront error `w` is a matrix.
 
 # Keyword arguments:
 

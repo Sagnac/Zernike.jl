@@ -190,7 +190,7 @@ In addition, the functions `get_j(m, n)` & `get_mn(j)` allow you to convert betw
 
 * `Zernike.metrics(ΔW::WavefrontError)` exists;
 
-* The `zplot` function can be invoked independently using `Polynomial` and `WavefrontError` function types, quantized wavefront errors, as well as `Observable`s of each; the plot will update each time the `Observable` changes;
+* The `zplot` function can be invoked independently using `Polynomial` and `WavefrontError` function types, quantized wavefront errors, and Observables of each; the plot will update each time the `Observable` changes (see the docstring for more info);
 
 * If you resize the plot window, right clicking on the figure will resize / trim the plot automatically so that it fits within the window without extra space;
 
