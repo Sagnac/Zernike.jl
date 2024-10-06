@@ -449,3 +449,10 @@ map_phase
 Reduces `WavefrontError` precision.
 """
 reduce_wave
+
+"""
+    sieve(v::Vector{Float64}, threshold::Float64)
+
+Zero out any elements lower than the threshold.
+"""
+sieve
