@@ -164,7 +164,7 @@ Z40(0.7, π/4)
 
 For wavefront reconstruction this is equivalent to `ΔW(ρ, θ)` = `∑aᵢZᵢ(ρ, θ)` where `aᵢ` and `Zᵢ` were determined from the fitting process according to `precision`.
 
-Arithmetric between these types is defined using the usual operators such that wavefront error approximations essentially form a commutative ring expressed in a Zernike basis.
+Arithmetric between these types is defined using the usual operators such that wavefront error approximations essentially form a commutative ring (with associativity of multiplication being approximate) expressed in a Zernike basis.
 
 In addition, the `Zernike.Superposition(W)` and `Zernike.Product(W)` constructors (where `W` is a `Vector{WavefrontError}`) serve as direct methods for creating composite functions which group evaluate a specified expansion set when an updated set of coefficients is not required.
 

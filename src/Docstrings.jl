@@ -284,7 +284,7 @@ fringe_to_j
 
 Convert ANSI standard indices to Fringe indices.
 
-Call fringe_to_j.(1:37) to return valid indices.
+Call `fringe_to_j.(1:37)` to return valid indices.
 
 See also [`fringe_to_j`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref) [`standardize`](@ref), [`standardize!`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
 """
