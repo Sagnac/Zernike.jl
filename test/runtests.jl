@@ -140,7 +140,7 @@ v = reconstruct(r, t, OPD_vec, 8)[1]
     @test W1.a == W1.v
     @test isempty(W1.fit_to)
     @test W1.n_max == 2
-    @test ==(W2, W3, W4)
+    @test W2 == W3 == W4
     idx_orders = j_orders .+ 1
     @test W2.v[idx_orders] == a
     @test iszero(W2.v[setdiff(1:45, idx_orders)])
