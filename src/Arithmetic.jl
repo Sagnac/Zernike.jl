@@ -1,8 +1,15 @@
-import Base: +, -, *, /, ^, sum, prod, factorial, convert, promote_rule
+import Base: +, -, *, /, ^, ==, sum, prod, factorial, convert, promote_rule
 
 struct MixedPhase{S, T <: WavefrontError} <: Phase
     b::Float64
     W::Vector{T}
+end
+
+function ==(P1::T, Pᵢ::T...) where T <: Union{Phase, RadialPolynomial, Harmonic}
+    for name ∈ fieldnames(T), P ∈ Pᵢ
+        getfield(P1, name) ≠ getfield(P, name) && return false
+    end
+    return true
 end
 
 Superposition{T} = MixedPhase{:sum, T}

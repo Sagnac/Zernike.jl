@@ -140,9 +140,7 @@ v = reconstruct(r, t, OPD_vec, 8)[1]
     @test W1.a == W1.v
     @test isempty(W1.fit_to)
     @test W1.n_max == 2
-    @testset "constructor equality" for i in (:recap, :v, :n_max, :fit_to, :a)
-        @test getfield(W2, i) == getfield(W3, i) == getfield(W4, i)
-    end
+    @test ==(W2, W3, W4)
     idx_orders = j_orders .+ 1
     @test W2.v[idx_orders] == a
     @test iszero(W2.v[setdiff(1:45, idx_orders)])
