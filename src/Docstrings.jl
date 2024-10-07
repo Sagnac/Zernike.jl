@@ -11,7 +11,8 @@ Returns a `Zernike.Output` type which contains (among other things):
 * `Z`: the `Polynomial` function `Z(ρ, θ)`;
 * `fig`: the `Makie` figure;
 * `coeffs`: vector of radial polynomial coefficients;
-* `latex`: `LaTeX` string of the Zernike polynomial.
+* `latex`: `LaTeX` string of the Zernike polynomial;
+* `unicode`: `Unicode` string of the Zernike polynomial.
 
 The coefficients belong to terms with exponent `n - 2(i - 1)` where `i` is the vector's index.
 
@@ -456,3 +457,17 @@ reduce_wave
 Zero out any elements lower than the threshold.
 """
 sieve
+
+"""
+    format_strings(m::Int, n::Int)
+
+Return a 2-tuple with the `Unicode` and `LaTeX` string representations of the Zernike polynomial.
+
+```jldoctest
+julia> unicode, latex = Zernike.format_strings(-8, 8);
+
+julia> unicode
+"√(18)ρ⁸sin(8θ)"
+```
+"""
+format_strings

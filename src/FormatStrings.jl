@@ -61,6 +61,8 @@ function format_strings(Z::Polynomial)
     return latexstring(Z_mn), Z_LaTeX, Z_Unicode
 end
 
+format_strings(m::Int, n::Int) = reverse(format_strings(Z(m, n))[2:3])
+
 function format_strings(recap::Vector)
     W_LaTeX = "ΔW ≈ "
     function ζ(i, sub_index = 0)
