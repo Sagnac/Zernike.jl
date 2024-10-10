@@ -55,6 +55,7 @@ factorial(z::Polynomial) = Product([Z(j) for j = 0:z.inds.j])
 +(φ::Phase) = φ
 -(φ::Phase) = -1 * φ
 
+# TODO: redesign converted precision scheme
 const converted = [(-1, -1)]
 
 function convert(::Type{<:WavefrontError}, Z::Polynomial)
@@ -87,6 +88,11 @@ promote_rule(::Type{<:Superposition}, ::Type{<:WavefrontError}) = Superposition
 promote_rule(::Type{Polynomial}, ::Type{<:Product}) = WavefrontError
 promote_rule(::Type{<:WavefrontError}, ::Type{<:Product}) = WavefrontError
 
+function getproperty(W::WavefrontError, name::Symbol)
+    value = getfield(W, name)
+    name == :fit_to && value == converted ? NTuple{2, Int}[] : value
+end
+
 function add_subtract(f::F, φ1::Phase, φ2::Phase) where F
     add_subtract(f, promote(φ1, φ2)...)
 end
@@ -105,7 +111,7 @@ function add_subtract(f::F, W1::T, W2::T) where {F, T <: WavefrontError}
     Z3 = similar(v3, Polynomial)
     foreach(Z -> setindex!(Z3, Z, Z.inds.j + 1), W1.Z ∪ W2.Z)
     n_max = max(W1.n_max, W2.n_max)
-    orders = setdiff(W1.fit_to ∪ W2.fit_to, converted)
+    orders = W1.fit_to ∪ W2.fit_to
     precision = max(W1.precision, W2.precision)
     Ψ(v3, Z3, n_max, orders; precision)
 end
@@ -133,7 +139,7 @@ function multiply(α::Float64, W::WavefrontError)
     (; v) = W
     Z = similar(v, Polynomial)
     foreach(Zᵢ -> setindex!(Z, Zᵢ, Zᵢ.inds.j + 1), W.Z)
-    Ψ(α * v, Z, W.n_max, W.fit_to; W.precision)
+    Ψ(α * v, Z, W.n_max, getfield(W, :fit_to); W.precision)
 end
 
 multiply(α::Float64, Z::Polynomial) = WavefrontError([(Z.inds.m, Z.inds.n)], [α])

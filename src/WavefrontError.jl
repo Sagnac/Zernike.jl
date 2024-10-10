@@ -227,6 +227,7 @@ getindex(W::WavefrontError, j::Int) = W.v[j+1]
 function reduce_wave(W::WavefrontError, precision::Int)
     @domain(precision < W.precision, precision)
     recap, a, Zᵢ = map(copy, (W.recap, W.a, W.Z))
+    fit_to = getfield(W, :fit_to)
     for i ∈ (reverse ∘ eachindex)(a)
         aᵢ = round(a[i]; digits = precision)
         if iszero(aᵢ)
@@ -239,7 +240,7 @@ function reduce_wave(W::WavefrontError, precision::Int)
             a[i] = aᵢ
         end
     end
-    return WavefrontError(recap, W.v, W.n_max, W.fit_to, a, Zᵢ, precision)
+    return WavefrontError(recap, W.v, W.n_max, fit_to, a, Zᵢ, precision)
 end
 
 function sieve(v::Vector{Float64}, threshold::Float64)
