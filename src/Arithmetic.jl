@@ -88,6 +88,8 @@ promote_rule(::Type{<:Superposition}, ::Type{<:WavefrontError}) = Superposition
 promote_rule(::Type{Polynomial}, ::Type{<:Product}) = WavefrontError
 promote_rule(::Type{<:WavefrontError}, ::Type{<:Product}) = WavefrontError
 
+WavefrontError(Z::Polynomial) = convert(WavefrontError, Z)
+
 function getproperty(W::WavefrontError, name::Symbol)
     value = getfield(W, name)
     name == :fit_to && value == converted ? NTuple{2, Int}[] : value
