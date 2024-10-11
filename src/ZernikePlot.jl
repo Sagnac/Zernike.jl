@@ -62,7 +62,9 @@ function zernikeplot!(axis, Z; m = 10, n = 10, finesse = finesse,
     ρᵪ, ρᵧ = polar_mat(ρ, θ)
     z = @lift($Z.(ρ', θ))
     if high_order
-        @. z[] = sign(z[]) * log10(abs(z[] * log(10)) + 1)
+        zv = z[]
+        ln10 = log(10.0)
+        @. z[] = sign(zv) * log10(abs(zv * ln10) + 1.0)
     end
     surface!(axis, ρᵪ, ρᵧ, z; shading = NoShading, colormap)
 end
