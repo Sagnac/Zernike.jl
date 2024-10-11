@@ -41,10 +41,10 @@ function reset_config()
 end
 
 function setproperty!(plotconfig::PlotConfig, name::Symbol, value)
-    if name == :reset && value
-        reset_config()
-    elseif name == :resize && value
-        refresh_monitor()
+    if name == :reset
+        value && reset_config()
+    elseif name == :resize
+        value && refresh_monitor()
     else
         setfield!(plotconfig, name, convert(fieldtype(PlotConfig, name), value))
     end
