@@ -178,35 +178,24 @@ end
 function transform(
     v::Vector{T},
     ε::T,
-    δ::Complex{T} = 0.0im,
-    ϕ::T = 0.0,
+    δ::Complex{T}  = 0.0im,
+    ϕ::T           = 0.0,
     ω::Tuple{T, T} = (1.0, 0.0);
     precision::Int = precision, finesse::Int = wavefront_finesse
 ) where T <: Float64
-    v2, n_max = S(v, ε, δ, ϕ, ω)
-    Zᵢ = similar(v, Polynomial)
-    ΔW = Ψ(v2, Zᵢ, n_max; precision)
+    ΔW = P(v, ε, δ, ϕ, ω; precision)
     Λ(ΔW; finesse)
 end
 
-function P(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T, T};
-           precision::Int = precision) where T <: Float64
+function P(
+    v::Vector{T},
+    ε::T,
+    δ::Complex{T}  = 0.0im,
+    ϕ::T           = 0.0,
+    ω::Tuple{T, T} = (1.0, 0.0);
+    precision::Int = precision
+) where T <: Float64
     v2, n_max = S(v, ε, δ, ϕ, ω)
     Zᵢ = similar(v, Polynomial)
     Ψ(v2, Zᵢ, n_max; precision)
-end
-
-function P(v::Vector{T}, ε::T;
-           precision::Int = precision) where T <: Float64
-    P(v, ε, 0.0im, zero(T), (1.0, 0.0); precision)
-end
-
-function P(v::Vector{T}, ε::T, δ::Complex{T};
-           precision::Int = precision) where T <: Float64
-    P(v, ε, δ, zero(T), (1.0, 0.0); precision)
-end
-
-function P(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T;
-           precision::Int = precision) where T <: Float64
-    P(v, ε, δ, ϕ, (1.0, 0.0); precision)
 end

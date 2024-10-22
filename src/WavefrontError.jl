@@ -175,17 +175,14 @@ end
 # main interface function
 function wavefront(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int;
                    precision::Int = precision, finesse::Int = wavefront_finesse)
-    v, Zᵢ = reconstruct(ρ, θ, OPD, n_max)
-    ΔW = Ψ(v, Zᵢ, n_max; precision)
+    ΔW = W(ρ, θ, OPD, n_max; precision)
     Λ(ΔW; finesse)
 end
 
 function wavefront(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
                    orders::Vector{Tuple{Int, Int}};
                    precision::Int = precision, finesse::Int = wavefront_finesse)
-    n_max = maximum(mn -> mn[2], orders; init = 0)
-    v, Zᵢ = reconstruct(ρ, θ, OPD, orders)
-    ΔW = Ψ(v, Zᵢ, n_max, orders; precision)
+    ΔW = W(ρ, θ, OPD, orders; precision)
     Λ(ΔW; finesse)
 end
 

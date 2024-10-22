@@ -41,9 +41,7 @@ end
 
 function scale(v::Vector{Float64}, ε::Float64;
            precision::Int = precision, finesse::Int = wavefront_finesse)
-    v2, n_max = Π(v, ε)
-    Zᵢ = similar(v, Polynomial)
-    ΔW = Ψ(v2, Zᵢ, n_max; precision)
+    ΔW = J(v, ε; precision)
     Λ(ΔW; finesse)
 end
 
