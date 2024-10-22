@@ -175,6 +175,8 @@ function get_j(m::Int, n::Int)
     return ((n + 2)n + m) ÷ 2
 end
 
+get_j(n_max::Int) = get_j(n_max, n_max)
+
 function get_mn(j::Int)
     @domain_check_j
     n = get_n(j)
@@ -237,7 +239,7 @@ end
 function standardize(fringe::Vector)
     j = fringe_to_j.(eachindex(fringe))
     n_max = get_n(maximum(j))
-    j_max = get_j(n_max, n_max)
+    j_max = get_j(n_max)
     a = zeros(eltype(fringe), j_max + 1)
     # normalize
     N = broadcast(x -> √radicand(x...), get_mn.(j))
@@ -249,7 +251,7 @@ function validate_length(v::Vector)
     len = length(v)
     j_max = len - 1
     n_max = get_n(j_max)
-    if j_max ≠ get_j(n_max, n_max)
+    if j_max ≠ get_j(n_max)
         error(
             """
             Invalid number of coefficients.

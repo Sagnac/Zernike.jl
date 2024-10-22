@@ -29,6 +29,14 @@ end
     standardize!(v)
     @test isequal(v, 1:15)
     @test noll_to_j.(j_to_noll.(0:1000)) == 0:1000
+    j = get_j(101)
+    u = rand(j + 1)
+    p = j_to_noll.(0:j)
+    w = copy(u)
+    invpermute!(w, p)
+    @test w != u
+    standardize!(w)
+    @test w == u
 end
 
 function compare_coefficients(j_max)

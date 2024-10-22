@@ -227,6 +227,12 @@ WavefrontError
 
 Return the single mode-ordering index `j` corresponding to azimuthal & radial indices `(m, n)`.
 
+----
+
+    get_j(n_max::Int)
+
+Return the single mode-ordering index `j` corresponding to the maximum radial index `n_max`; equivalent to `get_j(n_max, n_max)`.
+
 See also [`get_mn`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
 """
 get_j

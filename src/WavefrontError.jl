@@ -91,7 +91,7 @@ function fit(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, Zᵢ::Vector{Polynomial}
 end
 
 function reconstruct(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int)
-    j_max = get_j(n_max, n_max)
+    j_max = get_j(n_max)
     Zᵢ = Polynomial[Z(j) for j = 0:j_max]
     v = fit(ρ, θ, OPD, Zᵢ)
     return v, Zᵢ
@@ -251,7 +251,7 @@ end
 function standardize(v_sub::FloatVec, orders::Vector{Tuple{Int, Int}})
     j = [get_j(mn...) for mn in orders]
     n_max = get_n(maximum(j))
-    j_max = get_j(n_max, n_max)
+    j_max = get_j(n_max)
     v_padded = zeros(eltype(v_sub), j_max + 1)
     v_padded[j.+1] .= v_sub
     return v_padded
