@@ -1,8 +1,8 @@
 using Test
 using Zernike
 using Zernike: radicand, Φ, get_i, canonical, coords, reconstruct, validate_length,
-               map_phase, format_strings, LaTeXString, latexstring, J, metrics,
-               polar, max_precision, Superposition, Product, sieve, (..)
+               valid_fringes, map_phase, format_strings, LaTeXString, latexstring, J,
+               metrics, polar, max_precision, Superposition, Product, sieve, (..)
 using StatsBase: mean, sample
 
 @testset "fringe" begin
@@ -11,12 +11,12 @@ using StatsBase: mean, sample
     @test fringe_to_j.(fringe) == 0:14
     v_fringe = collect(1.0:18.0)
     N_ = (√radicand(m, n) for n = 0:4 for m = -n:2:n)
-    compare = map(N_, standardize(v_fringe), v_fringe[fringe]) do N, v, o
+    compare = map(N_, standardize(Fringe(v_fringe)), v_fringe[fringe]) do N, v, o
                   N * v ≈ o
               end
     @test compare |> all
     @test_throws DomainError j_to_fringe(21) # Z(-6, 6) ∉ Fringe
-    @test j_to_fringe.(fringe_to_j.(1:37)) == 1:37
+    @test j_to_fringe.(valid_fringes) == 1:37
 end
 
 @testset "noll" begin
@@ -26,7 +26,7 @@ end
     v = zeros(15)
     v[noll] = 1:15
     @test !isequal(v, 1:15)
-    standardize!(v)
+    v = standardize(Noll(v))
     @test isequal(v, 1:15)
     @test noll_to_j.(j_to_noll.(0:1000)) == 0:1000
     j = get_j(101)
@@ -35,8 +35,18 @@ end
     w = copy(u)
     invpermute!(w, p)
     @test w != u
-    standardize!(w)
+    w = standardize(Noll(w))
     @test w == u
+end
+
+# more index conversions
+@testset "standard" begin
+    j = collect(0:101)
+    v = rand(102)
+    s = Standard(standardize(v, j))
+    i = valid_fringes .+ 1
+    @test standardize(Fringe(Noll(s)))[i] ≈ v[i]
+    @test standardize(Noll(Fringe(s)))[i] ≈ v[i]
 end
 
 function compare_coefficients(j_max)

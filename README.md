@@ -175,11 +175,13 @@ This package uses the ANSI Z80.28-2004 standard sequential ordering scheme where
 
 * `noll_to_j(noll::Int)`: converts Noll indices to ANSI standard indices;
 * `j_to_noll(j::Int)`: converts ANSI standard indices to Noll indices;
-* `standardize!(noll::Vector)`: re-orders a Noll specified Zernike expansion coefficient vector according to the ANSI standard; this requires a full ordered vector up to `n_max`;
+* `standardize(noll::Noll)`: re-orders a Noll specified Zernike expansion coefficient vector according to the ANSI standard;
 * `fringe_to_j(fringe::Int)`: converts Fringe indices to ANSI standard indices; only indices 1:37 are valid;
 * `j_to_fringe(j::Int)`: converts ANSI standard indices to Fringe indices;
-* `standardize(fringe::Vector)`: formats a Fringe specified Zernike expansion coefficient vector according to the ANSI standard;
+* `standardize(fringe::Fringe)`: formats a Fringe specified Zernike expansion coefficient vector according to the ANSI standard;
 * `standardize(v_sub::Vector, orders::Vector{Tuple{Int, Int}})`: pads a subset Zernike expansion coefficient vector to the full standard length up to `n_max` (`1:j_max+1`).
+
+The `Noll` and `Fringe` types are used to wrap the input coefficient vectors for the `standardize` method arguments (e.g. `standardize(Fringe(v::Vector{Float64}))`). These can also be used to convert between the ordering schemes (e.g. `Noll(fringe::Fringe)`, `Fringe(s::Standard)`).
 
 The `standardize` fringe method expects unnormalized coefficients; the input coefficients will be re-ordered and normalized in line with the orthonormal standard. As Fringe is a 37 polynomial subset of the full set of Zernike polynomials any coefficients in the standard order missing a counterpart in the input vector will be set to zero.
 

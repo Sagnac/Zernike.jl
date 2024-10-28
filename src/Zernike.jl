@@ -8,12 +8,12 @@
 module Zernike
 
 export zernike, wavefront, transform, Z, W, P, WavefrontError, get_j, get_mn,
-       noll_to_j, j_to_noll, fringe_to_j, j_to_fringe, standardize, standardize!,
-       Observable, plotconfig, zplot, reduce_wave
+       Noll, Fringe, noll_to_j, j_to_noll, fringe_to_j, j_to_fringe, standardize,
+       Standard, Observable, plotconfig, zplot, reduce_wave
 
 const public_names = "public \
     radial_coefficients, wavefront_coefficients, transform_coefficients, \
-    metrics, scale, J, Superposition, Product, sieve, format_strings"
+    metrics, scale, J, Superposition, Product, sieve, format_strings, valid_fringes"
 
 VERSION >= v"1.11.0-DEV.469" && eval(Meta.parse(public_names))
 
@@ -66,6 +66,46 @@ struct Output
     unicode::String
     inds::String
     high_order::Bool
+end
+
+# normalization constant for Fringe coefficients
+N(j::Vector{Int}) = broadcast(x -> √radicand(x...), get_mn.(j))
+
+struct Standard
+    v::Vector{Float64}
+end
+
+struct Noll
+    v::Vector{Float64}
+end
+
+struct Fringe
+    v::Vector{Float64}
+end
+
+Standard(noll::Noll) = Standard(standardize(noll))
+Standard(fringe::Fringe) = Standard(standardize(fringe))
+
+Noll(fringe::Fringe) = (Noll ∘ Standard ∘ standardize)(fringe)
+
+Fringe(noll::Noll) = (Fringe ∘ Standard ∘ standardize)(noll)
+
+function Noll(s::Standard)
+    sv = s.v
+    j = eachindex(sv) .- 1
+    noll = j_to_noll.(j)
+    v = zeros(maximum(noll))
+    v[noll] = sv
+    return Noll(v)
+end
+
+function Fringe(s::Standard)
+    sv = s.v
+    j = [i for i ∈ 0:length(sv)-1 if i ∈ valid_fringes]
+    fringe = j_to_fringe.(j)
+    v = zeros(maximum(fringe))
+    v[fringe] .= N(j) .* sv[j.+1]
+    return Fringe(v)
 end
 
 macro domain(ex, msg::String, val)
@@ -175,6 +215,8 @@ function get_j(m::Int, n::Int)
     return ((n + 2)n + m) ÷ 2
 end
 
+get_j((m, n)) = get_j(m, n)
+
 get_j(n_max::Int) = get_j(n_max, n_max)
 
 function get_mn(j::Int)
@@ -201,9 +243,12 @@ function j_to_noll(j::Int)
     (n + 1)n ÷ 2 + abs(m) + k
 end
 
-function standardize!(noll::Vector)
-    validate_length(noll)
-    invpermute!(noll, [noll_to_j(i) + 1 for i in eachindex(noll)])
+function standardize(noll::Noll)
+    (; v) = noll
+    p = [noll_to_j(i) + 1 for i in eachindex(v)]
+    u = zeros(maximum(p))
+    u[p] = v
+    return u
 end
 
 function fringe_to_j(fringe::Int)
@@ -229,21 +274,20 @@ function j_to_fringe(j::Int)
     @domain(fringe ∈ 1:36,
         """
         \nPolynomial does not have a Fringe representation.
-        Call fringe_to_j.(1:37) for valid polynomial indices.
+        See Zernike.valid_fringes for valid polynomial indices.
         """,
         j
     )
     return fringe
 end
 
-function standardize(fringe::Vector)
-    j = fringe_to_j.(eachindex(fringe))
+function standardize(fringe::Fringe)
+    (; v) = fringe
+    j = fringe_to_j.(eachindex(v))
     n_max = get_n(maximum(j))
     j_max = get_j(n_max)
-    a = zeros(eltype(fringe), j_max + 1)
-    # normalize
-    N = broadcast(x -> √radicand(x...), get_mn.(j))
-    a[j.+1] = fringe ./ N
+    a = zeros(eltype(v), j_max + 1)
+    a[j.+1] = v ./ N(j)
     return a
 end
 
@@ -360,6 +404,8 @@ zernike(j::Int; finesse = finesse) = zernike(get_mn(j)...; finesse)
 Z(j::Int) = Z(get_mn(j)...)
 
 const piston = Z(0, 0)
+
+const valid_fringes = fringe_to_j.(1:37)
 
 # API namespace
 radial_coefficients(x...) = Φ(x...)[end]

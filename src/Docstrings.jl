@@ -265,17 +265,6 @@ See also [`noll_to_j`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`ge
 j_to_noll
 
 """
-    standardize!(noll::Vector)
-
-Re-order a Noll specified Zernike expansion coefficient vector according to the ANSI standard.
-
-This requires a full ordered vector up to `n_max`.
-
-See also [`standardize`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
-"""
-standardize!
-
-"""
     fringe_to_j(fringe::Int)
 
 Convert Fringe indices to ANSI standard indices.
@@ -298,21 +287,31 @@ See also [`fringe_to_j`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref) [`stand
 j_to_fringe
 
 """
-    standardize(fringe::Vector)
+    standardize(noll::Noll)
+    standardize(fringe::Fringe)
 
-Format a Fringe specified Zernike expansion coefficient vector according to the ANSI standard.
+Format a `Noll` or `Fringe` specified Zernike expansion coefficient vector according to the ANSI standard.
 
-This function expects unnormalized coefficients; the input coefficients will be re-ordered and normalized in line with the orthonormal standard. As Fringe is a 37 polynomial subset of the full set of Zernike polynomials any coefficients in the standard order missing a counterpart in the input vector will be set to zero.
+Floating-point coefficient vectors need to be wrapped in the index types (e.g. `standardize(Fringe(v))`).
+
+The `Fringe` method expects unnormalized coefficients; the input coefficients will be re-ordered and normalized in line with the orthonormal standard. As Fringe is a 37 polynomial subset of the full set of Zernike polynomials any coefficients in the standard order missing a counterpart in the input vector will be set to zero.
 
 See also [`standardize!`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
 
 ----
 
+    standardize(v_sub::FloatVec, j::AbstractVector{Int})
     standardize(v_sub::Vector, orders::Vector{Tuple{Int, Int}})
+    standardize(W::WavefrontError)
 
 Pad a subset Zernike expansion coefficient vector to the full standard length up to `n_max` (`1:j_max+1`).
 
 The tuples in `orders` must be of the form `(m, n)` associated with the respective coefficients at each index in `v_sub`.
+
+`j` is a vector of single-mode ordering indices associated with the coefficients.
+
+The `WavefrontError` method pads the `W.a` coefficient vector.
+
 """
 standardize
 
