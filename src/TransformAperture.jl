@@ -17,7 +17,12 @@ function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <
     @domain(0.0 < ε ≤ 1.0, ε)
     @domain(ε + abs(δ) ≤ 1.0, ε, δ)
     @domain(0.0 < ω[1] ≤ 1.0, ω[1])
-    len, n_max = validate_length(v)
+    len, n_max = try
+                     validate_length(v)
+                 catch
+                     v = standardize(v, 0:length(v)-1)
+                     validate_length(v)
+                 end
     remap = Dict{NTuple{2, Int}, Int}()
     order = NTuple{3, Int}[]
     # normalization factors for complex Zernike polynomials

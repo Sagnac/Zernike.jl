@@ -2,7 +2,8 @@ using Test
 using Zernike
 using Zernike: radicand, Φ, get_i, canonical, coords, reconstruct, validate_length,
                valid_fringes, map_phase, format_strings, LaTeXString, latexstring, J,
-               metrics, polar, max_precision, Superposition, Product, sieve, (..)
+               metrics, polar, max_precision, Superposition, Product, sieve,
+               transform_coefficients, (..)
 using StatsBase: mean, sample
 
 @testset "fringe" begin
@@ -380,4 +381,10 @@ end
     W2 = reduce_wave(ΔW, 7)
     @test W2 == W(OPD, 8; precision = 7)
     @test round.(sieve(W2.v, 1e-7); digits = 7) == standardize(W2)
+end
+
+@testset "transform" begin
+    v1 = rand(40)
+    v2 = [v1; zeros(5)]
+    @test transform_coefficients(v1, ε, δ, ϕ) == transform_coefficients(v2, ε, δ, ϕ)
 end
