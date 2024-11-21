@@ -44,7 +44,7 @@ function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <
         for n = μ:2:n_max
             i += 1
             k1 = (n - μ) ÷ 2
-            push!(remap, (m, n) => i)
+            remap[(m, n)] = i
             push!(order, (get_j(m, n) + 1, get_j(-m, n) + 1, sign(m)))
             N[i,i] = √(n+1)
             γ = λ[get_i(μ, n)]
