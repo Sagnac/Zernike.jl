@@ -13,7 +13,9 @@ export zernike, wavefront, transform, Z, W, P, WavefrontError, get_j, get_mn,
 
 const public_names = "public \
     radial_coefficients, wavefront_coefficients, transform_coefficients, \
-    metrics, scale, J, Superposition, Product, sieve, format_strings, valid_fringes"
+    metrics, scale, J, Superposition, Product, \
+    sieve, format_strings, valid_fringes, \
+    derivatives, PartialDerivative, Gradient"
 
 VERSION >= v"1.11.0-DEV.469" && eval(Meta.parse(public_names))
 
@@ -38,6 +40,7 @@ const FloatMat = AbstractMatrix{<:AbstractFloat}
 const SurfacePlot = Surface{Tuple{Matrix{Float64}, Matrix{Float64}, Matrix{Float32}}}
 
 abstract type Phase end
+abstract type Polynomials <: Phase end
 
 struct RadialPolynomial
     λ::Vector{Float64}
@@ -49,7 +52,7 @@ struct Harmonic
     m::Int
 end
 
-struct Polynomial <: Phase
+struct Polynomial <: Polynomials
     inds::NamedTuple{(:j, :n, :m), NTuple{3, Int}}
     N::Float64
     R::RadialPolynomial
@@ -78,6 +81,7 @@ include("Arithmetic.jl")
 include("ZernikePlot.jl")
 include("ScaleAperture.jl")
 include("TransformAperture.jl")
+include("Derivatives.jl")
 include("Docstrings.jl")
 
 function (R::RadialPolynomial)(ρ::Real)
@@ -91,7 +95,7 @@ function (M::Harmonic)(θ::Real)
     m < 0 ? -sin(m * θ) : cos(m * θ)
 end
 
-function (Z::Polynomial)(ρ::Real, θ::Real = 0)
+function (Z::Polynomials)(ρ::Real, θ::Real = 0)
     (; N, R, M) = Z
     N * R(ρ) * M(θ)
 end
