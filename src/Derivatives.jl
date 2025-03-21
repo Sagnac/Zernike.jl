@@ -19,7 +19,7 @@ Returns ∇Z(ρ, θ).
 """
 Gradient(Z::Polynomial) = Gradient{Polynomial}(Z)
 
-(g::Gradient)(ρ::Real, θ::Real = 0) = [g.r(ρ, θ), g.t(ρ, θ)]
+(g::Gradient)(ρ::Real, θ::Real = 0) = [g.r(ρ, θ), g.t(ρ, θ) / ρ]
 
 p(i, order) = ∏(i-order+1:float(i))
 
