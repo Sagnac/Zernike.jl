@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ['lts', '1', 'nightly']
+        version: ['lts', '1']
     steps:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v2
