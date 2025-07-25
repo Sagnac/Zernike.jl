@@ -1,4 +1,4 @@
-struct PartialDerivative{T <: Union{RadialPolynomial, Harmonic}} <: Polynomials
+struct PartialDerivative{T <: Union{RadialPolynomial, Harmonic}} <: AbstractPolynomial
     order::Int
     inds::NamedTuple{(:j, :n, :m), NTuple{3, Int}}
     N::Float64

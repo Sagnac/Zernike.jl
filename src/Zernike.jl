@@ -40,7 +40,7 @@ const FloatMat = AbstractMatrix{<:AbstractFloat}
 const SurfacePlot = Surface{Tuple{Matrix{Float64}, Matrix{Float64}, Matrix{Float32}}}
 
 abstract type Phase end
-abstract type Polynomials <: Phase end
+abstract type AbstractPolynomial <: Phase end
 
 struct RadialPolynomial
     λ::Vector{Float64}
@@ -52,7 +52,7 @@ struct Harmonic
     m::Int
 end
 
-struct Polynomial <: Polynomials
+struct Polynomial <: AbstractPolynomial
     inds::NamedTuple{(:j, :n, :m), NTuple{3, Int}}
     N::Float64
     R::RadialPolynomial
@@ -95,7 +95,7 @@ function (M::Harmonic)(θ::Real)
     m < 0 ? -sin(m * θ) : cos(m * θ)
 end
 
-function (Z::Polynomials)(ρ::Real, θ::Real = 0)
+function (Z::AbstractPolynomial)(ρ::Real, θ::Real = 0)
     (; N, R, M) = Z
     N * R(ρ) * M(θ)
 end
