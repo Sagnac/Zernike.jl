@@ -1,7 +1,7 @@
 name = "Zernike"
 uuid = "e14b762e-e195-443f-a1b1-09f2ab0cc6c8"
 authors = ["Sagnac"]
-version = "5.3.1"
+version = "5.4.0"
 
 [deps]
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
@@ -21,4 +21,4 @@ julia = "1.10"
 LinearAlgebra = "1.10"
 Printf = "1.10"
 ShiftedArrays = "2.0.0"
-GLMakie = "0.10.0"
+GLMakie = "0.13.0"
