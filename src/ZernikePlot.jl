@@ -53,11 +53,8 @@ end
 propertynames(plotconfig::PlotConfig) = fieldnames(PlotConfig)..., :reset, :resize
 
 # specialized for Zernike polynomial and wavefront error functions
-function zernikeplot!(axis, Z; m = 10, n = 10, finesse = finesse,
+function zernikeplot!(axis, Z::Observable; m = 10, n = 10, finesse = finesse,
                       high_order = false, colormap = plotconfig.colormap)
-    if !(Z isa Observable)
-        Z = Observable(Z)
-    end
     ρ, θ = polar(m, n; finesse)
     ρᵪ, ρᵧ = polar_mat(ρ, θ)
     z = @lift($Z.(ρ', θ))
@@ -67,6 +64,11 @@ function zernikeplot!(axis, Z; m = 10, n = 10, finesse = finesse,
         @. z[] = sign(zv) * log10(abs(zv * ln10) + 1.0)
     end
     surface!(axis, ρᵪ, ρᵧ, z; shading = NoShading, colormap)
+end
+
+function zernikeplot!(axis, Z; m = 10, n = 10, finesse = finesse,
+                      high_order = false, colormap = plotconfig.colormap)
+    zernikeplot!(axis, Observable(Z); m, n, finesse, high_order, colormap)
 end
 
 # specialized for wavefront error matrices
