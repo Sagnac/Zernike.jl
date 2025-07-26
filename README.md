@@ -169,6 +169,16 @@ Arithmetric between these types is defined using the usual operators such that w
 
 In addition, the `Zernike.Superposition(W)` and `Zernike.Product(W)` constructors (where `W` is a `Vector{WavefrontError}`) serve as direct methods for creating composite functions which group evaluate a specified expansion set when an updated set of coefficients is not required.
 
+### Derivatives
+
+`Zernike.derivatives(Z::Polynomial, order::Int = 1)` computes the nth order partial derivatives of `Z(ρ, θ)` and returns the two-tuple (`∂Z/∂ρ`, `∂Z/∂θ`) containing the `PartialDerivative` types.
+
+`Zernike.Gradient(Z::Polynomial)` wraps the first-order partial derivatives and returns a callable `∇Z(ρ, θ)`.
+
+The partials and gradient are also functors which can be evaluated over the pupil.
+
+----
+
 ## Single-Index Ordering Schemes
 
 This package uses the ANSI Z80.28-2004 standard sequential ordering scheme where applicable, but provides several functions for converting between two other ordering methods, namely Noll and Fringe. The following methods are available:
@@ -188,6 +198,8 @@ The `standardize` fringe method expects unnormalized coefficients; the input coe
 For the `standardize` subset method the tuples in `orders` must be of the form `(m, n)` associated with the respective coefficients at each index in `v_sub`.
 
 In addition, the functions `get_j(m, n)` & `get_mn(j)` allow you to convert between the single and double indices.
+
+----
 
 ## Additional Notes
 

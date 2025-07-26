@@ -476,3 +476,17 @@ julia> unicode
 ```
 """
 format_strings
+
+"""
+    Zernike.Gradient(Z::Polynomial)
+
+Returns `∇Z(ρ, θ)`.
+"""
+Gradient
+
+"""
+    Zernike.derivatives(Z::Polynomial, order::Int = 1)
+
+Computes the nth order partial derivatives of `Z(ρ, θ)` and returns the two-tuple (`∂Z/∂ρ`, `∂Z/∂θ`).
+"""
+derivatives

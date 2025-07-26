@@ -312,6 +312,23 @@ end
     @test MAE(Z1 ^ n, Z1.(ρ, θ) .^ n) < mae_ϵ
 end
 
+@testset "derivatives" begin
+    Z75 = Z(5, 7)
+    partial_r, partial_t = Zernike.derivatives(Z75, 3)
+    coeffs = zeros(8)
+    coeffs[5] = 1470.0
+    coeffs[3] = -360.0
+    @test partial_r.N === 4.0
+    @test partial_r[] == coeffs
+    @test partial_r.M.m === 5
+    @test partial_t.N === 500.0
+    @test partial_t[] == Z75[]
+    @test partial_t.M.m === -5
+    gradient = Zernike.Gradient(Z62)
+    @test gradient.t.N ≈ -sqrt(14.0) * 2.0 ≈ gradient(1.0, π/4)[2]
+    @test gradient(1.0, 0.0)[1] .≈ 22 * sqrt(14.0)
+end
+
 @testset "format strings" begin
     latex1, latex2, unicode = format_strings(Z62)
     @test typeof(latex1) == typeof(latex2) == LaTeXString

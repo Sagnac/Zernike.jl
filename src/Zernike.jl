@@ -227,9 +227,9 @@ function show(io::IO, ::MIME"text/plain", output::Output)
     return
 end
 
-getindex(Z::Polynomial) = Z.R.λ
+getindex(Z::AbstractPolynomial) = Z.R.λ
 
-getindex(Z::Polynomial, i::Int) = Z.R.λ[i+1]
+getindex(Z::AbstractPolynomial, i::Int) = Z.R.λ[i+1]
 
 # methods
 zernike(; m, n, finesse = finesse) = zernike(m, n; finesse)
