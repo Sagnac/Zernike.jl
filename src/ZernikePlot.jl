@@ -56,14 +56,14 @@ propertynames(plotconfig::PlotConfig) = fieldnames(PlotConfig)..., :reset, :resi
 function zernikeplot!(axis, Z::Observable; m = 10, n = 10, finesse = finesse,
                       high_order = false, colormap = plotconfig.colormap)
     ρ, θ = polar(m, n; finesse)
-    ρᵪ, ρᵧ = polar_mat(ρ, θ)
+    x, y = polar_mat(ρ, θ)
     z = @lift($Z.(ρ', θ))
     if high_order
         zv = z[]
         ln10 = log(10.0)
         @. z[] = sign(zv) * log10(abs(zv * ln10) + 1.0)
     end
-    surface!(axis, ρᵪ, ρᵧ, z; shading = NoShading, colormap)
+    surface!(axis, x, y, z; shading = NoShading, colormap)
 end
 
 function zernikeplot!(axis, Z; m = 10, n = 10, finesse = finesse,
@@ -73,9 +73,9 @@ end
 
 # specialized for wavefront error matrices
 function zernikeplot!(axis, ρ, θ, w; kwargs...)
-    ρᵪ, ρᵧ = polar_mat(ρ, θ)
+    x, y = polar_mat(ρ, θ)
     colormap = haskey(kwargs, :colormap) ? kwargs[:colormap] : plotconfig.colormap
-    surface!(axis, ρᵪ, ρᵧ, w; shading = NoShading, colormap)
+    surface!(axis, x, y, w; shading = NoShading, colormap)
 end
 
 function zplot(args...; window_title = "ZernikePlot", plot_title = window_title,
@@ -87,8 +87,8 @@ function zplot(args...; window_title = "ZernikePlot", plot_title = window_title,
     axis3attributes = (
         title = plot_title,
         titlesize = fontsize,
-        xlabel = L"\rho_x",
-        ylabel = L"\rho_y",
+        xlabel = L"x",
+        ylabel = L"y",
         zlabel = L"Z",
         xlabelsize = fontsize,
         ylabelsize = fontsize,
