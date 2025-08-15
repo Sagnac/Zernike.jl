@@ -218,7 +218,13 @@ end
 
 getindex(W::WavefrontError) = W.v
 
-getindex(W::WavefrontError, j::Int) = W.v[j+1]
+getindex(W::WavefrontError, j) = W.v[j.+1]
+
+firstindex(W::WavefrontError) = 0
+
+lastindex(W::WavefrontError) = lastindex(W.v) - 1
+
+setindex!(W::WavefrontError, x, j) = (W.v[j.+1] = x)
 
 # reduces precision
 function reduce_wave(W::WavefrontError, precision::Int)

@@ -21,7 +21,8 @@ VERSION >= v"1.11.0-DEV.469" && eval(Meta.parse(public_names))
 
 using GLMakie
 import .Makie: latexstring, LaTeXString, FigureAxisPlot
-import Base: show, getindex, iterate, getproperty, setproperty!, propertynames
+import Base: show, getindex, setindex!, firstindex, lastindex,
+             getproperty, setproperty!, propertynames
 
 const ∑ = sum
 const ∏ = prod
@@ -229,7 +230,11 @@ end
 
 getindex(Z::AbstractPolynomial) = Z.R.λ
 
-getindex(Z::AbstractPolynomial, i::Int) = Z.R.λ[i+1]
+getindex(Z::AbstractPolynomial, i) = Z.R.λ[i.+1]
+
+firstindex(Z::AbstractPolynomial) = 0
+
+lastindex(Z::AbstractPolynomial) = lastindex(Z.R.λ) - 1
 
 # methods
 zernike(; m, n, finesse = finesse) = zernike(m, n; finesse)
