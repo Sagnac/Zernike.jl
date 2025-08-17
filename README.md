@@ -214,6 +214,7 @@ In addition, the functions `get_j(m, n)` & `get_mn(j)` allow you to convert betw
 * `Polynomial` and `WavefrontError` types can be indexed (zero-based) to return a specific coefficient; their full vector of coefficients can be conveniently accessed using single-argument `getindex` (e.g. `z[]`, `w[]`);
 
 * The Zernike polynomials are currently only valid up to degree ~812 at which point the maximum coefficient approaches the maximum for double-precision floating-point numbers (~1e308);
+  + because 64-bit floats are used for an expanded range by default the coefficients are exactly accurate up to order ~47, limited by the 53-bit (~1e16) precision of the significand after which results are only approximate; if more accuracy is desired arbitrary precision or plain `Int`s can be specified by passing the appropriate type (`Int`, `BigInt`, `BigFloat`) as the third argument to `Zernike.radial_coefficients`;
 
 * If you're interested in precompiling the package into a system image in order to speed up load times please see the [precompile directory](precompile) (at the moment PrecompileTools or the like is not used);
 
