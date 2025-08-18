@@ -9,13 +9,13 @@ module Zernike
 
 export zernike, wavefront, transform, Z, W, P, WavefrontError, get_j, get_mn,
        Noll, Fringe, noll_to_j, j_to_noll, fringe_to_j, j_to_fringe, standardize,
-       Standard, Observable, plotconfig, zplot, reduce_wave
+       Standard, Observable, zplot, reduce_wave
 
 const public_names = "public \
     radial_coefficients, wavefront_coefficients, transform_coefficients, \
     metrics, scale, J, Superposition, Product, \
     sieve, format_strings, valid_fringes, \
-    derivatives, PartialDerivative, Gradient"
+    derivatives, PartialDerivative, Gradient, plotconfig"
 
 VERSION >= v"1.11.0-DEV.469" && eval(Meta.parse(public_names))
 

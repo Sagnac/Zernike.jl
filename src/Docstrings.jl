@@ -316,8 +316,6 @@ The `WavefrontError` method pads the `W.a` coefficient vector.
 standardize
 
 """
-`plotconfig`
-
 `Zernike` plot settings.
 
 # Fields / Options:
