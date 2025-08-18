@@ -18,7 +18,7 @@ The coefficients belong to terms with exponent `n - 2(i - 1)` where `i` is the v
 
 The radial polynomial coefficients are computed using a fast and accurate algorithm suitable for high orders; it is based on a recursive relation presented by Honarvar & Paramesran (2013) doi:10.1364/OL.38.002487.
 
-See also [`Z`](@ref), [`wavefront`](@ref), [`transform`](@ref), [`coefficients`](@ref).
+See also: [`Z`](@ref), [`wavefront`](@ref), [`transform`](@ref), [`coefficients`](@ref).
 
 ----
 
@@ -35,7 +35,7 @@ zernike
 
 Return the Zernike `Polynomial` function `Z(ρ, θ)` corresponding to indices `m` and `n`.
 
-See also [`zernike`](@ref), [`W`](@ref), [`P`](@ref).
+See also: [`zernike`](@ref), [`W`](@ref), [`P`](@ref).
 """
 Z
 
@@ -67,7 +67,7 @@ Returns seven values contained within a `WavefrontOutput` type, with fields:
 * `axis`: the plot axis;
 * `plot`: the surface plot object.
 
-See also [`W`](@ref), [`zernike`](@ref), [`transform`](@ref), [`reconstruct`](@ref).
+See also: [`W`](@ref), [`zernike`](@ref), [`transform`](@ref), [`reconstruct`](@ref).
 
 ----
 
@@ -114,7 +114,7 @@ wavefront
 
 Return the `WavefrontError` function `ΔW(ρ, θ)` corresponding to an `n_max` fit.
 
-See also [`wavefront`](@ref), [`Z`](@ref), [`P`](@ref).
+See also: [`wavefront`](@ref), [`Z`](@ref), [`P`](@ref).
 """
 W
 
@@ -136,7 +136,7 @@ Available transformations are scaling, translation, & rotation for circular and 
 The order the transformations are applied is:\\
 scaling --> translation --> rotation --> elliptical transform.
 
-See also [`P`](@ref), [`zernike`](@ref), [`wavefront`](@ref), [`transform_coefficients`](@ref).
+See also: [`P`](@ref), [`zernike`](@ref), [`wavefront`](@ref), [`transform_coefficients`](@ref).
 
 ----
 
@@ -171,7 +171,7 @@ transform
 
 Return the `WavefrontError` function `ΔW(ρ, θ)` corresponding to the input transform parameters.
 
-See also [`transform`](@ref), [`Z`](@ref), [`W`](@ref).
+See also: [`transform`](@ref), [`Z`](@ref), [`W`](@ref).
 """
 P
 
@@ -191,7 +191,7 @@ Fields:
 
 This type can be indexed (zero-based) to return a specific radial coefficient corresponding to the term with exponent `i`. Calling `getindex` without an explicit index will return the full vector of coefficients.
 
-See also [`Zernike.WavefrontError`](@ref).
+See also: [`Zernike.WavefrontError`](@ref).
 """
 Polynomial
 
@@ -218,7 +218,7 @@ The `fit_to` field is an empty vector if the default full range up to `n_max` (`
 
 This type can be indexed (zero-based) to return a specific Zernike expansion coefficient corresponding to the Zernike polynomial of index `j`. Calling `getindex` without an explicit index will return the full vector of coefficients.
 
-See also [`Zernike.Polynomial`](@ref).
+See also: [`Zernike.Polynomial`](@ref).
 """
 WavefrontError
 
@@ -233,7 +233,7 @@ Return the single mode-ordering index `j` corresponding to azimuthal & radial in
 
 Return the single mode-ordering index `j` corresponding to the maximum radial index `n_max`; equivalent to `get_j(n_max, n_max)`.
 
-See also [`get_mn`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
+See also: [`get_mn`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
 """
 get_j
 
@@ -242,7 +242,7 @@ get_j
 
 Return the azimuthal & radial indices `(m, n)` given the single mode-ordering index `j`.
 
-See also [`get_j`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
+See also: [`get_j`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
 """
 get_mn
 
@@ -251,7 +251,7 @@ get_mn
 
 Convert Noll indices to ANSI standard indices.
 
-See also [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
+See also: [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
 """
 noll_to_j
 
@@ -260,7 +260,7 @@ noll_to_j
 
 Convert ANSI standard indices to Noll indices.
 
-See also [`noll_to_j`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
+See also: [`noll_to_j`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
 """
 j_to_noll
 
@@ -271,7 +271,7 @@ Convert Fringe indices to ANSI standard indices.
 
 Only indices 1:37 are valid.
 
-See also [`j_to_fringe`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref) [`standardize`](@ref), [`standardize!`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
+See also: [`j_to_fringe`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref) [`standardize`](@ref), [`standardize!`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
 """
 fringe_to_j
 
@@ -282,7 +282,7 @@ Convert ANSI standard indices to Fringe indices.
 
 Call `fringe_to_j.(1:37)` to return valid indices.
 
-See also [`fringe_to_j`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref) [`standardize`](@ref), [`standardize!`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
+See also: [`fringe_to_j`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref) [`standardize`](@ref), [`standardize!`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
 """
 j_to_fringe
 
@@ -296,7 +296,7 @@ Floating-point coefficient vectors need to be wrapped in the index types (e.g. `
 
 The `Fringe` method expects unnormalized coefficients; the input coefficients will be re-ordered and normalized in line with the orthonormal standard. As Fringe is a 37 polynomial subset of the full set of Zernike polynomials any coefficients in the standard order missing a counterpart in the input vector will be set to zero.
 
-See also [`standardize!`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
+See also: [`standardize!`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
 
 ----
 
@@ -330,7 +330,7 @@ There are two additional properties which trigger a settings refresh:
 * `plotconfig.reset = true` will reset all of the settings to their defaults;
 * `plotconfig.resize = true` will reset only the `size` and `fontsize` settings. This is useful if your primary monitor changes or you want to return to the automatically determined values.
 
-See also [`zplot`](@ref)
+See also: [`zplot`](@ref).
 """
 plotconfig
 
@@ -365,7 +365,7 @@ zplot(w)
 w[] = WavefrontError([0.0, 1.0, 1.0])
 ```
 
-See also [`plotconfig`](@ref)
+See also: [`plotconfig`](@ref).
 """
 zplot
 
@@ -399,7 +399,7 @@ Directly compute `Zernike` wavefront error expansion coefficients under pupil tr
 
 Returns a 2-tuple with the new coefficient vector and order `n_max`.
 
-See also [`transform`](@ref).
+See also: [`transform`](@ref).
 """
 transform_coefficients
 
@@ -412,7 +412,7 @@ Fit wavefront errors in terms of Zernike polynomials without computing extra res
 
 Returns a 2-tuple with the full vector of expansion coefficients and the corresponding Zernike polynomials.
 
-See also [`wavefront`](@ref).
+See also: [`wavefront`](@ref).
 """
 reconstruct
 
@@ -423,7 +423,7 @@ Scale the pupil over a wavefront using an algorithm based on `Janssen & Dirksen'
 
 `v` is the set of Zernike wavefront error expansion coefficients and `ε` is the scaling factor.
 
-See also [`transform`](@ref), [`J`](@ref).
+See also: [`transform`](@ref), [`J`](@ref).
 """
 scale
 
@@ -434,7 +434,7 @@ Scale the pupil over a wavefront using an algorithm based on `Janssen & Dirksen'
 
 `v` is the set of Zernike wavefront error expansion coefficients and `ε` is the scaling factor.
 
-See also [`P`](@ref), [`scale`](@ref).
+See also: [`P`](@ref), [`scale`](@ref).
 """
 J
 
@@ -443,7 +443,7 @@ J
 
 Reverse dimensional coordinate transform with respect to the main wavefront error method. Returns the OPD as a matrix along with the corresponding unique coordinate vectors. Assumes uniform sampling.
 
-See also [`wavefront`](@ref).
+See also: [`wavefront`](@ref).
 """
 map_phase
 
