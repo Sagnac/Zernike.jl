@@ -1,8 +1,10 @@
 # Zernike.jl
 
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://sagnac.github.io/Zernike.jl/stable) [![Tests](https://github.com/Sagnac/Zernike.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/Sagnac/Zernike.jl/actions/workflows/ci.yml)
+
 Generates Zernike polynomials, models wavefront errors, and plots them using Makie.
 
-![Zernike.jl](images/image.png)
+![Zernike.jl](docs/src/assets/images/image.png)
 
 This package can be added from the Julia REPL by:
 ```julia
@@ -143,7 +145,7 @@ Additionally, the wavefront error functions `wavefront(ρ, θ, OPD, n_max)` and 
 
 ----
 
-Plot options can be set by setting the `plotconfig` fields; see the docstring for more details.
+Plot options can be set by setting the `Zernike.plotconfig` fields; see the docstring for more details.
 
 ----
 

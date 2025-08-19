@@ -18,7 +18,7 @@ The coefficients belong to terms with exponent `n - 2(i - 1)` where `i` is the v
 
 The radial polynomial coefficients are computed using a fast and accurate algorithm suitable for high orders; it is based on a recursive relation presented by Honarvar & Paramesran (2013) doi:10.1364/OL.38.002487.
 
-See also: [`Z`](@ref), [`wavefront`](@ref), [`transform`](@ref), [`coefficients`](@ref).
+See also: [`Z`](@ref), [`wavefront`](@ref), [`transform`](@ref), [`radial_coefficients`](@ref).
 
 ----
 
@@ -233,7 +233,7 @@ Return the single mode-ordering index `j` corresponding to azimuthal & radial in
 
 Return the single mode-ordering index `j` corresponding to the maximum radial index `n_max`; equivalent to `get_j(n_max, n_max)`.
 
-See also: [`get_mn`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
+See also: [`get_mn`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`standardize`](@ref).
 """
 get_j
 
@@ -242,7 +242,7 @@ get_j
 
 Return the azimuthal & radial indices `(m, n)` given the single mode-ordering index `j`.
 
-See also: [`get_j`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
+See also: [`get_j`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`standardize`](@ref).
 """
 get_mn
 
@@ -251,7 +251,7 @@ get_mn
 
 Convert Noll indices to ANSI standard indices.
 
-See also: [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
+See also: [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref), [`standardize`](@ref).
 """
 noll_to_j
 
@@ -260,7 +260,7 @@ noll_to_j
 
 Convert ANSI standard indices to Noll indices.
 
-See also: [`noll_to_j`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref), [`standardize!`](@ref), [`standardize`](@ref).
+See also: [`noll_to_j`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref), [`standardize`](@ref).
 """
 j_to_noll
 
@@ -271,7 +271,7 @@ Convert Fringe indices to ANSI standard indices.
 
 Only indices 1:37 are valid.
 
-See also: [`j_to_fringe`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref) [`standardize`](@ref), [`standardize!`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
+See also: [`j_to_fringe`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`standardize`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
 """
 fringe_to_j
 
@@ -282,7 +282,7 @@ Convert ANSI standard indices to Fringe indices.
 
 Call `fringe_to_j.(1:37)` to return valid indices.
 
-See also: [`fringe_to_j`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref) [`standardize`](@ref), [`standardize!`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
+See also: [`fringe_to_j`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`standardize`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
 """
 j_to_fringe
 
@@ -296,7 +296,7 @@ Floating-point coefficient vectors need to be wrapped in the index types (e.g. `
 
 The `Fringe` method expects unnormalized coefficients; the input coefficients will be re-ordered and normalized in line with the orthonormal standard. As Fringe is a 37 polynomial subset of the full set of Zernike polynomials any coefficients in the standard order missing a counterpart in the input vector will be set to zero.
 
-See also: [`standardize!`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
+See also: [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`get_j`](@ref), [`get_mn`](@ref).
 
 ----
 
@@ -314,6 +314,15 @@ The `WavefrontError` method pads the `W.a` coefficient vector.
 
 """
 standardize
+
+"""
+    Standard(v::Vector{Float64})
+
+Wraps a standard ANSI / ISO vector of Zernike polynomial single indices for inter-conversions, viz. `Noll(s::Standard)` & `Fringe(s::Standard)`.
+
+See also: [`standardize`](@ref).
+"""
+Standard
 
 """
 `Zernike` plot settings.
@@ -377,7 +386,7 @@ Compute wavefront error metrics. Returns a named 3-tuple with the peak-to-valley
 metrics
 
 """
-    coefficients(m_max, n_max)
+    radial_coefficients(m_max, n_max)
 
 Compute the `Zernike` radial polynomial coefficients using an algorithm based on `Honarvar & Paramesran's` recursive relation suitable for high orders.
 
@@ -389,8 +398,19 @@ Returns a vector of coefficient vectors for each unique radial polynomial up to 
     n_max ≥ 0
     m_max ≤ n_max
     n_max ≡ m_max (mod 2).
+
+See also: [`wavefront_coefficients`](@ref), [`transform_coefficients`](@ref).
 """
-coefficients
+radial_coefficients
+
+"""
+    wavefront_coefficients(ρ, θ, OPD, n_max)
+
+Returns the full vector of Zernike expansion coefficients obtained through the least squares fit.
+
+See also: [`wavefront`](@ref), [`radial_coefficients`](@ref), [`transform_coefficients`](@ref).
+"""
+wavefront_coefficients
 
 """
     transform_coefficients(v, ε, δ, ϕ, ω)
@@ -399,7 +419,7 @@ Directly compute `Zernike` wavefront error expansion coefficients under pupil tr
 
 Returns a 2-tuple with the new coefficient vector and order `n_max`.
 
-See also: [`transform`](@ref).
+See also: [`transform`](@ref), [`radial_coefficients`](@ref), [`wavefront_coefficients`](@ref).
 """
 transform_coefficients
 
