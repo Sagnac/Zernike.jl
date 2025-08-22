@@ -1,4 +1,4 @@
-name: Test
+name: Tests
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.head_ref || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
 permissions:
@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   test:
-    name: ${{ matrix.version == '1' && 'stable' || matrix.version }} - ${{ github.event_name }}
+    name: ${{ matrix.version == '1' && 'stable' || matrix.version }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
@@ -25,7 +25,9 @@ jobs:
       matrix:
         version: ['lts', '1']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
