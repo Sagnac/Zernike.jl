@@ -4,6 +4,8 @@ Pkg.instantiate()
 
 using Documenter, Zernike
 
+module MakeDocs
+
 const link_paths = Dict(
     "docs/src/assets/images/image.png" => "assets/images/image.png",
     r".*github\.io.*"s => "",
@@ -15,7 +17,7 @@ const primaries = ["zernike", "wavefront", "transform"]
 
 const prim_regex = Regex(join(primaries, "|"))
 
-check(m) = !isnothing(m)
+check(m) = m isa RegexMatch
 
 function trimlines(file, io)
     close(io)
@@ -57,9 +59,15 @@ function readme(path)
     return pages
 end
 
+end # module MakeDocs
+
 DocMeta.setdocmeta!(Zernike, :DocTestSetup, :(using Zernike); recursive = true)
 
-makedocs(sitename = "Zernike", pages = readme("docs/src/"), modules = [Zernike])
+makedocs(
+    sitename = "Zernike",
+    pages = MakeDocs.readme("docs/src/"),
+    modules = [Zernike]
+)
 
 if get(ENV, "CI", nothing) == "true"
     deploydocs(repo = "github.com/Sagnac/Zernike.jl.git", devbranch = "dev")
