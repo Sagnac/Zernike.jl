@@ -59,6 +59,8 @@ function readme(path)
     return pages
 end
 
+const branch = get(ENV, "GITHUB_REF_NAME", "")
+
 end # module MakeDocs
 
 DocMeta.setdocmeta!(Zernike, :DocTestSetup, :(using Zernike); recursive = true)
@@ -69,6 +71,11 @@ makedocs(
     modules = [Zernike]
 )
 
-if get(ENV, "CI", nothing) == "true"
-    deploydocs(repo = "github.com/Sagnac/Zernike.jl.git", devbranch = "dev")
+if !isempty(MakeDocs.branch)
+    deploydocs(
+        repo = "github.com/Sagnac/Zernike.jl.git",
+        devbranch = MakeDocs.branch,
+        devurl = MakeDocs.branch,
+        versions = ["stable" => "master", "v^", "dev" => "dev"]
+    )
 end
