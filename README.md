@@ -71,7 +71,7 @@ If your phase data is in the form of a floating-point matrix instead you can cal
 wavefront(OPD, fit_to; options...)
 ```
 
-This assumes the wavefront error was uniformly measured using polar coordinates; the matrix is expected to be a polar grid of regularly spaced periodic samples with the first element referring to the value at the origin. The first axis of the matrix (the rows) must correspond to the angular variable `θ` while the second axis (the columns) must correspond to the radial variable `ρ`.
+This assumes the wavefront error was uniformly measured using polar coordinates; the matrix is expected to be a polar grid of regularly spaced periodic samples with the first element referring to the value at the origin and the end points including the boundary of the pupil (i.e. `ρ, θ = 0.0:step:1.0, 0.0:step:2π`). The first axis of the matrix (the rows) must correspond to the angular variable `θ` while the second axis (the columns) must correspond to the radial variable `ρ`.
 
 If instead your data is not equally spaced you can call:
 ```julia

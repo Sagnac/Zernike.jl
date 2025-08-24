@@ -81,7 +81,7 @@ Fit wavefront errors to specific Zernike polynomials specified in `orders` conta
 
 Fitting method accepting a floating-point matrix of phase data _uniformly_ produced in a polar coordinate system over the pupil.
 
-The matrix is expected to be a polar grid of regularly spaced periodic samples with the first element referring to the value at the origin. The first axis of the matrix (the rows) must correspond to the angular variable `θ` while the second axis (the columns) must correspond to the radial variable `ρ`.
+The matrix is expected to be a polar grid of regularly spaced periodic samples with the first element referring to the value at the origin and the end points including the boundary of the pupil (i.e. `ρ, θ = 0.0:step:1.0, 0.0:step:2π`). The first axis of the matrix (the rows) must correspond to the angular variable `θ` while the second axis (the columns) must correspond to the radial variable `ρ`.
 
 `fit_to` can be either `n_max::Int` or `orders::Vector{Tuple{Int, Int}}`.
 
