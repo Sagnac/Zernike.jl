@@ -12,6 +12,7 @@ using LinearAlgebra
 
 const b = binomial
 const ei = cis # ei(x) = exp(im*x)
+const SQRT2 = √2
 
 function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <: Float64
     @domain(0.0 < ε ≤ 1.0, ε)
@@ -155,9 +156,9 @@ function to_complex(v::Vector{Float64}, order::Vector{NTuple{3, Int}})
     c = similar(v, ComplexF64)
     for (i, j) in pairs(order)
         if j[3] < 0
-            c[i] = complex(v[j[2]], v[j[1]]) / √2
+            c[i] = complex(v[j[2]], v[j[1]]) / SQRT2
         elseif j[3] > 0
-            c[i] = complex(v[j[1]], -v[j[2]]) / √2
+            c[i] = complex(v[j[1]], -v[j[2]]) / SQRT2
         else
             c[i] = v[j[1]]
         end
@@ -170,9 +171,9 @@ function to_real(c::Vector{Complex{Float64}}, order::Vector{NTuple{3, Int}})
     v2 = similar(c2, Float64)
     for (i, j) in pairs(order)
         if j[3] < 0
-            v2[j[1]] = (c2[j[1]] - c2[j[2]])  / √2 |> imag
+            v2[j[1]] = (c2[j[1]] - c2[j[2]])  / SQRT2 |> imag
         elseif j[3] > 0
-            v2[j[1]] = (c2[j[1]] + c2[j[2]]) / √2 |> real
+            v2[j[1]] = (c2[j[1]] + c2[j[2]]) / SQRT2 |> real
         else
             v2[j[1]] = c2[j[1]] |> real
         end
