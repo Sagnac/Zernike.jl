@@ -1,6 +1,6 @@
 # Zernike.jl
-# Version 5.5.0
-# 2025-08-23
+# Version 5.5.1
+# 2025-08-27
 # https://github.com/Sagnac/Zernike.jl
 
 # Generates Zernike polynomials, models wavefront errors, and plots them using Makie.
