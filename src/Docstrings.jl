@@ -386,18 +386,16 @@ Compute wavefront error metrics. Returns a named 3-tuple with the peak-to-valley
 metrics
 
 """
-    radial_coefficients(m_max, n_max)
+    radial_coefficients(m::Int, n::Int)
 
-Compute the `Zernike` radial polynomial coefficients using an algorithm based on `Honarvar & Paramesran's` recursive relation suitable for high orders.
+Compute `Zernike` radial polynomial coefficients using an algorithm based on `Honarvar & Paramesran's` recursive relation suitable for high orders.
 
-Returns a vector of coefficient vectors for each unique radial polynomial up to Zernike indices `m_max`, `n_max`. The coefficient vector elements correspond to radial degree `n` in ascending order.
+The coefficients in the vector correspond to terms with powers in ascending order for a Zernike polynomial with indices `m` & `n` subject to the following requirements:
 
-`m_max` and `n_max` must be of type `Int` and must meet the following additional requirements:
-
-    m_max ≥ 0
-    n_max ≥ 0
-    m_max ≤ n_max
-    n_max ≡ m_max (mod 2).
+    m ≥ 0
+    n ≥ 0
+    m ≤ n
+    n ≡ m (mod 2).
 
 See also: [`wavefront_coefficients`](@ref), [`transform_coefficients`](@ref).
 """
