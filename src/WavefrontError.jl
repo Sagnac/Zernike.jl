@@ -283,9 +283,14 @@ end
 wavefront(; r, t, OPD, fit_to, options...) = wavefront(r, t, OPD, fit_to; options...)
 
 function wavefront(x::FloatVec, y::FloatVec, OPD::FloatVec; fit_to, options...)
-    ρ = hypot.(x, y)
-    θ = atan.(y, x)
+    ρ, θ = polar(x, y)
     wavefront(ρ, θ, OPD, fit_to; options...)
+end
+
+function W(x::FloatVec, y::FloatVec, OPD::FloatVec;
+           fit_to, precision::Int = precision)
+    ρ, θ = polar(x, y)
+    W(ρ, θ, OPD, fit_to; precision)
 end
 
 # extract pupil coordinates

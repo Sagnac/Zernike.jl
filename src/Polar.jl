@@ -4,6 +4,12 @@ function polar((u, v)::NTuple{2, Int})
     return ρ, θ
 end
 
+function polar(x::FloatVec, y::FloatVec)
+    ρ = hypot.(x, y)
+    θ = atan.(y, x)
+    return ρ, θ
+end
+
 function polar(ϵ::Int = ϵ_fit)
     ρ, θ = polar((ϵ, ϵ))
     return ρ', θ
