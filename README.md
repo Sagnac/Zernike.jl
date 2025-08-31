@@ -1,6 +1,6 @@
 # Zernike.jl
 
-[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://sagnac.github.io/Zernike.jl/stable) [![Tests](https://github.com/Sagnac/Zernike.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/Sagnac/Zernike.jl/actions/workflows/ci.yml)
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://sagnac.github.io/Zernike.jl/stable) [![Tests](https://github.com/Sagnac/Zernike.jl/actions/workflows/tests.yml/badge.svg)](https://github.com/Sagnac/Zernike.jl/actions/workflows/tests.yml)
 
 Generates Zernike polynomials, models wavefront errors, and plots them using Makie.
 
