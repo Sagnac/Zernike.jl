@@ -29,8 +29,8 @@ const ∏ = prod
 
 ⊗(x, y) = kron(x, y)
 
-const ϵ_max = 2^10
-const ϵ_fit = 21
+const d_max = 2^10
+const d_fit = 21
 
 const finesse = 100
 

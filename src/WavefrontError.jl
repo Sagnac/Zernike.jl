@@ -154,7 +154,7 @@ function Λ(ΔW::WavefrontError; finesse::Int)
 end
 
 function metrics(ΔW::WavefrontError)
-    ρ, θ = polar(ϵ_max)
+    ρ, θ = polar(d_max)
     w = ΔW.(ρ, θ)
     metrics(ΔW.v, w)
 end

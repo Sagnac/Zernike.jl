@@ -1,9 +1,9 @@
 using Zernike
-using Zernike: ϵ_fit
+using Zernike: d_fit
 
 # uniform sampling over the unit disk
-ρ = range(0.0, 1.0, ϵ_fit)
-OPD = stack(2sinc.(5ρ) for i = 1:ϵ_fit; dims = 1)
+ρ = range(0.0, 1.0, d_fit)
+OPD = stack(2sinc.(5ρ) for i = 1:d_fit; dims = 1)
 (; fig, coeffs, latex) = zernike(0, 4)
 wait(display(fig))
 (; v, fig) = wavefront(OPD, 8)
