@@ -1,4 +1,6 @@
-struct PartialDerivative{T <: Union{RadialPolynomial, Harmonic}} <: AbstractPolynomial
+const Factor = Union{RadialPolynomial, Harmonic}
+
+struct PartialDerivative{T <: Factor} <: AbstractPolynomial
     order::Int
     inds::NamedTuple{(:j, :n, :m), NTuple{3, Int}}
     N::Float64
