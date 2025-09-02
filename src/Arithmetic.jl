@@ -151,8 +151,8 @@ multiply(b::Float64, ΔW::T) where T <: MixedPhase = T(b, ΔW.W)
 multiply(φ1::Phase, φ2::Phase) = multiply(promote(φ1, φ2)...)
 
 function multiply(φ1::T, φ2::T) where T <: Phase
-    φ1::WavefrontError = φ1
-    φ2::WavefrontError = φ2
+    φ1 = convert(WavefrontError, φ1)
+    φ2 = convert(WavefrontError, φ2)
     ρ, θ = polar()
     φ3 = @. φ1(ρ, θ) * φ2(ρ, θ)
     n_max = φ1.n_max + φ2.n_max
@@ -163,7 +163,7 @@ end
 multiply(ΔW1::MixedPhase, ΔW2::MixedPhase) = wavefront_expansion(*, ΔW1, ΔW2)
 
 function exponentiate(φ::Phase, n::Integer)
-    φ::WavefrontError = φ
+    φ = convert(WavefrontError, φ)
     ρ, θ = polar()
     φ_n = @. φ(ρ, θ) ^ n
     n_max = φ.n_max * n
