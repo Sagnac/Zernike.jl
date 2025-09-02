@@ -87,3 +87,5 @@ function format_strings(recap::Vector)
     end
     return latexstring(W_LaTeX)
 end
+
+(Z::Polynomial)(::Type{String}) = format_strings(Z)[3]

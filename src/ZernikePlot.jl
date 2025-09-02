@@ -52,12 +52,12 @@ end
 
 propertynames(plotconfig::PlotConfig) = fieldnames(PlotConfig)..., :reset, :resize
 
-# specialized for Zernike polynomial and wavefront error functions
-function zernikeplot!(axis, Z::Observable; m = 10, n = 10, finesse = finesse,
+# for functions
+function zernikeplot!(axis, φ::Observable; m = 10, n = 10, finesse = finesse,
                       high_order = false, colormap = plotconfig.colormap)
     ρ, θ = polar(m, n; finesse)
     x, y = polar_mat(ρ, θ)
-    z = @lift($Z.(ρ', θ))
+    z = @lift($φ.(ρ', θ))
     if high_order
         zv = z[]
         ln10 = log(10.0)
@@ -66,16 +66,18 @@ function zernikeplot!(axis, Z::Observable; m = 10, n = 10, finesse = finesse,
     surface!(axis, x, y, z; shading = NoShading, colormap)
 end
 
-function zernikeplot!(axis, Z; m = 10, n = 10, finesse = finesse,
+function zernikeplot!(axis, φ; m = 10, n = 10, finesse = finesse,
                       high_order = false, colormap = plotconfig.colormap)
-    zernikeplot!(axis, Observable(Z); m, n, finesse, high_order, colormap)
+    zernikeplot!(axis, Observable(φ); m, n, finesse, high_order, colormap)
 end
 
-# specialized for wavefront error matrices
-function zernikeplot!(axis, ρ, θ, w; kwargs...)
+# for matrices
+function zernikeplot!(axis, ρ, θ, φ; kwargs...)
+    ρ = vec(ρ)
+    θ = vec(θ)
     x, y = polar_mat(ρ, θ)
     colormap = haskey(kwargs, :colormap) ? kwargs[:colormap] : plotconfig.colormap
-    surface!(axis, x, y, w; shading = NoShading, colormap)
+    surface!(axis, x, y, φ; shading = NoShading, colormap)
 end
 
 function zplot(args...; window_title = "ZernikePlot", plot_title = window_title,
@@ -128,3 +130,5 @@ function zplot(args...; window_title = "ZernikePlot", plot_title = window_title,
     activate!(; title = window_title, focus_on_show)
     return FigureAxisPlot(fig, axis3, plot)
 end
+
+(φ::Phase)() = zplot(φ)

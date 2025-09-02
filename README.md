@@ -177,7 +177,7 @@ In addition, the `Zernike.Superposition(W)` and `Zernike.Product(W)` constructor
 
 `Zernike.Gradient(Z::Polynomial)` wraps the first-order partial derivatives and returns a callable `∇Z(ρ, θ)`.
 
-The partials and gradient are also functors which can be evaluated over the pupil.
+The partials and gradient are also functors which can be evaluated over the pupil. In addition, partial derivatives can easily be plotted by simply calling them with no arguments.
 
 ----
 
