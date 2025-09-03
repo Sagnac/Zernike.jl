@@ -359,10 +359,10 @@ See also: [`zplot`](@ref), [`resize!`](@ref).
 reset!
 
 """
-    zplot(P; kwargs...)
-    zplot(ρ, θ, w; kwargs...)
+    zplot(φ; kwargs...)
+    zplot(ρ, θ, φ; kwargs...)
 
-Plot `Polynomial` and `WavefrontError` input function types `P` as well as quantized wavefront errors; for the latter the arguments must be a collection of discretized `ρ`, `θ`, `w` samples where the polar variable objects refer to either ranges or vectors and the wavefront error `w` is a matrix.
+Plot `Zernike` phase function types ([`Polynomial`](@ref)s, [`WavefrontError`](@ref)s, `PartialDerivative`s, arithmetic types, etc.) as well as quantized phase arrays; for the latter the arguments must be a collection of discretized samples where the polar variable objects refer to either ranges, vectors, or 1-dimensional matrices & the like, and the phase array `φ` is a matrix.
 
 # Keyword arguments:
 
