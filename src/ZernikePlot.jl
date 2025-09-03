@@ -29,28 +29,16 @@ end
 
 const plotconfig = PlotConfig(default_config()...)
 
-function refresh_monitor()
+function resize!(plotconfig::PlotConfig)
     plotconfig.size, plotconfig.fontsize = get_monitor_properties()
 end
 
-function reset_config()
+function reset!(plotconfig::PlotConfig)
     defaults = default_config()
     for name in fieldnames(PlotConfig)
         setfield!(plotconfig, name, defaults[name])
     end
 end
-
-function setproperty!(plotconfig::PlotConfig, name::Symbol, value)
-    if name == :reset
-        value && reset_config()
-    elseif name == :resize
-        value && refresh_monitor()
-    else
-        setfield!(plotconfig, name, convert(fieldtype(PlotConfig, name), value))
-    end
-end
-
-propertynames(plotconfig::PlotConfig) = fieldnames(PlotConfig)..., :reset, :resize
 
 # for functions
 function zernikeplot!(axis, φ::Observable; m = 10, n = 10, finesse = finesse,

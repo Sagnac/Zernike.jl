@@ -334,14 +334,29 @@ Standard
 * `colormap`::**Symbol**: Default: `:oslo`;
 * `focus_on_show`::**Bool**: whether the window is focused on generation (default: `true`).
 
-There are two additional properties which trigger a settings refresh:
-
-* `plotconfig.reset = true` will reset all of the settings to their defaults;
-* `plotconfig.resize = true` will reset only the `size` and `fontsize` settings. This is useful if your primary monitor changes or you want to return to the automatically determined values.
+There are two methods which can be used to trigger a settings refresh: [`resize!`](@ref) & [`reset!`](@ref).
 
 See also: [`zplot`](@ref).
 """
 plotconfig
+
+"""
+    resize!(plotconfig::PlotConfig)
+
+Reset only the `size` and `fontsize` settings for [`Zernike.plotconfig`](@ref). This is useful if your primary monitor changes or you want to return to the automatically determined values.
+
+See also: [`zplot`](@ref), [`reset!`](@ref).
+"""
+resize!
+
+"""
+    reset!(plotconfig::PlotConfig)
+
+Reset all of the [`Zernike.plotconfig`](@ref) settings to their defaults.
+
+See also: [`zplot`](@ref), [`resize!`](@ref).
+"""
+reset!
 
 """
     zplot(P; kwargs...)
