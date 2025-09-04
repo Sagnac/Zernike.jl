@@ -1,6 +1,6 @@
 var DOC_VERSIONS = [
   "stable",
-  "v5.5",
+  "v5.6",
   "dev",
 ];
 var DOCUMENTER_NEWEST = "master";
