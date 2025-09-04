@@ -4,24 +4,30 @@ using Printf
 # but this approach is intuitive enough
 # and doesn't require importing another package
 
-function format_strings(Z::Polynomial)
-    (; j, n, m) = Z.inds
+const minus = '\u2212'
+const superscripts = ['\u2070'; '\u00B9'; '\u00B2'; '\u00B3'; '\u2074':'\u2079']
+
+function format_strings(Z::AbstractPolynomial)
+    (; j, n) = Z.inds
     N = Z.N
     (; γ, ν) = Z.R
+    (; m) = Z.M
+    (iszero(γ) || iszero(N)) && return L"", L"", "0"
     μ = abs(m)
     k = length(γ) - 1
     γ_s = [@sprintf("%d", abs(γᵢ)) for γᵢ ∈ γ]
     UNICODE = ones(String, 3)
     LaTeX = ones(String, 3)
     # prefactor
-    if !isinteger(N)
-        N² = radicand(m, n)
-        UNICODE[1] = "√($N²)"
+    isint = isinteger(N)
+    if !isint
+        sgn = sign(N) < 0 ? minus : ""
+        N² = round(Int, N ^ 2)
+        UNICODE[1] = string(sgn, "√($N²)")
         LaTeX[1] = "\\sqrt{$N²}"
     elseif N ≠ 1
         UNICODE[1] = LaTeX[1] = @sprintf "%d" N
     end
-    superscripts = ['\u2070'; '\u00B9'; '\u00B2'; '\u00B3'; '\u2074':'\u2079']
     ω = ones(String, length(ν))
     for (i, v) in pairs(ν)
         v < 2 && break
@@ -32,7 +38,7 @@ function format_strings(Z::Polynomial)
     # polynomial terms
     ζ(i) = ν[i] == 1 ? "" : "^{$(ν[i])}"
     for i = 1:k
-        UNICODE[2] *= string(γ_s[i], "ρ", ω[i], γ[i+1] > 0 ? " + " : " \u2212 ")
+        UNICODE[2] *= string(γ_s[i], "ρ", ω[i], γ[i+1] > 0 ? " + " : " $minus ")
         LaTeX[2] *= string(γ_s[i], "\\rho", ζ(i), γ[i+1] > 0 ? " + " : " - ")
     end
     if ν[end] == 0
@@ -53,6 +59,10 @@ function format_strings(Z::Polynomial)
     elseif m > 0
         UNICODE[3] = "cos($(υ)θ)"
         LaTeX[3] = "\\cos($(υ)\\theta)"
+    end
+    if !iszero(j) && iszero(Z.R.λ[2:end])
+        unicode = isint ? Int(N * γ[1]) : "$(Int(γ[1]))" * UNICODE[1]
+        return L"", L"", string(unicode, UNICODE[3])
     end
     parentheses = k ≠ 0 ? ("(", ")") : ""
     Z_mn = "Z_{$n}^{$m}"
@@ -88,4 +98,4 @@ function format_strings(recap::Vector)
     return latexstring(W_LaTeX)
 end
 
-(Z::Polynomial)(::Type{String}) = format_strings(Z)[3]
+(Z::AbstractPolynomial)(::Type{String}) = format_strings(Z)[3]
