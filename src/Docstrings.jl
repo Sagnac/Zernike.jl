@@ -57,17 +57,18 @@ Estimates wavefront error by expressing optical aberrations as a linear combinat
 
 # Return values
 
-Returns seven values contained within a `WavefrontOutput` type, with fields:
+Returns eight values contained within a `WavefrontOutput` type, with fields:
 
 * `recap`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients rounded according to `precision`;
 * `v`: full vector of Zernike wavefront error expansion coefficients;
+* `ssr`: the sum of the squared residuals from the fit;
 * `metrics`: named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio;
 * `W`: the `WavefrontError` function `ΔW(ρ, θ)`;
 * `fig`: the plotted `Makie` figure;
 * `axis`: the plot axis;
 * `plot`: the surface plot object.
 
-See also: [`W`](@ref), [`zernike`](@ref), [`transform`](@ref), [`reconstruct`](@ref).
+See also: [`W`](@ref), [`zernike`](@ref), [`transform`](@ref).
 
 ----
 
@@ -212,7 +213,8 @@ Fields:
 * `fit_to`: vector of `(m, n)` tuples specifying the polynomials used for the fit;
 * `a`: vector of the Zernike expansion coefficients corresponding to each polynomial present;
 * `Z`: the respective Zernike polynomial functions;
-* `precision`: the precision with which the `a` & `Z` values were determined.
+* `precision`: the precision with which the `a` & `Z` values were determined;
+* `ssr`: the sum of the squared residuals from the fit.
 
 The `fit_to` field is an empty vector if the default full range up to `n_max` (`0:j_max`) was used with no `orders` specified. Note that these orders could differ from the polynomials determined after the fit; they are simply what was passed to the fitting function and may refer to polynomials not present in the reconstruction if after filtering the corresponding coefficients are zero.
 
@@ -419,7 +421,7 @@ radial_coefficients
 """
     wavefront_coefficients(ρ, θ, OPD, n_max)
 
-Returns the full vector of Zernike expansion coefficients obtained through the least squares fit.
+Returns a 2-tuple with the full vector of Zernike expansion coefficients obtained through the least squares fit and the corresponding sum of the squared residuals.
 
 See also: [`wavefront`](@ref), [`radial_coefficients`](@ref), [`transform_coefficients`](@ref).
 """
@@ -435,19 +437,6 @@ Returns a 2-tuple with the new coefficient vector and order `n_max`.
 See also: [`transform`](@ref), [`radial_coefficients`](@ref), [`wavefront_coefficients`](@ref).
 """
 transform_coefficients
-
-"""
-    reconstruct(ρ::Vector, θ::Vector, OPD::Vector, fit_to::Union{Int, Vector{Tuple{Int, Int}}})
-    reconstruct(ρ::Vector, θ::Vector, OPD::Matrix, fit_to)
-    reconstruct(OPD::Matrix, fit_to)
-
-Fit wavefront errors in terms of Zernike polynomials without computing extra results or plotting the wavefront error.
-
-Returns a 2-tuple with the full vector of expansion coefficients and the corresponding Zernike polynomials.
-
-See also: [`wavefront`](@ref).
-"""
-reconstruct
 
 """
     scale(v, ε; precision, finesse)

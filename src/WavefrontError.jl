@@ -12,11 +12,13 @@ struct WavefrontError{T <: Polynomial} <: Phase
     a::Vector{Float64}
     Z::Vector{T}
     precision::Int
+    ssr::Float64
 end
 
 struct WavefrontOutput
     recap::Recap
     v::Vector{Float64}
+    ssr::Float64
     metrics::NamedTuple{(:pv, :rms, :strehl), NTuple{3, Float64}}
     W::WavefrontError
     fig::Makie.Figure
@@ -24,8 +26,12 @@ struct WavefrontOutput
     plot::SurfacePlot
 end
 
+function WavefrontError(recap, v, n_max, fit_to, a, Z, precision, ssr)
+    WavefrontError{Polynomial}(recap, v, n_max, fit_to, a, Z, precision, ssr)
+end
+
 function WavefrontError(recap, v, n_max, fit_to, a, Z, precision)
-    WavefrontError{Polynomial}(recap, v, n_max, fit_to, a, Z, precision)
+    WavefrontError(recap, v, n_max, fit_to, a, Z, precision, 0.0)
 end
 
 function WavefrontError(a::FloatVec; precision = max_precision)
@@ -87,21 +93,26 @@ function fit(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, Zᵢ::Vector{Polynomial}
     # linear least squares
     A = stack(Z.(ρ, θ) for Z ∈ Zᵢ)
     # Zernike expansion coefficients
-    A \ OPD
+    v = A \ OPD
+    # residual vector
+    e = OPD - A * v
+    # sum of the squared residuals
+    ssr = e'e
+    return v, ssr
 end
 
 function reconstruct(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int)
     j_max = get_j(n_max)
     Zᵢ = Polynomial[Z(j) for j = 0:j_max]
-    v = fit(ρ, θ, OPD, Zᵢ)
-    return v, Zᵢ
+    v, ssr = fit(ρ, θ, OPD, Zᵢ)
+    return v, ssr, Zᵢ
 end
 
 function reconstruct(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
                      orders::Vector{Tuple{Int, Int}})
     Zᵢ = Polynomial[Z(mn...) for mn ∈ orders]
-    v = fit(ρ, θ, OPD, Zᵢ)
-    return v, Zᵢ
+    v, ssr = fit(ρ, θ, OPD, Zᵢ)
+    return v, ssr, Zᵢ
 end
 
 function reconstruct(OPD::FloatMat, fit_to)
@@ -113,7 +124,7 @@ function reconstruct(ρ::FloatVec, θ::FloatVec, OPD::FloatMat, fit_to)
 end
 
 # filtering / sifting function
-function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision::Int)
+function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[], ssr = 0.0; precision::Int)
     recap = @NamedTuple{j::Int, n::Int, m::Int, a::Float64}[]
     a = Float64[]
     Zₐ = Polynomial[]
@@ -137,12 +148,12 @@ function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[]; precision::Int)
     end
     isempty(recap) && push!(recap, (; piston.inds..., a = 0.0))
     # create the fitted polynomial
-    return WavefrontError(recap, v, n_max, orders, a, Zₐ, precision)
+    return WavefrontError(recap, v, n_max, orders, a, Zₐ, precision, ssr)
 end
 
 # synthesis function
 function Λ(ΔW::WavefrontError; finesse::Int)
-    (; recap, v, n_max) = ΔW
+    (; recap, v, n_max, ssr) = ΔW
     finesse = finesse ∈ 1:100 ? finesse : ceil(Int, 100 / √ length(recap))
     ρ, θ = polar(n_max, n_max; finesse)
     # construct the estimated wavefront error
@@ -150,7 +161,7 @@ function Λ(ΔW::WavefrontError; finesse::Int)
     W_LaTeX = format_strings(recap)
     titles = (plot_title = W_LaTeX, window_title = "Estimated wavefront error")
     fig, axis, plot = zplot(ρ, θ, w; titles...)
-    WavefrontOutput(recap, v, metrics(v, w), ΔW, fig, axis, plot)
+    WavefrontOutput(recap, v, ssr, metrics(v, w), ΔW, fig, axis, plot)
 end
 
 function metrics(ΔW::WavefrontError)
@@ -243,7 +254,7 @@ function reduce_wave(W::WavefrontError, precision::Int)
             a[i] = aᵢ
         end
     end
-    return WavefrontError(recap, W.v, W.n_max, fit_to, a, Zᵢ, precision)
+    return WavefrontError(recap, W.v, W.n_max, fit_to, a, Zᵢ, precision, W.ssr)
 end
 
 function sieve(v::Vector{Float64}, threshold::Float64)
@@ -268,16 +279,16 @@ standardize(W::WavefrontError) = standardize(W.a, [(i.m, i.n) for i ∈ W.recap]
 # methods
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int;
            precision::Int = precision)
-    v, Zᵢ = reconstruct(ρ, θ, OPD, n_max)
-    return Ψ(v, Zᵢ, n_max; precision)
+    v, ssr, Zᵢ = reconstruct(ρ, θ, OPD, n_max)
+    return Ψ(v, Zᵢ, n_max, [], ssr; precision)
 end
 
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
            orders::Vector{Tuple{Int, Int}};
            precision::Int = precision)
     n_max = maximum(mn -> mn[2], orders; init = 0)
-    v, Zᵢ = reconstruct(ρ, θ, OPD, orders)
-    return Ψ(v, Zᵢ, n_max, orders; precision)
+    v, ssr, Zᵢ = reconstruct(ρ, θ, OPD, orders)
+    return Ψ(v, Zᵢ, n_max, orders, ssr; precision)
 end
 
 wavefront(; r, t, OPD, fit_to, options...) = wavefront(r, t, OPD, fit_to; options...)

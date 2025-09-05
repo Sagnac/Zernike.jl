@@ -250,7 +250,7 @@ const valid_fringes = fringe_to_j.(1:37)
 # API namespace
 radial_coefficients(x...) = Φ(x...)[end]
 
-wavefront_coefficients(x...) = reconstruct(x...)[1]
+wavefront_coefficients(x...) = reconstruct(x...)[1:2]
 
 function transform_coefficients(
     v::Vector{Float64},

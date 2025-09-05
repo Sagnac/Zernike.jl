@@ -84,15 +84,16 @@ under the aforementioned dimensional ordering assumption.
 It is also possible to input normalized Cartesian coordinates using the method with 3 positional arguments and passing `fit_to` as a keyword argument:<br>
 `wavefront(x, y, OPD; fit_to, options...)`.
 
-The function returns seven values contained within a `WavefrontOutput` type, with fields:
+The function returns eight values contained within a `WavefrontOutput` type, with fields:
 
 1. `recap`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients rounded according to `precision`;
 2. `v`: full vector of Zernike wavefront error expansion coefficients;
-3. `metrics`: named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio;
-4. `W`: the `WavefrontError` function `ΔW(ρ, θ)`;
-5. `fig`: the plotted `Makie` figure;
-6. `axis`: the plot axis;
-7. `plot`: the surface plot object.
+3. `ssr`: the sum of the squared residuals from the fit;
+4. `metrics`: named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio;
+5. `W`: the `WavefrontError` function `ΔW(ρ, θ)`;
+6. `fig`: the plotted `Makie` figure;
+7. `axis`: the plot axis;
+8. `plot`: the surface plot object.
 
 ----
 
@@ -233,4 +234,6 @@ In addition, the functions `get_j(m, n)` & `get_mn(j)` allow you to convert betw
 ```julia
 Zernike.wavefront_coefficients(ρ, θ, OPD, n_max)
 ```
+which will return the weights and the corresponding residual error.
+
 Similarly you can do this for the radial polynomial coefficients and the NA transformed wavefront error expansion coefficients by importing the functions `radial_coefficients` and `transform_coefficients`, respectively.
