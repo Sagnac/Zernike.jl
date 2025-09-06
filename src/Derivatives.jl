@@ -1,3 +1,5 @@
+using SparseArrays
+
 const Factor = Union{RadialPolynomial, Harmonic}
 
 struct PartialDerivative{T <: Factor} <: AbstractPolynomial
@@ -18,23 +20,16 @@ Gradient(Z::Polynomial) = Gradient{Polynomial}(Z)
 
 (g::Gradient)(ρ::Real, θ::Real = 0) = [g.r(ρ, θ), g.t(ρ, θ) / ρ]
 
-p(i, order) = ∏(i-order+1:float(i))
-
-s(m, order)::Int = order % 4 ∈ (0, 1+2(m > 0)) || -1
-
 function derivatives(Z::Polynomial, order::Int = 1)
-    order < 1 && throw(DomainError(order))
+    @domain(order > 0, order)
     (; inds, N, R, M) = Z
     (; λ, γ, ν) = R
     (; m) = M
-    λ′ = zeros(length(λ))
-    i = eachindex(λ) .- 1
-    j = @. i ≥ order
-    @. λ′[j] = λ[j] * p(i[j], order)
-    λ′ = shift(λ′, -order)
+    D = spdiagm(1 => 1.0:length(λ)-1)
+    λ′ = D ^ order * λ
     ν′ = Int[νᵢ - order for νᵢ ∈ ν if νᵢ ≥ order]
     γ′ = Float64[λ′[νᵢ+1] for νᵢ ∈ ν′]
-    N′ = N * s(m, order) * abs(m) ^ order
+    N′ = N * (-1) ^ div(order * (order + sign(m)), 2) * abs(float(m)) ^ order
     m *= (-1) ^ order
     R′ = RadialPolynomial(λ′, γ′, ν′)
     M′ = Harmonic(m)
