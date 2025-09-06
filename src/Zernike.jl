@@ -148,6 +148,9 @@ function radicand(m::Int, n::Int)
     (2n + 2) ÷ (1 + δ(m))
 end
 
+# parity sign
+psgn(k::Int) = 1 | -(k & 1) # (-1) ^ k
+
 # This is the naive approach which implements the original explicit formula
 # for computing the polynomial coefficients.
 function canonical(μ::T, n::T, k::T) where T <: Int
@@ -157,7 +160,7 @@ function canonical(μ::T, n::T, k::T) where T <: Int
         t2::Float64 = factorial(s)
         t3::Float64 = factorial(k - s)
         t4::Float64 = factorial(k + μ - s)
-        γ[s+1] = (-1)^s * t1 / (t2 * t3 * t4)
+        γ[s+1] = psgn(s) * t1 / (t2 * t3 * t4)
     end
     return γ
 end
