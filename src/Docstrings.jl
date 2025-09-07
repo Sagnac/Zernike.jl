@@ -494,6 +494,12 @@ julia> unicode, latex = Zernike.format_strings(-8, 8);
 julia> unicode
 "√(18)ρ⁸sin(8θ)"
 ```
+
+----
+
+    format_strings(Z::AbstractPolynomial)
+
+Return a 3-tuple with the index formatted `LaTeX` variable name, the full `LaTeX` string equation, and the `Unicode` string representation of the polynomial.
 """
 format_strings
 

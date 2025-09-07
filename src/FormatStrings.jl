@@ -7,12 +7,12 @@ using Printf
 const minus = '\u2212'
 const superscripts = ['\u2070'; '\u00B9'; '\u00B2'; '\u00B3'; '\u2074':'\u2079']
 
-function format_strings(Z::AbstractPolynomial)
+function format_strings(Z::T) where T <: AbstractPolynomial
     (; j, n) = Z.inds
     N = Z.N
     (; γ, ν) = Z.R
     (; m) = Z.M
-    (iszero(γ) || iszero(N)) && return L"", L"", "0"
+    (iszero(γ) || iszero(N)) && return L"\partial Z_{0}^{0}", L"0", "0"
     μ = abs(m)
     k = length(γ) - 1
     γ_s = [@sprintf("%d", abs(γᵢ)) for γᵢ ∈ γ]
@@ -23,8 +23,8 @@ function format_strings(Z::AbstractPolynomial)
     if !isint
         sgn = sign(N) < 0 ? minus : ""
         N² = round(Int, N ^ 2)
-        UNICODE[1] = string(sgn, "√($N²)")
-        LaTeX[1] = "\\sqrt{$N²}"
+        UNICODE[1] = "$(sgn)√($N²)"
+        LaTeX[1] = "$(sgn)\\sqrt{$N²}"
     elseif N ≠ 1
         UNICODE[1] = LaTeX[1] = @sprintf "%d" N
     end
@@ -60,14 +60,21 @@ function format_strings(Z::AbstractPolynomial)
         UNICODE[3] = "cos($(υ)θ)"
         LaTeX[3] = "\\cos($(υ)\\theta)"
     end
-    if !iszero(j) && iszero(Z.R.λ[2:end])
-        unicode = isint ? Int(N * γ[1]) : "$(Int(γ[1]))" * UNICODE[1]
-        return L"", L"", string(unicode, UNICODE[3])
-    end
     parentheses = k ≠ 0 ? ("(", ")") : ""
-    Z_mn = "Z_{$n}^{$m}"
+    Z_mn = "Z_{$n}^{$(Z.inds.m)}"
+    if T <: PartialDerivative
+        (; order) = Z
+        var = T.parameters[1] == Harmonic ? "θ" : "ρ"
+        Z_mn = "\\frac{\\partial^$order $Z_mn}{\\partial $var^$order}"
+    end
     Z_Unicode = join(UNICODE, parentheses...)
     Z_LaTeX = latexstring(Z_mn, " = ", join(LaTeX, parentheses...))
+    if !iszero(j) && iszero(Z.R.λ[2:end])
+        unicode = isint ? Int(N * γ[1]) : "$(Int(γ[1]))" * UNICODE[1]
+        latex = replace(unicode, r"√\((\d+)\)" => s"\\sqrt{\1}")
+        Z_LaTeX = latexstring(Z_mn, " = ", latex, LaTeX[3])
+        Z_Unicode = string(unicode, UNICODE[3])
+    end
     return latexstring(Z_mn), Z_LaTeX, Z_Unicode
 end
 
