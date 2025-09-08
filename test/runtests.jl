@@ -350,10 +350,10 @@ end
 @testset "scale" begin
     @test_throws DomainError J(v, -1.0)
     @test_throws DomainError J(v, 2.0)
-    @test_throws DomainError P(v, -1.0)
-    @test_throws DomainError P(v, 2.0)
+    @test_throws DomainError Y(v, -1.0)
+    @test_throws DomainError Y(v, 2.0)
     ΔW_J_s = J(v, ε; precision = max_precision)
-    ΔW_P_s = P(v, ε; precision = max_precision)
+    ΔW_P_s = Y(v, ε; precision = max_precision)
     @test ΔW_J_s.a ≈ ΔW_P_s.a
     @test ΔW(ε, π/2) ≈ ΔW_J_s(1.0, π/2)
     @test ΔW(ε, π/2) ≈ ΔW_P_s(1.0, π/2)
@@ -367,9 +367,9 @@ end
 θ2 = asin(ε * sin(φ) / ρ2) + θ_t
 
 @testset "translate" begin
-    @test_throws DomainError P(v, 0.8, 0.1 + 0.4im)
-    @test_throws DomainError P(v, 1.0, 0.1 + 0.0im)
-    ΔW_t = P(v, ε, δ; precision = max_precision)
+    @test_throws DomainError Y(v, 0.8, 0.1 + 0.4im)
+    @test_throws DomainError Y(v, 1.0, 0.1 + 0.0im)
+    ΔW_t = Y(v, ε, δ; precision = max_precision)
     @test ΔW_t(1.0, θ1) ≈ ΔW(ρ2, θ2)
     @test ΔW_t(0.0, 0.0) ≈ ΔW(ρ_t, θ_t)
 end
@@ -381,16 +381,16 @@ end
 θ2 = asin(ε * sin(φ) / ρ2) + θ_t
 
 @testset "rotate" begin
-    ΔW_r1 = P(v, 1.0, 0.0im, ϕ; precision = max_precision)
+    ΔW_r1 = Y(v, 1.0, 0.0im, ϕ; precision = max_precision)
     @test ΔW_r1(1.0, 0.0) ≈ ΔW(1.0, ϕ)
-    ΔW_r2 = P(v, ε, δ, ϕ; precision = max_precision)
+    ΔW_r2 = Y(v, ε, δ, ϕ; precision = max_precision)
     @test ΔW_r2(1.0, θ1) ≈ ΔW(ρ2, θ2)
 end
 
 @testset "elliptical" begin
-    @test_throws DomainError P(v, ε, δ, ϕ, (-1.0, 0.0))
-    @test_throws DomainError P(v, ε, δ, ϕ, (2.0, 0.0))
-    ΔW_e = P([0.0, 0.0, 1.0], 1.0, 0.0im, 0.0, (0.148, 0.0))
+    @test_throws DomainError Y(v, ε, δ, ϕ, (-1.0, 0.0))
+    @test_throws DomainError Y(v, ε, δ, ϕ, (2.0, 0.0))
+    ΔW_e = Y([0.0, 0.0, 1.0], 1.0, 0.0im, 0.0, (0.148, 0.0))
     @test getfield(ΔW_e, :recap) == [(j = 2, n = 1, m = 1, a = 0.148)]
 end
 

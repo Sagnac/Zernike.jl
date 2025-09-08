@@ -150,13 +150,13 @@ Plot options can be set by setting the `Zernike.plotconfig` fields; see the docs
 
 ----
 
-## `Z`, `W`, `P` functions
+## `Z`, `W`, `Y` functions
 
 Analogs:
 ```
 Z: zernike
 W: wavefront
-P: transform
+Y: transform
 ```
 
 These methods avoid plotting and instead return `(ρ, θ)` functions as essentially closures, but packaged within `Polynomial` and `WavefrontError` types. The pupil can then be evaluated using these functions with polar coordinates:

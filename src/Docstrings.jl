@@ -35,7 +35,7 @@ zernike
 
 Return the Zernike `Polynomial` function `Z(ρ, θ)` corresponding to indices `m` and `n`.
 
-See also: [`zernike`](@ref), [`W`](@ref), [`P`](@ref).
+See also: [`zernike`](@ref), [`W`](@ref), [`Y`](@ref).
 """
 Z
 
@@ -115,7 +115,7 @@ wavefront
 
 Return the `WavefrontError` function `ΔW(ρ, θ)` corresponding to an `n_max` fit.
 
-See also: [`wavefront`](@ref), [`Z`](@ref), [`P`](@ref).
+See also: [`wavefront`](@ref), [`Z`](@ref), [`Y`](@ref).
 """
 W
 
@@ -137,7 +137,7 @@ Available transformations are scaling, translation, & rotation for circular and 
 The order the transformations are applied is:\\
 scaling --> translation --> rotation --> elliptical transform.
 
-See also: [`P`](@ref), [`zernike`](@ref), [`wavefront`](@ref), [`transform_coefficients`](@ref).
+See also: [`Y`](@ref), [`zernike`](@ref), [`wavefront`](@ref), [`transform_coefficients`](@ref).
 
 ----
 
@@ -168,13 +168,13 @@ The transformed expansion coefficients are computed using a fast and accurate al
 transform
 
 """
-    P(v, ε, [δ], [ϕ], [ω])
+    Y(v, ε, [δ], [ϕ], [ω])
 
 Return the `WavefrontError` function `ΔW(ρ, θ)` corresponding to the input transform parameters.
 
 See also: [`transform`](@ref), [`Z`](@ref), [`W`](@ref).
 """
-P
+Y
 
 """
 `Zernike.Polynomial`
@@ -456,7 +456,7 @@ Scale the pupil over a wavefront using an algorithm based on `Janssen & Dirksen'
 
 `v` is the set of Zernike wavefront error expansion coefficients and `ε` is the scaling factor.
 
-See also: [`P`](@ref), [`scale`](@ref).
+See also: [`Y`](@ref), [`scale`](@ref).
 """
 J
 

@@ -7,7 +7,7 @@
 
 module Zernike
 
-export zernike, wavefront, transform, Z, W, P, WavefrontError, get_j, get_mn,
+export zernike, wavefront, transform, Z, W, Y, WavefrontError, get_j, get_mn,
        Noll, Fringe, noll_to_j, j_to_noll, fringe_to_j, j_to_fringe, standardize,
        Standard, Observable, zplot, reduce_wave
 
