@@ -13,7 +13,7 @@ export zernike, wavefront, transform, Z, W, Y, WavefrontError, get_j, get_mn,
 
 const public_names = "public \
     radial_coefficients, wavefront_coefficients, transform_coefficients, \
-    metrics, scale, J, Superposition, Product, \
+    metrics, scale, S, Superposition, Product, \
     sieve, format_strings, valid_fringes, \
     derivatives, PartialDerivative, Gradient, plotconfig, resize!, reset!"
 
@@ -262,7 +262,7 @@ function transform_coefficients(
     ϕ::Float64            =       0.0,
     ω::NTuple{2, Float64} = (1.0, 0.0)
 )
-    return S(v, ε, δ, ϕ, ω)[1]
+    return Γ(v, ε, δ, ϕ, ω)[1]
 end
 
 end

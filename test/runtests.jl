@@ -1,7 +1,7 @@
 using Test
 using Zernike
 using Zernike: radicand, Φ, get_i, canonical, coords, reconstruct, validate_length,
-               valid_fringes, map_phase, format_strings, LaTeXString, latexstring, J,
+               valid_fringes, map_phase, format_strings, LaTeXString, latexstring, S,
                metrics, polar, max_precision, Superposition, Product, sieve,
                transform_coefficients, (..)
 using StatsBase: mean, sample
@@ -348,15 +348,16 @@ end
 ε = 0.75
 
 @testset "scale" begin
-    @test_throws DomainError J(v, -1.0)
-    @test_throws DomainError J(v, 2.0)
+    @test_throws DomainError S(v, -1.0)
+    @test_throws DomainError S(v, 2.0)
     @test_throws DomainError Y(v, -1.0)
     @test_throws DomainError Y(v, 2.0)
-    ΔW_J_s = J(v, ε; precision = max_precision)
-    ΔW_P_s = Y(v, ε; precision = max_precision)
-    @test ΔW_J_s.a ≈ ΔW_P_s.a
-    @test ΔW(ε, π/2) ≈ ΔW_J_s(1.0, π/2)
-    @test ΔW(ε, π/2) ≈ ΔW_P_s(1.0, π/2)
+    ΔW_S = S(v, ε; precision = max_precision)
+    ΔW_Y = Y(v, ε; precision = max_precision)
+    @test ΔW_S.a ≈ ΔW_Y.a
+    ΔW_scaled = ΔW(ε, π/2)
+    @test ΔW_scaled ≈ ΔW_S(1.0, π/2)
+    @test ΔW_scaled ≈ ΔW_Y(1.0, π/2)
 end
 
 δ = 0.15 + 0.15im

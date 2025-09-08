@@ -14,7 +14,7 @@ const b = binomial
 const ei = cis # ei(x) = exp(im*x)
 const SQRT2 = √2
 
-function S(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <: Float64
+function Γ(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <: Float64
     @domain(0.0 < ε ≤ 1.0, ε)
     @domain(ε + abs(δ) ≤ 1.0, ε, δ)
     @domain(0.0 < ω[1] ≤ 1.0, ω[1])
@@ -201,7 +201,7 @@ function Y(
     ω::Tuple{T, T} = (1.0, 0.0);
     precision::Int = precision
 ) where T <: Float64
-    v2, n_max = S(v, ε, δ, ϕ, ω)
+    v2, n_max = Γ(v, ε, δ, ϕ, ω)
     Zᵢ = similar(v, Polynomial)
     Ψ(v2, Zᵢ, n_max; precision)
 end

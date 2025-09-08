@@ -445,12 +445,12 @@ Scale the pupil over a wavefront using an algorithm based on `Janssen & Dirksen'
 
 `v` is the set of Zernike wavefront error expansion coefficients and `ε` is the scaling factor.
 
-See also: [`transform`](@ref), [`J`](@ref).
+See also: [`transform`](@ref), [`S`](@ref).
 """
 scale
 
 """
-    J(v, ε; precision)
+    S(v, ε; precision)
 
 Scale the pupil over a wavefront using an algorithm based on `Janssen & Dirksen's` formula and return a new `WavefrontError`.
 
@@ -458,7 +458,7 @@ Scale the pupil over a wavefront using an algorithm based on `Janssen & Dirksen'
 
 See also: [`Y`](@ref), [`scale`](@ref).
 """
-J
+S
 
 """
     map_phase(ρ, θ, OPD)
