@@ -20,13 +20,14 @@ Gradient(Z::Polynomial) = Gradient{Polynomial}(Z)
 
 (g::Gradient)(ρ::Real, θ::Real = 0) = [g.r(ρ, θ), g.t(ρ, θ) / ρ]
 
+derivatives(λ::Vector, order::Int) = spdiagm(1 => 1.0:length(λ)-1) ^ order * λ
+
 function derivatives(Z::Polynomial, order::Int = 1)
     @domain(order > 0, order)
     (; inds, N, R, M) = Z
     (; λ, γ, ν) = R
     (; m) = M
-    D = spdiagm(1 => 1.0:length(λ)-1)
-    λ′ = D ^ order * λ
+    λ′ = derivatives(λ, order)
     ν′ = Int[νᵢ - order for νᵢ ∈ ν if νᵢ ≥ order]
     γ′ = Float64[λ′[νᵢ+1] for νᵢ ∈ ν′]
     N′ = N * psgn(div(order * (order + sign(m)), 2)) * abs(float(m)) ^ order
