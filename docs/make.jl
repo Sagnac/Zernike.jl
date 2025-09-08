@@ -66,7 +66,7 @@ end # module MakeDocs
 DocMeta.setdocmeta!(Zernike, :DocTestSetup, :(using Zernike); recursive = true)
 
 makedocs(
-    sitename = "Zernike",
+    sitename = "Zernike.jl",
     pages = MakeDocs.readme("docs/src/"),
     modules = [Zernike],
     format = Documenter.HTML(warn_outdated = false)
