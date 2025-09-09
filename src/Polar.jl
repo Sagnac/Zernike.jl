@@ -30,7 +30,7 @@ end
 polar(z::Complex) = abs(z), angle(z)
 
 function polar_mat(ρ, θ)
-    x = [ρⱼ * cos(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
-    y = [ρⱼ * sin(θᵢ) for θᵢ ∈ θ, ρⱼ ∈ ρ]
+    x = @. ρ' * cos(θ)
+    y = @. ρ' * sin(θ)
     return x, y
 end
