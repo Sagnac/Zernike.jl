@@ -251,7 +251,9 @@ const piston = Z(0, 0)
 const valid_fringes = fringe_to_j.(1:37)
 
 # API namespace
-radial_coefficients(x...) = Φ(x...)[end]
+function radial_coefficients(m::Int, n::Int, T::Type{<:Number} = Float64)
+    Φ(abs(m), n, T)[end]
+end
 
 wavefront_coefficients(x...) = reconstruct(x...)[1:2]
 

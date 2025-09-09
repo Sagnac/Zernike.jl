@@ -403,15 +403,14 @@ Compute wavefront error metrics. Returns a named 3-tuple with the peak-to-valley
 metrics
 
 """
-    radial_coefficients(m::Int, n::Int)
+    radial_coefficients(m::Int, n::Int, T::Type{<:Number} = Float64)
 
-Compute `Zernike` radial polynomial coefficients using an algorithm based on `Honarvar & Paramesran's` recursive relation suitable for high orders.
+Compute `Zernike` radial polynomial coefficients as type `T` using an algorithm based on `Honarvar & Paramesran's` recursive relation suitable for high orders.
 
 The coefficients in the vector correspond to terms with powers in ascending order for a Zernike polynomial with indices `m` & `n` subject to the following requirements:
 
-    m ≥ 0
     n ≥ 0
-    m ≤ n
+    |m| ≤ n
     n ≡ m (mod 2).
 
 See also: [`wavefront_coefficients`](@ref), [`transform_coefficients`](@ref).
