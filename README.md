@@ -217,7 +217,9 @@ In addition, the functions `get_j(m, n)` & `get_mn(j)` allow you to convert betw
 
 * `Zernike.metrics(ΔW::WavefrontError)` exists;
 
-* `Zernike.format_strings(m, n)` will return both the `Unicode` and `LaTeX` string representations directly;
+* `Zernike.format_strings(Z::AbstractPolynomial)` will return both the `Unicode` and `LaTeX` string representations directly;
+
+* `Zernike.print_strings(j_max::Int)` will print the Unicode string representations of the polynomials up to `j_max`;
 
 * The `zplot` function can be invoked independently using `Polynomial` and `WavefrontError` function types, quantized wavefront errors, and Observables of each; the plot will update each time the `Observable` changes (see the docstring for more info);
 

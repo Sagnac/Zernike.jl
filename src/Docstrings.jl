@@ -483,24 +483,31 @@ Zero out any elements lower than the threshold.
 sieve
 
 """
-    format_strings(m::Int, n::Int)
+    format_strings(Z::AbstractPolynomial)
 
-Return a 2-tuple with the `Unicode` and `LaTeX` string representations of the Zernike polynomial.
+Return a 3-tuple with the index formatted `LaTeX` variable name, the full `LaTeX` string equation, and the `Unicode` string representation of the polynomial.
 
 ```jldoctest
-julia> unicode, latex = Zernike.format_strings(-8, 8);
+julia> name, latex, unicode = Zernike.format_strings(Z(-8, 8));
 
 julia> unicode
 "√(18)ρ⁸sin(8θ)"
 ```
+"""
+format_strings
+
+"""
+    print_strings([io::IO], j1::Int, j2::Int)
+
+Print the Unicode string representations of select Zernike polynomials from single index `j1` to `j2.`; the output stream defaults to `stdout`.
 
 ----
 
-    format_strings(Z::AbstractPolynomial)
+    print_strings(j_max::Int)
 
-Return a 3-tuple with the index formatted `LaTeX` variable name, the full `LaTeX` string equation, and the `Unicode` string representation of the polynomial.
+Print the Unicode string representations of the first `j + 1` Zernike polynomials from single index `0` to `j_max`.
 """
-format_strings
+print_strings
 
 """
     Zernike.Gradient(Z::Polynomial)

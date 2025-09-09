@@ -78,8 +78,6 @@ function format_strings(Z::T) where T <: AbstractPolynomial
     return latexstring(Z_mn), Z_LaTeX, Z_Unicode
 end
 
-format_strings(m::Int, n::Int) = reverse(format_strings(Z(m, n))[2:3])
-
 function format_strings(recap::Vector)
     W_LaTeX = "ΔW ≈ "
     function ζ(i, sub_index = 0)
@@ -106,3 +104,16 @@ function format_strings(recap::Vector)
 end
 
 (Z::AbstractPolynomial)(::Type{String}) = format_strings(Z)[3]
+
+function print_strings(io::IO, j1::Int, j2::Int)
+    @domain(j2 > j1, j1, j2)
+    j_max_digits = ndigits(j2)
+    for j ∈ j1:j2
+        println(io, j, ' ' ^ (4 + j_max_digits - ndigits(j)), Z(j)(String))
+    end
+    return
+end
+
+print_strings(j1::Int, j2::Int) = print_strings(stdout, j1, j2)
+
+print_strings(j_max::Int) = print_strings(0, j_max)

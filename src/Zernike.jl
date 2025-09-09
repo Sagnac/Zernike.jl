@@ -14,7 +14,7 @@ export zernike, wavefront, transform, Z, W, Y, WavefrontError, get_j, get_mn,
 const public_names = "public \
     radial_coefficients, wavefront_coefficients, transform_coefficients, \
     metrics, scale, S, Superposition, Product, \
-    sieve, format_strings, valid_fringes, \
+    sieve, format_strings, print_strings, valid_fringes, \
     derivatives, PartialDerivative, Gradient, plotconfig, resize!, reset!"
 
 VERSION >= v"1.11.0-DEV.469" && eval(Meta.parse(public_names))
