@@ -42,6 +42,7 @@ function Γ(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T 
     i = 0
     for m = -n_max:n_max
         μ = abs(m)
+        _rotate_ && (eimϕ = ei(m * ϕ))
         for n = μ:2:n_max
             i += 1
             k1 = (n - μ) ÷ 2
@@ -53,7 +54,7 @@ function Γ(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T 
                 setindex!(R, γ[n-2s+1], remap[(m, n-2s)], i)
             end
             if _rotate_
-                η_r[i,i] = ei(m * ϕ)
+                η_r[i,i] = eimϕ
             end
             if _scale_
                 η_s[i,i] = ε ^ n
