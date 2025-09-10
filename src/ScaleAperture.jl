@@ -16,14 +16,14 @@ function Π(v::Vector{T}, ε::T) where T <: Float64
     m = 0
     for i in eachindex(v)
         a = v[i]
-        N_mn = √radicand(m, n)
+        N_mn = √N²(m, n)
         R0 = Z(n, n).R(ε)
         v2[i] = a * N_mn * R0
         ii = i
         for n′ = n+2:2:n_max
             ii += 2n′
             a = v[ii]
-            N = √radicand(m, n′)
+            N = √N²(m, n′)
             R1 = Z(n, n′).R(ε)
             R2 = Z(n+2, n′).R(ε)
             v2[i] += a * N * (R1 - R2)

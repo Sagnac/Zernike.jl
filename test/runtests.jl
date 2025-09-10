@@ -1,6 +1,6 @@
 using Test
 using Zernike
-using Zernike: radicand, Φ, get_i, canonical, coords, reconstruct, validate_length,
+using Zernike: N², Φ, get_i, canonical, coords, reconstruct, validate_length,
                valid_fringes, map_phase, format_strings, LaTeXString, latexstring, S,
                metrics, polar, max_precision, Superposition, Product, sieve,
                transform_coefficients, (..)
@@ -11,8 +11,8 @@ using StatsBase: mean, sample
     fringe = [1, 3, 2, 6, 4, 5, 11, 8, 7, 10, 18, 13, 9, 12, 17]
     @test fringe_to_j.(fringe) == 0:14
     v_fringe = collect(1.0:18.0)
-    N_ = (√radicand(m, n) for n = 0:4 for m = -n:2:n)
-    compare = map(N_, standardize(Fringe(v_fringe)), v_fringe[fringe]) do N, v, o
+    N = (√N²(m, n) for n = 0:4 for m = -n:2:n)
+    compare = map(N, standardize(Fringe(v_fringe)), v_fringe[fringe]) do N, v, o
                   N * v ≈ o
               end
     @test compare |> all

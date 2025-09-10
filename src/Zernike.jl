@@ -142,11 +142,7 @@ function validate_length(v::Vector)
     return len, n_max
 end
 
-function radicand(m::Int, n::Int)
-    # Kronecker delta δ_{m0}
-    δ(m) = m == 0
-    (2n + 2) ÷ (1 + δ(m))
-end
+N²(m::Int, n::Int) = div(2n + 2, 1 + iszero(m))
 
 # parity sign
 psgn(k::Int) = 1 | -(k & 1) # (-1) ^ k
@@ -175,7 +171,7 @@ function Z(m::Int, n::Int)
     # OSA single mode index
     j = get_j(m, n)
     # normalization constant following the orthogonality relation
-    N = √radicand(m, n)
+    N = √N²(m, n)
     # power (exponent)
     ν = Int[n - 2s for s = 0:k]
     # polynomial coefficients
