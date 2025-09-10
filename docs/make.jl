@@ -61,6 +61,8 @@ end
 
 const branch = get(ENV, "GITHUB_REF_NAME", "")
 
+const dev_branch = branch == "stable" ? "dev" : branch
+
 end # module MakeDocs
 
 DocMeta.setdocmeta!(Zernike, :DocTestSetup, :(using Zernike); recursive = true)
@@ -75,8 +77,8 @@ makedocs(
 if !isempty(MakeDocs.branch)
     deploydocs(
         repo = "github.com/Sagnac/Zernike.jl.git",
-        devbranch = MakeDocs.branch,
-        devurl = MakeDocs.branch,
-        versions = ["stable" => "master", "v^", "dev" => "dev"]
+        devbranch = MakeDocs.dev_branch,
+        devurl = MakeDocs.dev_branch,
+        versions = ["stable" => "v^", "master" => "master", "dev" => "dev"]
     )
 end
