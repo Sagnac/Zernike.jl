@@ -9,11 +9,11 @@ Generates Zernike polynomials, models wavefront errors, and plots them using Mak
 This package can be added from the Julia REPL by:
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/Sagnac/Zernike.jl", rev="stable")
+Pkg.add(url="https://github.com/Sagnac/Zernike.jl")
 ```
 or entering the package mode by pressing `]` and entering:
 ```
-add https://github.com/Sagnac/Zernike.jl#stable
+add https://github.com/Sagnac/Zernike.jl
 ```
 
 It can then be loaded by typing `using Zernike`.
