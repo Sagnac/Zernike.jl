@@ -6,16 +6,36 @@ using Documenter, Zernike
 
 module MakeDocs
 
+const api_links = [
+    "Zernike\\.metrics",
+    "plotconfig",
+    "zplot",
+    "format_strings",
+    "print_strings",
+    "radial_coefficients",
+    "transform_coefficients",
+]
+
+const api_regex = Regex("(`(" * join(api_links, "|(Zernike\\.)??") * ").*?`)")
+
 const link_paths = Dict(
     "docs/src/assets/images/image.png" => "assets/images/image.png",
     r".*github\.io.*"s => "",
-    r"(`(Zernike\.plotconfig|zplot)`)" => s"[\1](@ref)",
+    api_regex => s"[\1](@ref \2)",
     "(precompile)" => "(https://github.com/Sagnac/Zernike.jl/tree/master/precompile)"
 )
 
 const primaries = ["zernike", "wavefront", "transform"]
 
 const prim_regex = Regex(join(primaries, "|"))
+
+const meta_block = """
+```@meta
+CurrentModule = Zernike
+DocTestSetup = :(using Zernike)
+EditURL = "https://github.com/Sagnac/Zernike.jl/blob/master/README.md"
+```
+"""
 
 check(m) = m isa RegexMatch
 
@@ -31,7 +51,7 @@ function readme(path)
     pages = Any["Home" => "index.md"]
     section = []
     file = path * pages[1][2]
-    write(file, "")
+    write(file, meta_block)
     io = open(file, "a")
     for line in eachline("README.md"; keep = true)
         line = replace(line, link_paths...)
@@ -48,7 +68,7 @@ function readme(path)
                 push!(pages, "Primary functions" => section)
                 empty!(primaries)
             end
-            write(file, "# " * header * "\n")
+            write(file, "# " * header * "\n" * meta_block)
             io = open(file, "a")
             continue
         end
