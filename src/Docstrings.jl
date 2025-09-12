@@ -493,6 +493,8 @@ julia> name, latex, unicode = Zernike.format_strings(Z(-8, 8));
 julia> unicode
 "√(18)ρ⁸sin(8θ)"
 ```
+
+See also: [`print_strings`](@ref).
 """
 format_strings
 
@@ -506,6 +508,8 @@ Print the Unicode string representations of select Zernike polynomials from sing
     print_strings(j_max::Int)
 
 Print the Unicode string representations of the first `j + 1` Zernike polynomials from single index `0` to `j_max`.
+
+See also: [`format_strings`](@ref).
 """
 print_strings
 
