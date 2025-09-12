@@ -81,7 +81,7 @@ end
 
 function (ΔW::WavefrontError)(ρ, θ = 0)
     (; a, Z) = ΔW
-    ∑(aᵢ * Z[i](ρ, θ) for (i, aᵢ) ∈ pairs(a); init = 0.0)
+    ∑(aᵢ * Zᵢ(ρ, θ) for (aᵢ, Zᵢ) ∈ zip(a, Z); init = 0.0)
 end
 
 (W::WavefrontOutput)(ρ, θ) = W.W(ρ, θ)
