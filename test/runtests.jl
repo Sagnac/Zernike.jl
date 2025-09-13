@@ -333,15 +333,14 @@ end
     latex1, latex2, unicode = format_strings(Z62)
     @test typeof(latex1) == typeof(latex2) == LaTeXString
     @test unicode == "√(14)(15ρ⁶ − 20ρ⁴ + 6ρ²)cos(2θ)"
-    recap = []
-    for i = 1:10
-        j = i - 1
-        m, n = get_mn(j)
-        push!(recap, (; j, n, m, a = -float(i)))
-    end
+    ΔW1 = WavefrontError(-(1.0:10.0))
+    ΔW2 = WavefrontError(-(1.0:4.0))
     abbreviated = "ΔW ≈ -10.000Z_{3}^{3} - 9.000Z_{3}^{1} \
                         - 8.000Z_{3}^{-1} - 7.000Z_{3}^{-3}..."
-    @test format_strings(recap) == latexstring(abbreviated)
+    non_abbreviated = "ΔW ≈ -1.000Z_{0}^{0} - 2.000Z_{1}^{-1} \
+                            - 3.000Z_{1}^{1} - 4.000Z_{2}^{-2}"
+    @test format_strings(ΔW1) == latexstring(abbreviated)
+    @test format_strings(ΔW2) == latexstring(non_abbreviated)
 end
 
 ΔW = W(OPD, 8; precision = max_precision)

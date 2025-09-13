@@ -496,6 +496,12 @@ julia> unicode
 "√(18)ρ⁸sin(8θ)"
 ```
 
+----
+
+    format_strings(ΔW::WavefrontError)
+
+Return a (possibly truncated) symbolic representation of the wavefront error in a Zernike basis as a `LaTeXString`.
+
 See also: [`print_strings`](@ref).
 """
 format_strings

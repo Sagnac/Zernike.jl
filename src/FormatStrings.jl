@@ -78,7 +78,8 @@ function format_strings(Z::T) where T <: AbstractPolynomial
     return latexstring(Z_mn), Z_LaTeX, Z_Unicode
 end
 
-function format_strings(recap::Vector)
+function format_strings(ΔW::WavefrontError)
+    (; recap) = ΔW
     W_LaTeX = "ΔW ≈ "
     function ζ(i, sub_index = 0)
         aᵢ = recap[i][:a]
