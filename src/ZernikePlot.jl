@@ -1,5 +1,5 @@
 import GLMakie: GLFW.GetPrimaryMonitor, GLFW.GetMonitorContentScale,
-                MonitorProperties, activate!
+                MonitorProperties, activate!, Screen
 
 mutable struct PlotConfig
     size::Tuple{Float64, Float64}
@@ -120,3 +120,5 @@ function zplot(args...; window_title = "ZernikePlot", plot_title = window_title,
 end
 
 (φ::Phase)() = zplot(φ)
+
+(φ::Phase)(::Type{T}) where T <: Screen = display(T(), φ())

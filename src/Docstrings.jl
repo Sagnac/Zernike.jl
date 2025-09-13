@@ -391,6 +391,8 @@ zplot(w)
 w[] = WavefrontError([0.0, 1.0, 1.0])
 ```
 
+As a convenient shortcut any type of phase object can be plotted by simply calling it with no arguments, e.g. as `w()`; similarly, calling it as `w(Screen)` will plot it in a new window; note the first method depends on `display` automatically being called, while the second will explicitly call it.
+
 See also: [`plotconfig`](@ref).
 """
 zplot
