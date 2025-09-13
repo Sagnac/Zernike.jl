@@ -103,6 +103,8 @@ function format_strings(recap::Vector)
     return latexstring(W_LaTeX)
 end
 
+format_strings(ΔW::WavefrontError) = format_strings(ΔW.recap)
+
 (Z::AbstractPolynomial)(::Type{String}) = format_strings(Z)[3]
 
 function print_strings(io::IO, j1::Int, j2::Int)

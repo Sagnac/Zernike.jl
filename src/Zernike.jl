@@ -73,11 +73,11 @@ struct Output
 end
 
 include("Domain.jl")
+include("WavefrontError.jl")
 include("IndexConversions.jl")
 include("Polar.jl")
 include("RadialCoefficients.jl")
 include("FormatStrings.jl")
-include("WavefrontError.jl")
 include("Arithmetic.jl")
 include("ZernikePlot.jl")
 include("ScaleAperture.jl")
