@@ -28,13 +28,13 @@ Product(b, W) = Product{WavefrontError}(b, W)
 
 Product(W) = Product(1.0, W)
 
-function (ΔW::Superposition{<:WavefrontError})(ρ, θ)
-    ΔW.b * ∑(W(ρ, θ) for W ∈ ΔW.W; init = 0.0)
+function (ΔW::Superposition{<:WavefrontError})(t...)
+    ΔW.b * ∑(W(t...) for W ∈ ΔW.W; init = 0.0)
 end
 
 ∑(v::Vector{<:Phase}) = Superposition(v)
 
-(ΔW::Product{<:WavefrontError})(ρ, θ) = ΔW.b * ∏(W(ρ, θ) for W ∈ ΔW.W; init = 1.0)
+(ΔW::Product{<:WavefrontError})(t...) = ΔW.b * ∏(W(t...) for W ∈ ΔW.W; init = 1.0)
 
 ∏(v::Vector{<:Phase}) = Product(v)
 

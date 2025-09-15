@@ -79,12 +79,14 @@ function WavefrontError(orders::Vector{Int}, a::FloatVec)
     WavefrontError([get_mn(j) for j ∈ orders], a)
 end
 
-function (ΔW::WavefrontError)(ρ, θ = 0)
+function (ΔW::WavefrontError)(ρ::Real, θ::Real = 0)
     (; a, Z) = ΔW
     ∑(aᵢ * Zᵢ(ρ, θ) for (aᵢ, Zᵢ) ∈ zip(a, Z); init = 0.0)
 end
 
-(W::WavefrontOutput)(ρ, θ) = W.W(ρ, θ)
+(ΔW::WavefrontError)(xy::Complex) = ΔW(polar(xy)...)
+
+(W::WavefrontOutput)(t...) = W.W(t...)
 
 function fit(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, Zᵢ::Vector{Polynomial})
     if !allequal(length.((ρ, θ, OPD)))

@@ -101,7 +101,9 @@ function (Z::AbstractPolynomial)(ρ::Real, θ::Real = 0)
     N * R(ρ) * M(θ)
 end
 
-(Z::Output)(ρ, θ) = Z.Z(ρ, θ)
+(Z::AbstractPolynomial)(xy::Complex) = Z(polar(xy)...)
+
+(Z::Output)(t...) = Z.Z(t...)
 
 # radial order
 get_n(j::Int) = ceil(Int, (-3 + √(9 + 8j)) / 2)
