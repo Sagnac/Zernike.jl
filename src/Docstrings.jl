@@ -302,7 +302,7 @@ See also: [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_t
 
 ----
 
-    standardize(v_sub::FloatVec, j::AbstractVector{Int})
+    standardize(v_sub::FloatVec, [j::AbstractVector{Int}])
     standardize(v_sub::Vector, orders::Vector{Tuple{Int, Int}})
     standardize(W::WavefrontError)
 
@@ -310,7 +310,7 @@ Pad a subset Zernike expansion coefficient vector to the full standard length up
 
 The tuples in `orders` must be of the form `(m, n)` associated with the respective coefficients at each index in `v_sub`.
 
-`j` is a vector of single-mode ordering indices associated with the coefficients.
+`j` is a vector of single-mode ordering indices associated with the coefficients; if this is not supplied the coefficients will be assumed to be in order (`0:j`).
 
 The `WavefrontError` method pads the `W.a` coefficient vector.
 

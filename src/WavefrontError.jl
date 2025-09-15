@@ -272,6 +272,8 @@ function standardize(v_sub::FloatVec, j::AbstractVector{Int})
     return v_padded
 end
 
+standardize(v_sub::FloatVec) = standardize(v_sub, 0:length(v_sub)-1)
+
 function standardize(v_sub::FloatVec, orders::Vector{Tuple{Int, Int}})
     standardize(v_sub, get_j.(orders))
 end
