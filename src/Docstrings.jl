@@ -524,9 +524,20 @@ print_strings
 """
     Zernike.Gradient(Z::Polynomial)
 
-Returns `∇Z(ρ, θ)`.
+Returns the gradient `∇Z(ρ, θ)` in a polar basis.
+
+If called with a complex number `x + iy` this function returns the vector `[∂Z/∂x, ∂Z/∂y]` at the point `(x, y)` in Cartesian coordinates instead.
 """
 Gradient
+
+"""
+    Zernike.Laplacian(Z::Polynomial)
+
+Returns the Laplacian `ΔZ(ρ, θ)`.
+
+This function can be evaluated in Cartesian coordinates if passed a complex number instead (i.e. `∇²Z(x, y) ≡ ΔZ(xy::Complex)`).
+"""
+Laplacian
 
 """
     Zernike.derivatives(Z::Polynomial, order::Int = 1)

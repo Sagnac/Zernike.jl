@@ -20,6 +20,32 @@ Gradient(Z::Polynomial) = Gradient{Polynomial}(Z)
 
 (g::Gradient)(ρ::Real, θ::Real = 0) = [g.r(ρ, θ), g.t(ρ, θ) / ρ]
 
+function (g::Gradient)(xy::Complex)
+    ρ, θ = polar(xy)
+    ∇Z = g(ρ, θ)
+    s, c = sc = sincos(θ)
+    ∂Z_∂x = (c, -s) ⋅ ∇Z
+    ∂Z_∂y = sc ⋅ ∇Z
+    return ∂Z_∂x, ∂Z_∂y
+end
+
+struct Laplacian{T <: Polynomial}
+    r1::PartialDerivative{RadialPolynomial}
+    r2::PartialDerivative{RadialPolynomial}
+    t::PartialDerivative{Harmonic}
+    function Laplacian{T}(Z::T) where T <: Polynomial
+        new(derivatives(Z)[1], derivatives(Z, 2)...)
+    end
+end
+
+Laplacian(Z::T) where T <: Polynomial = Laplacian{T}(Z)
+
+function (l::Laplacian)(ρ::Real, θ::Real = 0)
+    l.r1(ρ, θ) / ρ + l.r2(ρ, θ) + l.t(ρ, θ) / ρ ^ 2
+end
+
+(l::Laplacian)(xy::Complex) = l(polar(xy)...)
+
 derivatives(λ::Vector, order::Int) = spdiagm(1 => 1.0:length(λ)-1) ^ order * λ
 
 function derivatives(Z::Polynomial, order::Int = 1)
@@ -43,4 +69,4 @@ function show(io::IO, ∂::T) where T <: PartialDerivative
     print(io, T, " order: ", ∂.order)
 end
 
-show(io::IO, ::T) where T <: Gradient = print(io, T)
+show(io::IO, ::T) where T <: Union{Gradient, Laplacian} = print(io, T)
