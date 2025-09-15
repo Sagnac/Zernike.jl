@@ -364,7 +364,7 @@ reset!
     zplot(φ; kwargs...)
     zplot(ρ, θ, φ; kwargs...)
 
-Plot `Zernike` phase function types ([`Polynomial`](@ref)s, [`WavefrontError`](@ref)s, `PartialDerivative`s, arithmetic types, etc.) as well as quantized phase arrays; for the latter the arguments must be a collection of discretized samples where the polar variable objects refer to either ranges, vectors, or 1-dimensional matrices & the like, and the phase array `φ` is a matrix.
+Plot `Zernike` phase function types ([`Polynomial`](@ref)s, [`WavefrontError`](@ref)s, `PartialDerivative`s, arithmetic types, etc.) as well as quantized phase arrays; for the latter the arguments must be a collection of discretized samples where the polar variable objects refer to either ranges, vectors, or 1-dimensional matrices & the like, and the phase structure `φ` is either an array corresponding to these samples or a callable type in which case the matrix will be constructed for you.
 
 # Keyword arguments:
 

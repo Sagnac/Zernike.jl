@@ -40,9 +40,9 @@ function reset!(plotconfig::PlotConfig)
     end
 end
 
-# for functions
-function zernikeplot!(axis, φ::Observable; m = 10, n = 10, finesse = finesse,
+function zernikeplot!(axis, φ; m = 10, n = 10, finesse = finesse,
                       high_order = false, colormap = plotconfig.colormap)
+    φ = convert(Observable, φ)
     ρ, θ = polar(m, n; finesse)
     x, y = polar_mat(ρ, θ)
     z = @lift($φ.(ρ', θ))
@@ -54,18 +54,18 @@ function zernikeplot!(axis, φ::Observable; m = 10, n = 10, finesse = finesse,
     surface!(axis, x, y, z; shading = NoShading, colormap)
 end
 
-function zernikeplot!(axis, φ; m = 10, n = 10, finesse = finesse,
-                      high_order = false, colormap = plotconfig.colormap)
-    zernikeplot!(axis, Observable(φ); m, n, finesse, high_order, colormap)
-end
-
-# for matrices
-function zernikeplot!(axis, ρ, θ, φ; kwargs...)
+function zernikeplot!(axis, ρ, θ, φ::FloatMat; kwargs...)
     ρ = vec(ρ)
     θ = vec(θ)
     x, y = polar_mat(ρ, θ)
     colormap = haskey(kwargs, :colormap) ? kwargs[:colormap] : plotconfig.colormap
     surface!(axis, x, y, φ; shading = NoShading, colormap)
+end
+
+function zernikeplot!(axis, ρ, θ, φ; kwargs...)
+    ρ = vec(ρ)
+    θ = vec(θ)
+    zernikeplot!(axis, ρ, θ, φ.(ρ', θ); kwargs...)
 end
 
 function zplot(args...; window_title = "ZernikePlot", plot_title = window_title,
