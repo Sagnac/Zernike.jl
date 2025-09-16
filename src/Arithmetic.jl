@@ -2,7 +2,7 @@ import Base: +, -, *, /, ^, ==, <, sum, prod, factorial, convert, promote_rule
 
 struct MixedPhase{S, T <: WavefrontError} <: Phase
     b::Float64
-    W::Vector{T}
+    W::Vector{WavefrontError{Polynomial}}
 end
 
 ==(Z1::Polynomial, Z2::Polynomial) = Z1.inds.j == Z2.inds.j

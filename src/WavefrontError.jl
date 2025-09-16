@@ -10,7 +10,7 @@ struct WavefrontError{T <: Polynomial} <: Phase
     n_max::Int
     fit_to::Vector{Tuple{Int, Int}}
     a::Vector{Float64}
-    Z::Vector{T}
+    Z::Vector{Polynomial}
     precision::Int
     ssr::Float64
 end
@@ -20,7 +20,7 @@ struct WavefrontOutput
     v::Vector{Float64}
     ssr::Float64
     metrics::NamedTuple{(:pv, :rms, :strehl), NTuple{3, Float64}}
-    W::WavefrontError
+    W::WavefrontError{Polynomial}
     fig::Makie.Figure
     axis::Axis3
     plot::SurfacePlot
