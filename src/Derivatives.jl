@@ -70,3 +70,51 @@ function show(io::IO, ∂::T) where T <: Derivative
 end
 
 show(io::IO, ::T) where T <: Union{Gradient, Laplacian} = print(io, T)
+
+function Wavefront(g::Gradient)
+    (; m, n) = g.r.inds
+    index_order_1 = NTuple{3}{Int}[]
+    index_order_2 = NTuple{3}{Int}[]
+    mn_orders_1 = NTuple{2}{Int}[]
+    mn_orders_2 = NTuple{2}{Int}[]
+    c1 = Float64[]
+    c2 = Float64[]
+    m1 = m - 1
+    m2 = m + 1
+    for s = 0:div(n - abs(m), 2)
+        cs = n - 2s
+        n′ = cs - 1
+        n′ < 0 && break
+        if abs(m1) ≤ n′
+            set_order!(index_order_1, m1, n′)
+            push!(mn_orders_1, (m1, n′))
+            push!(c1, cs)
+        end
+        if abs(m2) ≤ n′
+            set_order!(index_order_2, m2, n′)
+            push!(mn_orders_2, (m2, n′))
+            push!(c2, cs)
+        end
+    end
+    if isempty(c1)
+        c1 = [0.0]
+        index_order_1 = [(1, 1, 0)]
+        mn_orders_1 = [(0, 0)]
+    end
+    if isempty(c2)
+        c2 = [0.0]
+        index_order_2 = [(1, 1, 0)]
+        mn_orders_2 = [(0, 0)]
+    end
+    c1 = standardize(c1, mn_orders_1)
+    c2 = standardize(c2, mn_orders_2)
+    c1 = to_complex(c1, index_order_1)
+    c2 = to_complex(c2, index_order_2)
+    cx = c1 + c2
+    cy = im * (c1 - c2)
+    ax = to_real(cx, index_order_1)
+    ay = to_real(cy, index_order_2)
+    ∂Z_∂x = Wavefront(ax)
+    ∂Z_∂y = Wavefront(ay)
+    return (; ∂Z_∂x, ∂Z_∂y)
+end

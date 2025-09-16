@@ -47,7 +47,7 @@ function Γ(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T 
             i += 1
             k1 = (n - μ) ÷ 2
             remap[(m, n)] = i
-            set_order!(m, n, order)
+            set_order!(order, m, n)
             N[i,i] = √(n+1)
             γ = λ[get_i(μ, n)]
             for s = 0:k1
@@ -153,7 +153,7 @@ function translate_ellipse(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64
     return η_s, η_e
 end
 
-function set_order!(m::Int, n::Int, order::Vector{NTuple{3, Int}})
+function set_order!(order::Vector{NTuple{3, Int}}, m::Int, n::Int)
     push!(order, (get_j(m, n) + 1, get_j(-m, n) + 1, sign(m)))
 end
 
