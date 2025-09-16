@@ -62,7 +62,7 @@ function format_strings(Z::T) where T <: AbstractPolynomial
     end
     parentheses = k ≠ 0 ? ("(", ")") : ""
     Z_mn = "Z_{$n}^{$(Z.inds.m)}"
-    if T <: PartialDerivative
+    if T <: Derivative
         (; order) = Z
         var = T.parameters[1] == Harmonic ? "θ" : "ρ"
         Z_mn = "\\frac{\\partial^$order $Z_mn}{\\partial $var^$order}"
@@ -78,7 +78,7 @@ function format_strings(Z::T) where T <: AbstractPolynomial
     return latexstring(Z_mn), Z_LaTeX, Z_Unicode
 end
 
-function format_strings(ΔW::WavefrontError)
+function format_strings(ΔW::Wavefront)
     (; recap) = ΔW
     W_LaTeX = "ΔW ≈ "
     function ζ(i, sub_index = 0)

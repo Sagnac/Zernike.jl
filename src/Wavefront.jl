@@ -4,7 +4,7 @@ const precision = 3
 const max_precision = 17
 const wavefront_finesse = 101
 
-struct WavefrontError{T <: Polynomial} <: Phase
+struct Wavefront{T <: Polynomial} <: Phase
     recap::Recap
     v::Vector{Float64}
     n_max::Int
@@ -20,21 +20,21 @@ struct WavefrontOutput
     v::Vector{Float64}
     ssr::Float64
     metrics::NamedTuple{(:pv, :rms, :strehl), NTuple{3, Float64}}
-    W::WavefrontError{Polynomial}
+    W::Wavefront{Polynomial}
     fig::Makie.Figure
     axis::Axis3
     plot::SurfacePlot
 end
 
-function WavefrontError(recap, v, n_max, fit_to, a, Z, precision, ssr)
-    WavefrontError{Polynomial}(recap, v, n_max, fit_to, a, Z, precision, ssr)
+function Wavefront(recap, v, n_max, fit_to, a, Z, precision, ssr)
+    Wavefront{Polynomial}(recap, v, n_max, fit_to, a, Z, precision, ssr)
 end
 
-function WavefrontError(recap, v, n_max, fit_to, a, Z, precision)
-    WavefrontError(recap, v, n_max, fit_to, a, Z, precision, 0.0)
+function Wavefront(recap, v, n_max, fit_to, a, Z, precision)
+    Wavefront(recap, v, n_max, fit_to, a, Z, precision, 0.0)
 end
 
-function WavefrontError(a::FloatVec; precision = max_precision)
+function Wavefront(a::FloatVec; precision = max_precision)
     fit_to = []
     v = a
     recap = similar(a, NamedTuple)
@@ -47,10 +47,10 @@ function WavefrontError(a::FloatVec; precision = max_precision)
         Zᵢ[i] = Z(j)
     end
     n_max = n
-    return WavefrontError(recap, v, n_max, fit_to, a, Zᵢ, precision)
+    return Wavefront(recap, v, n_max, fit_to, a, Zᵢ, precision)
 end
 
-function WavefrontError(orders::Vector{Tuple{Int, Int}}, a::FloatVec;
+function Wavefront(orders::Vector{Tuple{Int, Int}}, a::FloatVec;
                         precision = max_precision)
     length(a) != length(orders) && throw(ArgumentError("Lengths must be equal."))
               allunique(orders) || throw(ArgumentError("Orders must be unique."))
@@ -67,24 +67,24 @@ function WavefrontError(orders::Vector{Tuple{Int, Int}}, a::FloatVec;
     end
     n_max = n
     v = standardize(a, orders)
-    return WavefrontError(recap, v, n_max, fit_to, a, Zᵢ, precision)
+    return Wavefront(recap, v, n_max, fit_to, a, Zᵢ, precision)
 end
 
-function WavefrontError(orders::Vector{NamedTuple{(:m, :n), Tuple{Int, Int}}},
+function Wavefront(orders::Vector{NamedTuple{(:m, :n), Tuple{Int, Int}}},
                         a::FloatVec)
-    WavefrontError([(mn...,) for mn ∈ orders], a)
+    Wavefront([(mn...,) for mn ∈ orders], a)
 end
 
-function WavefrontError(orders::Vector{Int}, a::FloatVec)
-    WavefrontError([get_mn(j) for j ∈ orders], a)
+function Wavefront(orders::Vector{Int}, a::FloatVec)
+    Wavefront([get_mn(j) for j ∈ orders], a)
 end
 
-function (ΔW::WavefrontError)(ρ::Real, θ::Real = 0)
+function (ΔW::Wavefront)(ρ::Real, θ::Real = 0)
     (; a, Z) = ΔW
     ∑(aᵢ * Zᵢ(ρ, θ) for (aᵢ, Zᵢ) ∈ zip(a, Z); init = 0.0)
 end
 
-(ΔW::WavefrontError)(xy::Complex) = ΔW(polar(xy)...)
+(ΔW::Wavefront)(xy::Complex) = ΔW(polar(xy)...)
 
 (W::WavefrontOutput)(t...) = W.W(t...)
 
@@ -150,11 +150,11 @@ function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[], ssr = 0.0; precision::In
     end
     isempty(recap) && push!(recap, (; piston.inds..., a = 0.0))
     # create the fitted polynomial
-    return WavefrontError(recap, v, n_max, orders, a, Zₐ, precision, ssr)
+    return Wavefront(recap, v, n_max, orders, a, Zₐ, precision, ssr)
 end
 
 # synthesis function
-function Λ(ΔW::WavefrontError; finesse::Int)
+function Λ(ΔW::Wavefront; finesse::Int)
     (; recap, v, n_max, ssr) = ΔW
     finesse = finesse ∈ 1:100 ? finesse : ceil(Int, 100 / √ length(recap))
     ρ, θ = polar(n_max, n_max; finesse)
@@ -166,7 +166,7 @@ function Λ(ΔW::WavefrontError; finesse::Int)
     WavefrontOutput(recap, v, ssr, metrics(v, w), ΔW, fig, axis, plot)
 end
 
-function metrics(ΔW::WavefrontError)
+function metrics(ΔW::Wavefront)
     ρ, θ = polar(d_max)
     w = ΔW.(ρ, θ)
     metrics(ΔW.v, w)
@@ -200,9 +200,9 @@ function wavefront(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
 end
 
 # overload show to clean up the output
-show(io::IO, W::T) where {T <: WavefrontError} = print(io, T, ": n_max = ", W.n_max)
+show(io::IO, W::T) where {T <: Wavefront} = print(io, T, ": n_max = ", W.n_max)
 
-function show(io::IO, m::MIME"text/plain", W::WavefrontError)
+function show(io::IO, m::MIME"text/plain", W::Wavefront)
     show(io, W)
     haskey(io, :typeinfo) ? (return) : println(io)
     strip3 = map(-, displaysize(io), (3, 0))
@@ -229,18 +229,18 @@ function show(io::IO, m::MIME"text/plain", W::WavefrontOutput)
     return
 end
 
-getindex(W::WavefrontError) = W.v
+getindex(W::Wavefront) = W.v
 
-getindex(W::WavefrontError, j) = W.v[j.+1]
+getindex(W::Wavefront, j) = W.v[j.+1]
 
-firstindex(W::WavefrontError) = 0
+firstindex(W::Wavefront) = 0
 
-lastindex(W::WavefrontError) = lastindex(W.v) - 1
+lastindex(W::Wavefront) = lastindex(W.v) - 1
 
-setindex!(W::WavefrontError, x, j) = (W.v[j.+1] = x)
+setindex!(W::Wavefront, x, j) = (W.v[j.+1] = x)
 
 # reduces precision
-function reduce_wave(W::WavefrontError, precision::Int)
+function reduce_wave(W::Wavefront, precision::Int)
     @domain(precision < W.precision, precision)
     recap, a, Zᵢ = map(copy, (W.recap, W.a, W.Z))
     fit_to = getfield(W, :fit_to)
@@ -256,7 +256,7 @@ function reduce_wave(W::WavefrontError, precision::Int)
             a[i] = aᵢ
         end
     end
-    return WavefrontError(recap, W.v, W.n_max, fit_to, a, Zᵢ, precision, W.ssr)
+    return Wavefront(recap, W.v, W.n_max, fit_to, a, Zᵢ, precision, W.ssr)
 end
 
 function sieve(v::Vector{Float64}, threshold::Float64)
@@ -278,7 +278,7 @@ function standardize(v_sub::FloatVec, orders::Vector{Tuple{Int, Int}})
     standardize(v_sub, get_j.(orders))
 end
 
-standardize(W::WavefrontError) = standardize(W.a, [(i.m, i.n) for i ∈ W.recap])
+standardize(W::Wavefront) = standardize(W.a, [(i.m, i.n) for i ∈ W.recap])
 
 # methods
 function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int;

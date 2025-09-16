@@ -1,8 +1,8 @@
 import Base: +, -, *, /, ^, ==, <, sum, prod, factorial, convert, promote_rule
 
-struct MixedPhase{S, T <: WavefrontError} <: Phase
+struct MixedPhase{S, T <: Wavefront} <: Phase
     b::Float64
-    W::Vector{WavefrontError{Polynomial}}
+    W::Vector{Wavefront{Polynomial}}
 end
 
 ==(Z1::Polynomial, Z2::Polynomial) = Z1.inds.j == Z2.inds.j
@@ -18,23 +18,23 @@ end
 
 Superposition{T} = MixedPhase{:sum, T}
 
-Superposition(b, W) = Superposition{WavefrontError}(b, W)
+Superposition(b, W) = Superposition{Wavefront}(b, W)
 
 Superposition(W) = Superposition(1.0, W)
 
 Product{T} = MixedPhase{:product, T}
 
-Product(b, W) = Product{WavefrontError}(b, W)
+Product(b, W) = Product{Wavefront}(b, W)
 
 Product(W) = Product(1.0, W)
 
-function (ΔW::Superposition{<:WavefrontError})(t...)
+function (ΔW::Superposition{<:Wavefront})(t...)
     ΔW.b * ∑(W(t...) for W ∈ ΔW.W; init = 0.0)
 end
 
 ∑(v::Vector{<:Phase}) = Superposition(v)
 
-(ΔW::Product{<:WavefrontError})(t...) = ΔW.b * ∏(W(t...) for W ∈ ΔW.W; init = 1.0)
+(ΔW::Product{<:Wavefront})(t...) = ΔW.b * ∏(W(t...) for W ∈ ΔW.W; init = 1.0)
 
 ∏(v::Vector{<:Phase}) = Product(v)
 
@@ -58,39 +58,39 @@ factorial(z::Polynomial) = Product([Z(j) for j = 0:z.inds.j])
 # TODO: redesign converted precision scheme
 const converted = [(-1, -1)]
 
-function convert(::Type{<:WavefrontError}, Z::Polynomial)
+function convert(::Type{<:Wavefront}, Z::Polynomial)
     a1 = 1.0
     a = [a1]
     (; m, n, j) = Z.inds
     recap = [(; j, n, m, a = a1)]
     v = standardize(a, [(m, n)])
     fit_to = converted
-    WavefrontError(recap, v, n, fit_to, a, [Z], precision)
+    Wavefront(recap, v, n, fit_to, a, [Z], precision)
 end
 
 function convert(::Type{<:Superposition}, Z::Polynomial)
-    Superposition([convert(WavefrontError, Z)])
+    Superposition([convert(Wavefront, Z)])
 end
 
-function convert(::Type{<:Superposition}, W::WavefrontError)
+function convert(::Type{<:Superposition}, W::Wavefront)
     Superposition([W])
 end
 
-function convert(::Type{<:WavefrontError}, ΔW::Product)
+function convert(::Type{<:Wavefront}, ΔW::Product)
     OPD = ΔW.(polar()...)
     n_max, precision = params(ΔW)
     W(OPD, n_max; precision)
 end
 
-promote_rule(::Type{<:WavefrontError}, ::Type{Polynomial}) = WavefrontError
+promote_rule(::Type{<:Wavefront}, ::Type{Polynomial}) = Wavefront
 promote_rule(::Type{<:Superposition}, ::Type{Polynomial}) = Superposition
-promote_rule(::Type{<:Superposition}, ::Type{<:WavefrontError}) = Superposition
-promote_rule(::Type{Polynomial}, ::Type{<:Product}) = WavefrontError
-promote_rule(::Type{<:WavefrontError}, ::Type{<:Product}) = WavefrontError
+promote_rule(::Type{<:Superposition}, ::Type{<:Wavefront}) = Superposition
+promote_rule(::Type{Polynomial}, ::Type{<:Product}) = Wavefront
+promote_rule(::Type{<:Wavefront}, ::Type{<:Product}) = Wavefront
 
-WavefrontError(Z::Polynomial) = convert(WavefrontError, Z)
+Wavefront(Z::Polynomial) = convert(Wavefront, Z)
 
-function getproperty(W::WavefrontError, name::Symbol)
+function getproperty(W::Wavefront, name::Symbol)
     value = getfield(W, name)
     name == :fit_to && value == converted ? NTuple{2, Int}[] : value
 end
@@ -99,7 +99,7 @@ function add_subtract(f::F, φ1::Phase, φ2::Phase) where F
     add_subtract(f, promote(φ1, φ2)...)
 end
 
-function add_subtract(f::F, W1::T, W2::T) where {F, T <: WavefrontError}
+function add_subtract(f::F, W1::T, W2::T) where {F, T <: Wavefront}
     v1 = W1.v
     v2 = W2.v
     len1 = length(v1)
@@ -122,7 +122,7 @@ function add_subtract(f::F, Z1::T, Z2::T) where {F, T <: Polynomial}
     Z1.inds.j == Z2.inds.j && return 2 * Z1
     orders = [(Z.inds.m, Z.inds.n) for Z ∈ (Z1, Z2)]
     a = [1.0, f(1.0)]
-    WavefrontError(orders, a)
+    Wavefront(orders, a)
 end
 
 function add_subtract(f::F, ΔW1::T, ΔW2::T) where {F, T <: Superposition}
@@ -137,22 +137,22 @@ function add_subtract(f::F, ΔW1::MixedPhase, ΔW2::MixedPhase) where F
     wavefront_expansion(f, ΔW1, ΔW2)
 end
 
-function multiply(α::Float64, W::WavefrontError)
+function multiply(α::Float64, W::Wavefront)
     (; v) = W
     Z = similar(v, Polynomial)
     foreach(Zᵢ -> setindex!(Z, Zᵢ, Zᵢ.inds.j + 1), W.Z)
     Ψ(α * v, Z, W.n_max, getfield(W, :fit_to); W.precision)
 end
 
-multiply(α::Float64, Z::Polynomial) = WavefrontError([(Z.inds.m, Z.inds.n)], [α])
+multiply(α::Float64, Z::Polynomial) = Wavefront([(Z.inds.m, Z.inds.n)], [α])
 
 multiply(b::Float64, ΔW::T) where T <: MixedPhase = T(b, ΔW.W)
 
 multiply(φ1::Phase, φ2::Phase) = multiply(promote(φ1, φ2)...)
 
 function multiply(φ1::T, φ2::T) where T <: Phase
-    φ1 = convert(WavefrontError, φ1)
-    φ2 = convert(WavefrontError, φ2)
+    φ1 = convert(Wavefront, φ1)
+    φ2 = convert(Wavefront, φ2)
     ρ, θ = polar()
     φ3 = @. φ1(ρ, θ) * φ2(ρ, θ)
     n_max = φ1.n_max + φ2.n_max
@@ -163,7 +163,7 @@ end
 multiply(ΔW1::MixedPhase, ΔW2::MixedPhase) = wavefront_expansion(*, ΔW1, ΔW2)
 
 function exponentiate(φ::Phase, n::Integer)
-    φ = convert(WavefrontError, φ)
+    φ = convert(Wavefront, φ)
     ρ, θ = polar()
     φ_n = @. φ(ρ, θ) ^ n
     n_max = φ.n_max * n

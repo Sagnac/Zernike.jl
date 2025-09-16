@@ -151,10 +151,10 @@ v = reconstruct(r, t, OPD_vec, 8)[1]
     a = rand(5)
     named_orders = [(m = i[1], n = i[2]) for i in orders]
     j_orders = [4, 12, 24, 25, 40]
-    W1 = WavefrontError(a)
-    W2 = WavefrontError(orders, a)
-    W3 = WavefrontError(named_orders, a)
-    W4 = WavefrontError(j_orders, a)
+    W1 = Wavefront(a)
+    W2 = Wavefront(orders, a)
+    W3 = Wavefront(named_orders, a)
+    W4 = Wavefront(j_orders, a)
     @test eltype(W1.recap) <: NamedTuple
     @test W1.a == W1.v
     @test isempty(W1.fit_to)
@@ -197,7 +197,7 @@ end
     ρ, θ = rand(0.2..0.7, 2)
     i1 = j[1] + 1
     i2 = j[2] + 1
-    @test W1 isa WavefrontError && W2 isa WavefrontError
+    @test W1 isa Wavefront && W2 isa Wavefront
     @test Set(Z.j for Z ∈ W1.recap ∪ W2.recap) == Set(j[1:2])
     @test W1.a == [1.0, 1.0]
     @test W2.a == [1.0, -1.0]
@@ -208,8 +208,8 @@ end
     @test Z1(ρ, θ) + Z2(ρ, θ) ≈ W1(ρ, θ)
     @test Z1(ρ, θ) - Z2(ρ, θ) ≈ W2(ρ, θ)
     a = rand(7)
-    W3 = WavefrontError(j[1:4], a[1:4])
-    W4 = WavefrontError(j[5:7], a[5:7])
+    W3 = Wavefront(j[1:4], a[1:4])
+    W4 = Wavefront(j[5:7], a[5:7])
     W5 = Z1 + W4
     W6 = Z2 - W4
     W4_v = W4.v
@@ -219,7 +219,7 @@ end
     v2 = zeros(length(W6.v))
     v2[eachindex(W4_v)] = -W4_v
     v2[i2] += 1.0
-    @test W5 isa WavefrontError && W6 isa WavefrontError
+    @test W5 isa Wavefront && W6 isa Wavefront
     @test Set(Z.j for Z ∈ W5.recap) == Set(j[[1; 5:7]])
     @test Set(Z.j for Z ∈ W6.recap) == Set(j[[2; 5:7]])
     @test W5.v == v1
@@ -247,7 +247,7 @@ end
     S2 = Z1 - S1
     @test S2 isa Superposition
     S_v = [W.v for W ∈ S2.W]
-    Z1_v = convert(WavefrontError, Z1)[]
+    Z1_v = convert(Wavefront, Z1)[]
     @test -b * W3.v ∈ S_v && -b * W4.v ∈ S_v && Z1_v ∈ S_v
     S3 = S1 + W5
     @test S3 isa Superposition
@@ -273,23 +273,23 @@ end
         p2 = w.(ρ, θ)
         mean(abs.(p2 .- p1))
     end
-    W11 = convert(WavefrontError, Z1)
-    W12 = convert(WavefrontError, Z2)
+    W11 = convert(Wavefront, Z1)
+    W12 = convert(Wavefront, Z2)
     S6 = Superposition([W11])
     S7 = Superposition([W12])
     P1 = Product([W11])
     P2 = Product([W12])
-    P = Vector{WavefrontError}(undef, 10)
-    P[1] = (Z1 * Z2)::WavefrontError
-    P[2] = (Z1 * W12)::WavefrontError
-    P[3] = (Z1 * S7)::WavefrontError
-    P[4] = (Z1 * P2)::WavefrontError
-    P[5] = (W11 * W12)::WavefrontError
-    P[6] = (W11 * S7)::WavefrontError
-    P[7] = (W11 * P2)::WavefrontError
-    P[8] = (S6 * S7)::WavefrontError
-    P[9] = (S6 * P2)::WavefrontError
-    P[10] = (P1 * P2)::WavefrontError
+    P = Vector{Wavefront}(undef, 10)
+    P[1] = (Z1 * Z2)::Wavefront
+    P[2] = (Z1 * W12)::Wavefront
+    P[3] = (Z1 * S7)::Wavefront
+    P[4] = (Z1 * P2)::Wavefront
+    P[5] = (W11 * W12)::Wavefront
+    P[6] = (W11 * S7)::Wavefront
+    P[7] = (W11 * P2)::Wavefront
+    P[8] = (S6 * S7)::Wavefront
+    P[9] = (S6 * P2)::Wavefront
+    P[10] = (P1 * P2)::Wavefront
     mae_ϵ = 0.01
     mae = MAE(P[1])
     @test mae < mae_ϵ
@@ -333,8 +333,8 @@ end
     latex1, latex2, unicode = format_strings(Z62)
     @test typeof(latex1) == typeof(latex2) == LaTeXString
     @test unicode == "√(14)(15ρ⁶ − 20ρ⁴ + 6ρ²)cos(2θ)"
-    ΔW1 = WavefrontError(-(1.0:10.0))
-    ΔW2 = WavefrontError(-(1.0:4.0))
+    ΔW1 = Wavefront(-(1.0:10.0))
+    ΔW2 = Wavefront(-(1.0:4.0))
     abbreviated = "ΔW ≈ -10.000Z_{3}^{3} - 9.000Z_{3}^{1} \
                         - 8.000Z_{3}^{-1} - 7.000Z_{3}^{-3}..."
     non_abbreviated = "ΔW ≈ -1.000Z_{0}^{0} - 2.000Z_{1}^{-1} \

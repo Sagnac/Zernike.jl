@@ -7,7 +7,7 @@
 
 module Zernike
 
-export zernike, wavefront, transform, Z, W, Y, WavefrontError, get_j, get_mn,
+export zernike, wavefront, transform, Z, W, Y, Wavefront, get_j, get_mn,
        Noll, Fringe, noll_to_j, j_to_noll, fringe_to_j, j_to_fringe, standardize,
        Standard, Observable, zplot, reduce_wave, Screen
 
@@ -15,7 +15,7 @@ const public_names = "public \
     radial_coefficients, wavefront_coefficients, transform_coefficients, \
     metrics, scale, S, Superposition, Product, \
     sieve, format_strings, print_strings, valid_fringes, \
-    derivatives, PartialDerivative, Gradient, plotconfig, resize!, reset!"
+    derivatives, Derivative, Gradient, plotconfig, resize!, reset!"
 
 VERSION >= v"1.11.0-DEV.469" && eval(Meta.parse(public_names))
 
@@ -73,7 +73,7 @@ struct Output
 end
 
 include("Domain.jl")
-include("WavefrontError.jl")
+include("Wavefront.jl")
 include("IndexConversions.jl")
 include("Polar.jl")
 include("RadialCoefficients.jl")

@@ -90,7 +90,7 @@ The function returns eight values contained within a `WavefrontOutput` type, wit
 2. `v`: full vector of Zernike wavefront error expansion coefficients;
 3. `ssr`: the sum of the squared residuals from the fit;
 4. `metrics`: named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio;
-5. `W`: the `WavefrontError` function `ΔW(ρ, θ)`;
+5. `W`: the `Wavefront` function `ΔW(ρ, θ)`;
 6. `fig`: the plotted `Makie` figure;
 7. `axis`: the plot axis;
 8. `plot`: the surface plot object.
@@ -159,7 +159,7 @@ W: wavefront
 Y: transform
 ```
 
-These methods avoid plotting and instead return `(ρ, θ)` functions as essentially closures, but packaged within `Polynomial` and `WavefrontError` types. The pupil can then be evaluated using these functions with polar coordinates:
+These methods avoid plotting and instead return `(ρ, θ)` functions as essentially closures, but packaged within `Polynomial` and `Wavefront` types. The pupil can then be evaluated using these functions with polar coordinates:
 
 ```julia
 Z40 = Z(0, 4)
@@ -170,11 +170,11 @@ For wavefront reconstruction this is equivalent to `ΔW(ρ, θ)` = `∑aᵢZᵢ(
 
 Arithmetic between these types is defined using the usual operators such that wavefront error approximations essentially form a commutative ring (with associativity of multiplication being approximate) expressed in a Zernike basis.
 
-In addition, the `Zernike.Superposition(W)` and `Zernike.Product(W)` constructors (where `W` is a `Vector{WavefrontError}`) serve as direct methods for creating composite functions which group evaluate a specified expansion set when an updated set of coefficients is not required.
+In addition, the `Zernike.Superposition(W)` and `Zernike.Product(W)` constructors (where `W` is a `Vector{Wavefront}`) serve as direct methods for creating composite functions which group evaluate a specified expansion set when an updated set of coefficients is not required.
 
 ### Derivatives
 
-`Zernike.derivatives(Z::Polynomial, order::Int = 1)` computes the nth order partial derivatives of `Z(ρ, θ)` and returns the two-tuple (`∂Z/∂ρ`, `∂Z/∂θ`) containing the `PartialDerivative` types.
+`Zernike.derivatives(Z::Polynomial, order::Int = 1)` computes the nth order partial derivatives of `Z(ρ, θ)` and returns the two-tuple (`∂Z/∂ρ`, `∂Z/∂θ`) containing the `Derivative` types.
 
 `Zernike.Gradient(Z::Polynomial)` wraps the first-order partial derivatives and returns a callable `∇Z(ρ, θ)`.
 
@@ -215,17 +215,17 @@ In addition, the functions `get_j(m, n)` & `get_mn(j)` allow you to convert betw
 
 ## Additional Notes
 
-* `Zernike.metrics(ΔW::WavefrontError)` exists;
+* `Zernike.metrics(ΔW::Wavefront)` exists;
 
 * `Zernike.format_strings(Z::AbstractPolynomial)` will return both the `Unicode` and `LaTeX` string representations directly;
 
 * `Zernike.print_strings(j_max::Int)` will print the Unicode string representations of the polynomials up to `j_max`;
 
-* The `zplot` function can be invoked independently using `Polynomial` and `WavefrontError` function types, quantized wavefront errors, and Observables of each; the plot will update each time the `Observable` changes (see the docstring for more info);
+* The `zplot` function can be invoked independently using `Polynomial` and `Wavefront` function types, quantized wavefront errors, and Observables of each; the plot will update each time the `Observable` changes (see the docstring for more info);
 
 * If you resize the plot window, right clicking on the figure will resize / trim the plot automatically so that it fits within the window without extra space;
 
-* `Polynomial` and `WavefrontError` types can be indexed (zero-based) to return a specific coefficient; their full vector of coefficients can be conveniently accessed using single-argument `getindex` (e.g. `z[]`, `w[]`);
+* `Polynomial` and `Wavefront` types can be indexed (zero-based) to return a specific coefficient; their full vector of coefficients can be conveniently accessed using single-argument `getindex` (e.g. `z[]`, `w[]`);
 
 * Callable types can be called with complex arguments as a convenient method to evaluate them in Cartesian coordinates;
 

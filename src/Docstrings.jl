@@ -63,7 +63,7 @@ Returns eight values contained within a `WavefrontOutput` type, with fields:
 * `v`: full vector of Zernike wavefront error expansion coefficients;
 * `ssr`: the sum of the squared residuals from the fit;
 * `metrics`: named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio;
-* `W`: the `WavefrontError` function `ΔW(ρ, θ)`;
+* `W`: the `Wavefront` function `ΔW(ρ, θ)`;
 * `fig`: the plotted `Makie` figure;
 * `axis`: the plot axis;
 * `plot`: the surface plot object.
@@ -113,7 +113,7 @@ wavefront
 """
     W(ρ, θ, OPD, n_max)
 
-Return the `WavefrontError` function `ΔW(ρ, θ)` corresponding to an `n_max` fit.
+Return the `Wavefront` function `ΔW(ρ, θ)` corresponding to an `n_max` fit.
 
 See also: [`wavefront`](@ref), [`Z`](@ref), [`Y`](@ref).
 """
@@ -170,7 +170,7 @@ transform
 """
     Y(v, ε, [δ], [ϕ], [ω])
 
-Return the `WavefrontError` function `ΔW(ρ, θ)` corresponding to the input transform parameters.
+Return the `Wavefront` function `ΔW(ρ, θ)` corresponding to the input transform parameters.
 
 See also: [`transform`](@ref), [`Z`](@ref), [`W`](@ref).
 """
@@ -192,12 +192,12 @@ Fields:
 
 This type can be indexed (zero-based) to return a specific radial coefficient corresponding to the term with exponent `i`. Calling `getindex` without an explicit index will return the full vector of coefficients.
 
-See also: [`Zernike.WavefrontError`](@ref).
+See also: [`Zernike.Wavefront`](@ref).
 """
 Polynomial
 
 """
-`Zernike.WavefrontError`
+`Zernike.Wavefront`
 
 Callable type: function `ΔW(ρ, θ)` bound to a given set of Zernike polynomial functions `Zᵢ(ρ, θ)` and their corresponding expansion coefficients `aᵢ`.
 
@@ -222,7 +222,7 @@ This type can be indexed (zero-based) to return a specific Zernike expansion coe
 
 See also: [`Zernike.Polynomial`](@ref).
 """
-WavefrontError
+Wavefront
 
 """
     get_j(m::Int, n::Int)
@@ -304,7 +304,7 @@ See also: [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_t
 
     standardize(v_sub::FloatVec, [j::AbstractVector{Int}])
     standardize(v_sub::Vector, orders::Vector{Tuple{Int, Int}})
-    standardize(W::WavefrontError)
+    standardize(W::Wavefront)
 
 Pad a subset Zernike expansion coefficient vector to the full standard length up to `n_max` (`1:j_max+1`).
 
@@ -312,7 +312,7 @@ The tuples in `orders` must be of the form `(m, n)` associated with the respecti
 
 `j` is a vector of single-mode ordering indices associated with the coefficients; if this is not supplied the coefficients will be assumed to be in order (`0:j`).
 
-The `WavefrontError` method pads the `W.a` coefficient vector.
+The `Wavefront` method pads the `W.a` coefficient vector.
 
 """
 standardize
@@ -364,7 +364,7 @@ reset!
     zplot(φ; kwargs...)
     zplot(ρ, θ, φ; kwargs...)
 
-Plot `Zernike` phase function types ([`Polynomial`](@ref)s, [`WavefrontError`](@ref)s, `PartialDerivative`s, arithmetic types, etc.) as well as quantized phase arrays; for the latter the arguments must be a collection of discretized samples where the polar variable objects refer to either ranges, vectors, or 1-dimensional matrices & the like, and the phase structure `φ` is either an array corresponding to these samples or a callable type in which case the matrix will be constructed for you.
+Plot `Zernike` phase function types ([`Polynomial`](@ref)s, [`Wavefront`](@ref)s, `Derivative`s, arithmetic types, etc.) as well as quantized phase arrays; for the latter the arguments must be a collection of discretized samples where the polar variable objects refer to either ranges, vectors, or 1-dimensional matrices & the like, and the phase structure `φ` is either an array corresponding to these samples or a callable type in which case the matrix will be constructed for you.
 
 # Keyword arguments:
 
@@ -384,11 +384,11 @@ Plots can be updated on demand by passing an `Observable` and changing its value
 For example:
 
 ```julia
-w = Observable(WavefrontError([0.0, -1.0, 1.0]))
+w = Observable(Wavefront([0.0, -1.0, 1.0]))
 zplot(w)
 
 # update
-w[] = WavefrontError([0.0, 1.0, 1.0])
+w[] = Wavefront([0.0, 1.0, 1.0])
 ```
 
 As a convenient shortcut any type of phase object can be plotted by simply calling it with no arguments, e.g. as `w()`; similarly, calling it as `w(Screen)` will plot it in a new window; note the first method depends on `display` automatically being called, while the second will explicitly call it.
@@ -398,7 +398,7 @@ See also: [`plotconfig`](@ref).
 zplot
 
 """
-    metrics(ΔW::WavefrontError)
+    metrics(ΔW::Wavefront)
 
 Compute wavefront error metrics. Returns a named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio.
 """
@@ -453,7 +453,7 @@ scale
 """
     S(v, ε; precision)
 
-Scale the pupil over a wavefront using an algorithm based on `Janssen & Dirksen's` formula and return a new `WavefrontError`.
+Scale the pupil over a wavefront using an algorithm based on `Janssen & Dirksen's` formula and return a new `Wavefront`.
 
 `v` is the set of Zernike wavefront error expansion coefficients and `ε` is the scaling factor.
 
@@ -471,9 +471,9 @@ See also: [`wavefront`](@ref).
 map_phase
 
 """
-    reduce_wave(W::WavefrontError, precision::Int)
+    reduce_wave(W::Wavefront, precision::Int)
 
-Reduces `WavefrontError` precision.
+Reduces `Wavefront` precision.
 """
 reduce_wave
 
@@ -498,7 +498,7 @@ julia> unicode
 
 ----
 
-    format_strings(ΔW::WavefrontError)
+    format_strings(ΔW::Wavefront)
 
 Return a (possibly truncated) symbolic representation of the wavefront error in a Zernike basis as a `LaTeXString`.
 

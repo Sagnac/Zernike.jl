@@ -2,7 +2,7 @@ using SparseArrays
 
 const Factor = Union{RadialPolynomial, Harmonic}
 
-struct PartialDerivative{T <: Factor} <: AbstractPolynomial
+struct Derivative{T <: Factor} <: AbstractPolynomial
     order::Int
     inds::NamedTuple{(:j, :n, :m), NTuple{3, Int}}
     N::Float64
@@ -11,8 +11,8 @@ struct PartialDerivative{T <: Factor} <: AbstractPolynomial
 end
 
 struct Gradient{T <: Polynomial}
-    r::PartialDerivative{RadialPolynomial}
-    t::PartialDerivative{Harmonic}
+    r::Derivative{RadialPolynomial}
+    t::Derivative{Harmonic}
     Gradient{Polynomial}(Z::Polynomial) = new(derivatives(Z)...)
 end
 
@@ -30,9 +30,9 @@ function (g::Gradient)(xy::Complex)
 end
 
 struct Laplacian{T <: Polynomial}
-    r1::PartialDerivative{RadialPolynomial}
-    r2::PartialDerivative{RadialPolynomial}
-    t::PartialDerivative{Harmonic}
+    r1::Derivative{RadialPolynomial}
+    r2::Derivative{RadialPolynomial}
+    t::Derivative{Harmonic}
     function Laplacian{T}(Z::T) where T <: Polynomial
         new(derivatives(Z)[1], derivatives(Z, 2)...)
     end
@@ -60,12 +60,12 @@ function derivatives(Z::Polynomial, order::Int = 1)
     m *= psgn(order)
     R′ = RadialPolynomial(λ′, γ′, ν′)
     M′ = Harmonic(m)
-    ∂Z_∂ρ = PartialDerivative{RadialPolynomial}(order, inds, N, R′, M)
-    ∂Z_∂θ = PartialDerivative{Harmonic}(order, inds, N′, R, M′)
+    ∂Z_∂ρ = Derivative{RadialPolynomial}(order, inds, N, R′, M)
+    ∂Z_∂θ = Derivative{Harmonic}(order, inds, N′, R, M′)
     return ∂Z_∂ρ, ∂Z_∂θ
 end
 
-function show(io::IO, ∂::T) where T <: PartialDerivative
+function show(io::IO, ∂::T) where T <: Derivative
     print(io, T, " order: ", ∂.order)
 end
 
