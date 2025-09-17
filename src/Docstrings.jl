@@ -249,6 +249,24 @@ See also: [`get_j`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to
 get_mn
 
 """
+    get_m(j::Int)
+
+Return the azimuthal index `m` given the single mode-ordering index `j`.
+
+See also: [`get_n`](@ref), [`get_mn`](@ref), [`get_j`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`standardize`](@ref).
+"""
+get_m
+
+"""
+    get_n(j::Int)
+
+Return the radial index `n` given the single mode-ordering index `j`.
+
+See also: [`get_m`](@ref), [`get_mn`](@ref), [`get_j`](@ref), [`noll_to_j`](@ref), [`j_to_noll`](@ref), [`fringe_to_j`](@ref), [`j_to_fringe`](@ref), [`standardize`](@ref).
+"""
+get_n
+
+"""
     noll_to_j(noll::Int)
 
 Convert Noll indices to ANSI standard indices.

@@ -7,9 +7,10 @@
 
 module Zernike
 
-export zernike, wavefront, transform, Z, W, Y, Wavefront, get_j, get_mn,
-       Noll, Fringe, noll_to_j, j_to_noll, fringe_to_j, j_to_fringe, standardize,
-       Standard, Observable, zplot, reduce_wave, Screen
+export zernike, wavefront, transform, Z, W, Y, Wavefront,
+       get_j, get_m, get_n, get_mn, Noll, Fringe, Standard,
+       noll_to_j, j_to_noll, fringe_to_j, j_to_fringe, standardize,
+       Observable, zplot, Screen, reduce_wave
 
 const public_names = "public \
     radial_coefficients, wavefront_coefficients, transform_coefficients, \
@@ -110,6 +111,8 @@ get_n(j::Int) = ceil(Int, (-3 + √(9 + 8j)) / 2)
 
 # azimuthal frequency
 get_m(j::Int, n::Int) = 2j - (n + 2)n
+
+get_m(j::Int) = get_mn(j)[1]
 
 # ISO / ANSI / OSA standard single mode-ordering index
 function get_j(m::Int, n::Int)
