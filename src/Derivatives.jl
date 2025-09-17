@@ -26,7 +26,7 @@ function (g::Gradient)(xy::Complex)
     s, c = sc = sincos(θ)
     ∂Z_∂x = (c, -s) ⋅ ∇Z
     ∂Z_∂y = sc ⋅ ∇Z
-    return ∂Z_∂x, ∂Z_∂y
+    return [∂Z_∂x, ∂Z_∂y]
 end
 
 struct Laplacian{T <: Polynomial}
