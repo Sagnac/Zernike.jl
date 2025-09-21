@@ -47,7 +47,7 @@ function Γ(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T 
             i += 1
             k1 = (n - μ) ÷ 2
             remap[(m, n)] = i
-            set_order!(m, n, order)
+            conjugate_indices!(order, m, n)
             N[i,i] = √(n+1)
             γ = λ[get_i(μ, n)]
             for s = 0:k1
@@ -153,17 +153,22 @@ function translate_ellipse(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64
     return η_s, η_e
 end
 
-function set_order!(m::Int, n::Int, order::Vector{NTuple{3, Int}})
+function conjugate_indices!(order::Vector{NTuple{3, Int}}, m::Int, n::Int)
     push!(order, (get_j(m, n) + 1, get_j(-m, n) + 1, sign(m)))
 end
 
-function to_complex(v::Vector{Float64}, order::Vector{NTuple{3, Int}})
+function sort_coeffs(c::Vector{Complex{Float64}}, order::Vector{NTuple{3, Int}})
+    c[sortperm(order; by = first)]
+end
+
+function to_complex(v::Vector{Float64}, order::Vector{NTuple{3, Int}},
+                    σ = SQRT2)
     c = similar(v, ComplexF64)
     for (i, j) in pairs(order)
         if j[3] < 0
-            c[i] = complex(v[j[2]],  v[j[1]]) / SQRT2
+            c[i] = complex(v[j[2]],  v[j[1]]) / σ
         elseif j[3] > 0
-            c[i] = complex(v[j[1]], -v[j[2]]) / SQRT2
+            c[i] = complex(v[j[1]], -v[j[2]]) / σ
         else
             c[i] = v[j[1]]
         end
@@ -171,14 +176,15 @@ function to_complex(v::Vector{Float64}, order::Vector{NTuple{3, Int}})
     return c
 end
 
-function to_real(c::Vector{Complex{Float64}}, order::Vector{NTuple{3, Int}})
-    c2 = c[sortperm(order; by = first)]
+function to_real(c::Vector{Complex{Float64}}, order::Vector{NTuple{3, Int}},
+                 σ = SQRT2)
+    c2 = sort_coeffs(c, order)
     v2 = similar(c2, Float64)
     for (i, j) in pairs(order)
         if j[3] < 0
-            v2[j[1]] = (c2[j[1]] - c2[j[2]]) / SQRT2 |> imag
+            v2[j[1]] = (c2[j[1]] - c2[j[2]]) / σ |> imag
         elseif j[3] > 0
-            v2[j[1]] = (c2[j[1]] + c2[j[2]]) / SQRT2 |> real
+            v2[j[1]] = (c2[j[1]] + c2[j[2]]) / σ |> real
         else
             v2[j[1]] = c2[j[1]] |> real
         end
