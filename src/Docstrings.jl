@@ -505,12 +505,10 @@ sieve
 """
     format_strings(Z::AbstractPolynomial)
 
-Return a 3-tuple with the index formatted `LaTeX` variable name, the full `LaTeX` string equation, and the `Unicode` string representation of the polynomial.
+Return a 3-tuple with the index formatted `LaTeX` variable name, the full `LaTeX` string equation, and the `Unicode` string representation of the polynomial. Calling the polynomial with the `String` type is a shortcut which yields just the symbolic `Unicode` string.
 
 ```jldoctest
-julia> name, latex, unicode = Zernike.format_strings(Z(-8, 8));
-
-julia> unicode
+julia> Z(-8, 8)(String)
 "√(18)ρ⁸sin(8θ)"
 ```
 
