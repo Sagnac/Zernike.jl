@@ -131,7 +131,15 @@ function grad(m::Int, n::Int)
             end
         end
     end
-    op, d = m < 0 ? ((-), im) : ((+), 1)
-    cx, cy = (op(c[i], c[i+1]) / 2d for i = (1, 3))
+    cx, cy = to_complex(c, m)
     return cx, cy, c
+end
+
+function to_complex(c::Vector{Vector{ComplexF64}}, m::Int)
+    if m < 0
+        cx, cy = (-(c[i], c[i+1]) / 2im for i = (1, 3))
+    else
+        cx, cy = (+(c[i], c[i+1]) / 2   for i = (1, 3))
+    end
+    return cx, cy
 end
