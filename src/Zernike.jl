@@ -22,15 +22,15 @@ VERSION >= v"1.11.0-DEV.469" && eval(Meta.parse(public_names))
 
 using GLMakie
 import .Makie: latexstring, LaTeXString, FigureAxisPlot
-import Base: show, getindex, setindex!, firstindex, lastindex,
-             getproperty
+import Base: show, getindex, setindex!, firstindex, lastindex, getproperty
 
 const ∑ = sum
 const ∏ = prod
 
 ⊗(x, y) = kron(x, y)
 
-const d_max = 2^10
+# magic numbers, limited by performance
+const d_max = 1024
 const d_fit = 21
 
 const finesse = 100

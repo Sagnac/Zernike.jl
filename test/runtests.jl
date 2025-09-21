@@ -314,16 +314,16 @@ end
 
 @testset "derivatives" begin
     Z75 = Z(5, 7)
-    ∂Z_∂ρ, ∂Z_∂θ = Zernike.derivatives(Z75, 3)
+    ∂ρ, ∂θ = Zernike.derivatives(Z75, 3)
     coeffs = zeros(8)
     coeffs[5] = 1470.0
     coeffs[3] = -360.0
-    @test ∂Z_∂ρ.N === 4.0
-    @test ∂Z_∂ρ[] == coeffs
-    @test ∂Z_∂ρ.M.m === 5
-    @test ∂Z_∂θ.N === 500.0
-    @test ∂Z_∂θ[] == Z75[]
-    @test ∂Z_∂θ.M.m === -5
+    @test ∂ρ.N === 4.0
+    @test ∂ρ[] == coeffs
+    @test ∂ρ.M.m === 5
+    @test ∂θ.N === 500.0
+    @test ∂θ[] == Z75[]
+    @test ∂θ.M.m === -5
     gradient = Zernike.Gradient(Z62)
     @test gradient.t.N ≈ -sqrt(14.0) * 2.0 ≈ gradient(1.0, π/4)[2]
     @test gradient(1.0, 0.0)[1] ≈ 22 * sqrt(14.0)

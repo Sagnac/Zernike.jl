@@ -24,9 +24,9 @@ function (g::Gradient)(xy::Complex)
     ρ, θ = polar(xy)
     ∇Z = g(ρ, θ)
     s, c = sc = sincos(θ)
-    ∂Z_∂x = (c, -s) ⋅ ∇Z
-    ∂Z_∂y = sc ⋅ ∇Z
-    return [∂Z_∂x, ∂Z_∂y]
+    ∂x = (c, -s) ⋅ ∇Z
+    ∂y = sc ⋅ ∇Z
+    return [∂x, ∂y]
 end
 
 struct Laplacian{T <: Polynomial}
@@ -60,9 +60,9 @@ function derivatives(Z::Polynomial, order::Int = 1)
     m *= psgn(order)
     R′ = RadialPolynomial(λ′, γ′, ν′)
     M′ = Harmonic(m)
-    ∂Z_∂ρ = Derivative{RadialPolynomial}(order, inds, N, R′, M)
-    ∂Z_∂θ = Derivative{Harmonic}(order, inds, N′, R, M′)
-    return ∂Z_∂ρ, ∂Z_∂θ
+    ∂ρ = Derivative{RadialPolynomial}(order, inds, N, R′, M)
+    ∂θ = Derivative{Harmonic}(order, inds, N′, R, M′)
+    return ∂ρ, ∂θ
 end
 
 function show(io::IO, ∂::T) where T <: Derivative
