@@ -92,6 +92,11 @@ function Wavefront(::Type{<:Gradient}, m::Int, n::Int; normalize::Bool = true)
     return ∂x, ∂y
 end
 
+function Wavefront(::Type{<:Gradient}, j::Int; kw...)
+    @domain_check_j
+    Wavefront(Gradient, get_mn(j)...; kw...)
+end
+
 function conjugate_indices(n_max::Int)
     order = Vector{NTuple{3}{Int}}(undef, get_j(max(n_max, 0)) + 1)
     for i in eachindex(order)
@@ -119,10 +124,11 @@ the real ones.
 =#
 
 function grad(m::Int, n::Int)
+    μ = abs(m)
+    @domain_check_mn
     len = get_j(max(n - 1, 0)) + 1
     c = zeros(ComplexF64, (len, 4))
     # c[:,1:2] ≡ ∂/∂x (Z(±m, n)), c[:,3:4] ≡ ∂/∂y (Z(±m, n))
-    μ = abs(m)
     for ci = n:-2:μ
         n′ = ci - 1
         n′ < 0 && break
