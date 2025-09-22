@@ -71,17 +71,22 @@ end
 
 show(io::IO, ::T) where T <: Union{Gradient, Laplacian} = print(io, T)
 
-function Wavefront(g::Gradient)
+function Wavefront(g::Gradient; kw...)
     (; m, n) = g.r.inds
-    Wavefront(Gradient, m, n)
+    Wavefront(Gradient, m, n; kw...)
 end
 
-function Wavefront(::Type{<:Gradient}, m::Int, n::Int)
+function Wavefront(::Type{<:Gradient}, m::Int, n::Int; normalize::Bool = true)
     c = grad(m, n)
     cx, cy = to_complex(c, m)
     order = conjugate_indices(n - 1)
     ax = to_real(cx, order, 1)
     ay = to_real(cy, order, 1)
+    if normalize
+        N = √N²(m, n)
+        ax *= N
+        ay *= N
+    end
     ∂x = Wavefront(ax)
     ∂y = Wavefront(ay)
     return ∂x, ∂y
