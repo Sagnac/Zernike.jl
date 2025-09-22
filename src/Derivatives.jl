@@ -116,17 +116,16 @@ function grad(m::Int, n::Int)
     len = get_j(max(n - 1, 0)) + 1
     c = [zeros(ComplexF64, len) for i = 1:4]
     # c[1:2] ≡ ∂/∂x (Z(±m, n)), c[3:4] ≡ ∂/∂y (Z(±m, n))
-    for s = 0:div(n - abs(m), 2)
-        cs = n - 2s
-        n′ = cs - 1
+    μ = abs(m)
+    for ci = n:-2:μ
+        n′ = ci - 1
         n′ < 0 && break
-        μ = abs(m)
         for (i, m′) ∈ enumerate(((μ + 1, μ - 1), (-μ + 1, -μ - 1)))
             for (i′, m′′) ∈ enumerate(m′)
                 if abs(m′′) ≤ n′
                     i′′ = get_j(m′′, n′) + 1
-                    c[i][i′′] = cs
-                    c[i+2][i′′] = psgn(i′) * im * cs
+                    c[i][i′′] = ci
+                    c[i+2][i′′] = psgn(i′) * im * ci
                 end
             end
         end
