@@ -128,7 +128,7 @@ function grad(m::Int, n::Int)
     @domain_check_mn
     len = get_j(max(n - 1, 0)) + 1
     c = zeros(ComplexF64, (len, 4))
-    # c[:,1:2] ≡ ∂/∂x (Z(±m, n)), c[:,3:4] ≡ ∂/∂y (Z(±m, n))
+    # c[:,1:2] ≡ ∂/∂x (Z(±|m|, n)), c[:,3:4] ≡ ∂/∂y (Z(±|m|, n))
     t = (μ + 1, μ - 1)
     t = (t, .-reverse(t))
     for ci = n:-2:μ
@@ -142,6 +142,11 @@ function grad(m::Int, n::Int)
         end
     end
     return c
+end
+
+function grad(m::Int, n::Int, ::Type{Vector})
+    c = grad(m, n)
+    m > 0 ? (return c[:,1], c[:,3]) : (return c[:,2], c[:,4])
 end
 
 function to_complex(c::Matrix{ComplexF64}, m::Int)
