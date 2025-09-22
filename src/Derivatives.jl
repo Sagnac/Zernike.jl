@@ -77,7 +77,8 @@ function Wavefront(g::Gradient)
 end
 
 function Wavefront(::Type{<:Gradient}, m::Int, n::Int)
-    cx, cy = grad(m, n)
+    c = grad(m, n)
+    cx, cy = to_complex(c, m)
     order = conjugate_indices(n - 1)
     ax = to_real(cx, order, 1)
     ay = to_real(cy, order, 1)
@@ -130,8 +131,7 @@ function grad(m::Int, n::Int)
             end
         end
     end
-    cx, cy = to_complex(c, m)
-    return cx, cy, c
+    return c
 end
 
 function to_complex(c::Vector{Vector{ComplexF64}}, m::Int)
