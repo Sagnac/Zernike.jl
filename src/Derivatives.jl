@@ -120,8 +120,8 @@ the real ones.
 
 function grad(m::Int, n::Int)
     len = get_j(max(n - 1, 0)) + 1
-    c = [zeros(ComplexF64, len) for i = 1:4]
-    # c[1:2] ≡ ∂/∂x (Z(±m, n)), c[3:4] ≡ ∂/∂y (Z(±m, n))
+    c = zeros(ComplexF64, (len, 4))
+    # c[:,1:2] ≡ ∂/∂x (Z(±m, n)), c[:,3:4] ≡ ∂/∂y (Z(±m, n))
     μ = abs(m)
     for ci = n:-2:μ
         n′ = ci - 1
@@ -130,8 +130,8 @@ function grad(m::Int, n::Int)
             for (i′, m′′) ∈ enumerate(m′)
                 if abs(m′′) ≤ n′
                     i′′ = get_j(m′′, n′) + 1
-                    c[i][i′′] = ci
-                    c[i+2][i′′] = psgn(i′) * im * ci
+                    c[i′′,i] = ci
+                    c[i′′,i+2] = psgn(i′) * im * ci
                 end
             end
         end
@@ -139,7 +139,8 @@ function grad(m::Int, n::Int)
     return c
 end
 
-function to_complex(c::Vector{Vector{ComplexF64}}, m::Int)
+function to_complex(c::Matrix{ComplexF64}, m::Int)
+    c = eachcol(c)
     if m < 0
         cx, cy = (-(c[i], c[i+1]) / 2im for i = (1, 3))
     else
