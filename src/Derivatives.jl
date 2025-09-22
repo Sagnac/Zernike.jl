@@ -97,6 +97,22 @@ function Wavefront(::Type{<:Gradient}, j::Int; kw...)
     Wavefront(Gradient, get_mn(j)...; kw...)
 end
 
+function Wavefront(l::Laplacian; kw...)
+    (; m, n) = l.r1.inds
+    Wavefront(Laplacian, m, n; kw...)
+end
+
+function Wavefront(::Type{<:Laplacian}, m::Int, n::Int; normalize::Bool = true)
+    a = lap(m, n)
+    normalize && (a *= √N²(m, n))
+    return Wavefront(a)
+end
+
+function Wavefront(::Type{<:Laplacian}, j::Int; kw...)
+    @domain_check_j
+    Wavefront(Laplacian, get_mn(j)...; kw...)
+end
+
 function conjugate_indices(n_max::Int)
     order = Vector{NTuple{3}{Int}}(undef, get_j(max(n_max, 0)) + 1)
     for i in eachindex(order)
@@ -106,7 +122,7 @@ function conjugate_indices(n_max::Int)
     return order
 end
 
-#= The following algorithm computes Cartesian derivatives in terms of Zernike polynomials. It is based on mathematical formulas found in:
+#= The following algorithms compute Cartesian derivatives in terms of Zernike polynomials. It is based on mathematical formulas found in:
 
 https://doi.org/10.1364/JOSAA.31.001604
 
@@ -119,7 +135,8 @@ Note:
 Complex polynomials correspond to a linear combination of two real, standard
 Zernike polynomials. As such, derivatives must be computed for conjugate indices
 and appropriately combined before converting the complex coefficients to
-the real ones.
+the real ones. For second order derivatives this is not necessary, hence the
+Laplacian can be computed directly.
 
 =#
 
@@ -157,4 +174,14 @@ function to_complex(c::Matrix{ComplexF64}, m::Int)
         cx, cy = (+(c[i], c[i+1]) / 2   for i = (1, 3))
     end
     return cx, cy
+end
+
+function lap(m::Int, n::Int)
+    μ = abs(m)
+    @domain_check_mn
+    a = zeros(get_j(max(n - 2, 0)) + 1)
+    for s = μ:2:n-2
+        a[get_j(m, s) + 1] = (s + 1) * (n + s + 2) * (n - s)
+    end
+    return a
 end
