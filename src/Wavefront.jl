@@ -2,6 +2,7 @@ const Recap = Vector{NamedTuple{(:j, :n, :m, :a), Tuple{Int, Int, Int, Float64}}
 
 const precision = 3
 const max_precision = 17
+# out-of-bounds sentinel used for dynamically setting default values:
 const wavefront_finesse = 101
 
 struct Wavefront{T <: Polynomial} <: Phase
