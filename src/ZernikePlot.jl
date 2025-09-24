@@ -122,3 +122,5 @@ end
 (φ::Phase)() = zplot(φ)
 
 (φ::Phase)(::Type{T}) where T <: Screen = display(T(), φ())
+
+(φ::Observable{<:Phase})() = φ[]()
