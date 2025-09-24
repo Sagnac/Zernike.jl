@@ -238,7 +238,15 @@ firstindex(W::Wavefront) = 0
 
 lastindex(W::Wavefront) = lastindex(W.v) - 1
 
-setindex!(W::Wavefront, x, j) = (W.v[j.+1] = x)
+function setindex!(W::Wavefront, x, j)
+    for (i, t) in pairs(W.recap)
+        if t.j == j
+            W.recap[i] = merge(t, (; a = x))
+        end
+    end
+    W.a[j.+1] = x
+    W.v[j.+1] = x
+end
 
 # reduces precision
 function reduce_wave(W::Wavefront, precision::Int)
