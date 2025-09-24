@@ -71,6 +71,13 @@ end
 
 show(io::IO, ::T) where T <: Union{Gradient, Laplacian} = print(io, T)
 
+function complex(g::Gradient)
+    function(xy::Complex)
+        abs(xy) > 1.0 && return 0.0im
+        complex(g(xy)...)
+    end
+end
+
 function Wavefront(g::Gradient; kw...)
     (; m, n) = g.r.inds
     Wavefront(Gradient, m, n; kw...)

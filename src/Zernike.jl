@@ -22,7 +22,7 @@ VERSION >= v"1.11.0-DEV.469" && eval(Meta.parse(public_names))
 
 using GLMakie
 import .Makie: latexstring, LaTeXString, FigureAxisPlot
-import Base: show, getindex, setindex!, firstindex, lastindex, getproperty
+import Base: show, getindex, setindex!, firstindex, lastindex, getproperty, complex
 
 const ∑ = sum
 const ∏ = prod
@@ -230,6 +230,16 @@ function show(io::IO, ::MIME"text/plain", output::Output)
     end
     display(output.fig)
     return
+end
+
+function complex(Z::AbstractPolynomial)
+    (; N, R, M) = Z
+    (; m) = M
+    function(s::Complex)
+        ρ, θ = polar(s)
+        ρ > 1.0 && return 0.0im
+        N * R(ρ) * ei(m * θ)
+    end
 end
 
 getindex(Z::AbstractPolynomial) = Z.R.λ
