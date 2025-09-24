@@ -72,7 +72,7 @@ function zplot(args...; window_title = "ZernikePlot", plot_title = window_title,
                size = plotconfig.size, fontsize = plotconfig.fontsize,
                focus_on_show = plotconfig.focus_on_show, kwargs...)
     if get(kwargs, :high_order, false)
-        plot_title = latexstring("Log transform of ", plot_title)
+        plot_title = LaTeXString("Log transform of " * plot_title)
     end
     axis3attributes = (
         title = plot_title,
