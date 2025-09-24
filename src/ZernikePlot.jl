@@ -35,12 +35,17 @@ function resize!(plotconfig::PlotConfig)
     plotconfig.size, plotconfig.fontsize = get_monitor_properties()
 end
 
-function reset!(plotconfig::PlotConfig)
+function reset!(plotconfig::PlotConfig; only_theme = false)
+    set_theme!(; GLMakie = (; title = "Makie", focus_on_show = false))
+    only_theme && return plotconfig
     defaults = default_config()
     for name in fieldnames(PlotConfig)
         setfield!(plotconfig, name, defaults[name])
     end
+    return plotconfig
 end
+
+const window_title = "ZernikePlot"
 
 const shading = NoShading
 
@@ -72,14 +77,13 @@ function zernikeplot!(axis, ρ, θ, φ; kwargs...)
     zernikeplot!(axis, ρ, θ, φ.(ρ', θ); kwargs...)
 end
 
-function zplot(args...; window_title = "ZernikePlot", plot_title = window_title,
-               size = plotconfig.size, fontsize = plotconfig.fontsize,
-               focus_on_show = plotconfig.focus_on_show, theme = plotconfig.theme,
-               kwargs...)
+function _zplot(args...; plot_title = window_title,
+                size = plotconfig.size,
+                fontsize = plotconfig.fontsize,
+                kwargs...)
     if get(kwargs, :high_order, false)
         plot_title = LaTeXString("Log transform of " * plot_title)
     end
-    set_theme!(theme)
     axis3attributes = (
         title = plot_title,
         titlesize = fontsize,
@@ -121,8 +125,22 @@ function zplot(args...; window_title = "ZernikePlot", plot_title = window_title,
     colsize!(fig.layout, 1, Aspect(1, 1.0))
     resize_to_layout!(fig)
     onmouserightup(_ -> resize_to_layout!(fig), addmouseevents!(fig.scene))
-    activate!(; title = window_title, focus_on_show)
     return FigureAxisPlot(fig, axis3, plot)
+end
+
+function zplot(args...;
+    window_title = window_title,
+    focus_on_show = plotconfig.focus_on_show,
+    theme = plotconfig.theme,
+    kwargs...
+)
+    screen_config = (; title = window_title, focus_on_show)
+    if Makie.current_backend() != GLMakie
+        GLMakie.activate!(; screen_config...)
+    else
+        set_theme!(; GLMakie = screen_config)
+    end
+    with_theme(() -> _zplot(args...; kwargs...), theme)
 end
 
 (φ::Phase)() = zplot(φ)

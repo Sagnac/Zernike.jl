@@ -357,7 +357,12 @@ Standard
 
 There are two methods which can be used to trigger a settings refresh: [`resize!`](@ref) & [`reset!`](@ref).
 
-Note: setting the `theme` to `Zernike.Attributes()` will use the default Makie theme.
+!!! tip
+    Setting the `theme` to `Zernike.Attributes()` will use the default `Makie` theme.
+
+!!! note
+
+    The `focus_on_show` attribute of `plotconfig` only controls whether `Zernike` plots will set that option of the screen configuration, but if using `Makie` to create other types of plots this property needs to be set using `activate!` or `set_theme!`. The `Zernike.reset!(plotconfig)` function will appropriately reset these along with the rest of the `plotconfig`.
 
 See also: [`zplot`](@ref).
 """
@@ -373,9 +378,13 @@ See also: [`zplot`](@ref), [`reset!`](@ref).
 resize!
 
 """
-    reset!(plotconfig::PlotConfig)
+    reset!(plotconfig::PlotConfig; [only_theme = false])
 
 Reset all of the [`Zernike.plotconfig`](@ref) settings to their defaults.
+
+!!! note
+
+    This will also reset the part of the `GLMakie` global / universal theme used by `Zernike`, particularly the window `title` and `focus_on_show` properties, until another `Zernike` plot is crafted. If you only want to reset the theme and keep the `plotconfig` intact then call with the keyword argument `only_theme = true`.
 
 See also: [`zplot`](@ref), [`resize!`](@ref).
 """
@@ -392,6 +401,7 @@ Plot `Zernike` phase function types ([`Polynomial`](@ref)s, [`Wavefront`](@ref)s
 * `size`::**Tuple{Float64, Float64}**: window size (DPI scaled resolution);
 * `fontsize`::**Float64**: text size;
 * `colormap`::**Symbol**: Default: `:oslo`;
+* `theme`::**Makie.Attributes**: Default: `theme_black()`;
 * `focus_on_show`::**Bool**: whether the window is focused on generation (default: `true`);
 * `window_title`::**String**: window title;
 * `plot_title`::**Union{String, LaTeXString}**: plot title;
@@ -399,6 +409,10 @@ Plot `Zernike` phase function types ([`Polynomial`](@ref)s, [`Wavefront`](@ref)s
 * `n`::**Int**: radial order (used to determine matrix size);
 * `finesse`::**Int**: `{1 ≤ finesse ≤ 100}`: (used to determine matrix size);
 * `high_order`::**Bool**: whether to apply a logarithmic transform (default: `false`).
+
+Any keyword arguments supported by `Makie`'s `surface` are also supported.
+
+----
 
 Plots can be updated on demand by passing an `Observable` and changing its value.
 
@@ -411,6 +425,8 @@ zplot(w)
 # update
 w[] = Wavefront([0.0, 1.0, 1.0])
 ```
+
+----
 
 As a convenient shortcut any type of phase object can be plotted by simply calling it with no arguments, e.g. as `w()`; similarly, calling it as `w(Screen)` will plot it in a new window; note the first method depends on `display` automatically being called, while the second will explicitly call it.
 
