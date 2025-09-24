@@ -5,6 +5,7 @@ mutable struct PlotConfig
     size::Tuple{Float64, Float64}
     fontsize::Float64
     colormap::Symbol
+    theme::Makie.Attributes
     focus_on_show::Bool
 end
 
@@ -23,6 +24,7 @@ function default_config()
     return (;
         get_monitor_properties()...,
         colormap = :oslo,
+        theme = theme_black(),
         focus_on_show = true,
     )
 end
@@ -72,10 +74,12 @@ end
 
 function zplot(args...; window_title = "ZernikePlot", plot_title = window_title,
                size = plotconfig.size, fontsize = plotconfig.fontsize,
-               focus_on_show = plotconfig.focus_on_show, kwargs...)
+               focus_on_show = plotconfig.focus_on_show, theme = plotconfig.theme,
+               kwargs...)
     if get(kwargs, :high_order, false)
         plot_title = LaTeXString("Log transform of " * plot_title)
     end
+    set_theme!(theme)
     axis3attributes = (
         title = plot_title,
         titlesize = fontsize,

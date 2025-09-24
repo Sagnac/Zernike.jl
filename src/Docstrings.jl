@@ -352,9 +352,12 @@ Standard
 * `size`::**Tuple{Float64, Float64}**: window size (DPI scaled resolution);
 * `fontsize`::**Float64**: text size;
 * `colormap`::**Symbol**: Default: `:oslo`;
+* `theme`::**Makie.Attributes**: Default: `theme_black()`;
 * `focus_on_show`::**Bool**: whether the window is focused on generation (default: `true`).
 
 There are two methods which can be used to trigger a settings refresh: [`resize!`](@ref) & [`reset!`](@ref).
+
+Note: setting the `theme` to `Zernike.Attributes()` will use the default Makie theme.
 
 See also: [`zplot`](@ref).
 """
