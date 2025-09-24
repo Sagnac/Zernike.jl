@@ -58,7 +58,7 @@ function zernikeplot!(axis, ρ, θ, φ::FloatMat; kwargs...)
     ρ = vec(ρ)
     θ = vec(θ)
     x, y = polar_mat(ρ, θ)
-    colormap = haskey(kwargs, :colormap) ? kwargs[:colormap] : plotconfig.colormap
+    colormap = get(kwargs, :colormap, plotconfig.colormap)
     surface!(axis, x, y, φ; shading = NoShading, colormap)
 end
 
@@ -71,7 +71,7 @@ end
 function zplot(args...; window_title = "ZernikePlot", plot_title = window_title,
                size = plotconfig.size, fontsize = plotconfig.fontsize,
                focus_on_show = plotconfig.focus_on_show, kwargs...)
-    if haskey(kwargs, :high_order) && kwargs[:high_order]
+    if get(kwargs, :high_order, false)
         plot_title = latexstring("Log transform of ", plot_title)
     end
     axis3attributes = (
