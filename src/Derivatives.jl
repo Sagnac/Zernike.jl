@@ -121,13 +121,15 @@ function Wavefront(::Type{<:Laplacian}, j::Int; kw...)
 end
 
 function conjugate_indices(n_max::Int)
-    order = Vector{NTuple{3}{Int}}(undef, get_j(max(n_max, 0)) + 1)
+    order = Vector{NTuple{3}{Int}}(undef, to_i(n_max))
     for i in eachindex(order)
         m, n = get_mn(i - 1)
-        order[i] = (i, get_j(-m, n) + 1, sign(m))
+        order[i] = (i, to_i(-m, n), sign(m))
     end
     return order
 end
+
+to_i(n_max::Int) = get_j(max(n_max, 0)) + 1
 
 #= The following algorithms compute Cartesian derivatives in terms of Zernike polynomials. It is based on mathematical formulas found in:
 
@@ -150,7 +152,7 @@ Laplacian can be computed directly.
 function grad(m::Int, n::Int)
     μ = abs(m)
     @domain_check_mn
-    len = get_j(max(n - 1, 0)) + 1
+    len = to_i(n - 1)
     c = zeros(ComplexF64, (len, 4))
     # c[:,1:2] ≡ ∂/∂x (Z(±|m|, n)), c[:,3:4] ≡ ∂/∂y (Z(±|m|, n))
     t = (μ + 1, μ - 1)
@@ -160,7 +162,7 @@ function grad(m::Int, n::Int)
         n′ < 0 && break
         for (i, m′) ∈ enumerate(t′), (i′, m′′) ∈ enumerate(m′)
             abs(m′′) > n′ && continue
-            i′′ = get_j(m′′, n′) + 1
+            i′′ = to_i(m′′, n′)
             c[i′′,i] = s
             c[i′′,i+2] = psgn(i′) * im * s
         end
@@ -186,9 +188,9 @@ end
 function lap(m::Int, n::Int)
     μ = abs(m)
     @domain_check_mn
-    a = zeros(get_j(max(n - 2, 0)) + 1)
+    a = zeros(to_i(n - 2))
     for s = μ:2:n-2
-        a[get_j(m, s) + 1] = (s + 1) * (n + s + 2) * (n - s)
+        a[to_i(m, s)] = (s + 1) * (n + s + 2) * (n - s)
     end
     return a
 end

@@ -132,6 +132,8 @@ function get_mn(j::Int)
     return m, n
 end
 
+to_i(m::Int, n::Int) = get_j(m, n) + 1
+
 function validate_length(v::Vector)
     len = length(v)
     j_max = len - 1

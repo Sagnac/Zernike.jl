@@ -154,7 +154,7 @@ function translate_ellipse(ε::Float64, δ::ComplexF64, ξ::Float64, φ::Float64
 end
 
 function conjugate_indices!(order::Vector{NTuple{3, Int}}, m::Int, n::Int)
-    push!(order, (get_j(m, n) + 1, get_j(-m, n) + 1, sign(m)))
+    push!(order, (to_i(m, n), to_i(-m, n), sign(m)))
 end
 
 function sort_coeffs(c::Vector{Complex{Float64}}, order::Vector{NTuple{3, Int}})
