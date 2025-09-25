@@ -232,14 +232,12 @@ function show(io::IO, ::MIME"text/plain", output::Output)
     return
 end
 
-function complex(Z::AbstractPolynomial)
+function (Z::AbstractPolynomial)(s::Complex)
+    ρ, θ = polar(s)
+    ρ > 1.0 && return 0.0im
     (; N, R, M) = Z
     (; m) = M
-    function(s::Complex)
-        ρ, θ = polar(s)
-        ρ > 1.0 && return 0.0im
-        N * R(ρ) * ei(m * θ)
-    end
+    N * R(ρ) * ei(m * θ)
 end
 
 getindex(Z::AbstractPolynomial) = Z.R.λ
