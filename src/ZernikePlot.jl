@@ -49,6 +49,14 @@ const window_title = "ZernikePlot"
 
 const shading = NoShading
 
+const zproperties = (
+    :zlabelvisible,
+    :zgridvisible,
+    :zticksvisible,
+    :zticklabelsvisible,
+    :zspinesvisible,
+)
+
 function zernikeplot!(axis, φ; m = 10, n = 10, finesse = finesse,
                       high_order = false, colormap = plotconfig.colormap, kwargs...)
     φ = convert(Observable, φ)
@@ -97,22 +105,15 @@ function _zplot(args...; plot_title = window_title,
         protrusions = 80,
     )
     fig = Figure(; size)
-    axis3 = Axis3(fig[1,1]; axis3attributes...)
-    plot = zernikeplot!(axis3, args...; kwargs...)
+    axis3::Axis3 = Axis3(fig[1,1]; axis3attributes...)
+    plot::SurfacePlot = zernikeplot!(axis3, args...; kwargs...)
     on(_ -> reset_limits!(axis3), plot[3])
     # hacky way to produce a top-down heatmap-style view without generating
     # another plot with a different set of data
     # accomplished by adding a toggle which changes the perspective on demand
-    zproperties = (
-        :zlabelvisible,
-        :zgridvisible,
-        :zticksvisible,
-        :zticklabelsvisible,
-        :zspinesvisible,
-    )
     pgrid = GridLayout(fig[1,2]; tellheight = false, valign = :bottom)
     Label(pgrid[1,1], "Pupil view"; fontsize = 0.76fontsize)
-    pupil = Toggle(pgrid[2,1]; active = true)
+    pupil::Toggle = Toggle(pgrid[2,1]; active = true)
     on(pupil.active; update = true) do active
         for property in zproperties
             getproperty(axis3, property)[] = !active
