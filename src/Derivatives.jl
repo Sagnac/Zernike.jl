@@ -194,3 +194,51 @@ function lap(m::Int, n::Int)
     end
     return a
 end
+
+function W(B_plus::Vector{ComplexF64}, B_minus::Vector{ComplexF64})
+    _, n_max = validate_length(B_plus)
+    n′_max = n_max + 1
+    α = Vector{ComplexF64}(undef, to_i(n′_max))
+    for i in eachindex(α)
+        m, n = get_mn(i - 1)
+        m′ = (m + 1, m - 1)
+        n′ = (n - 1, n + 1, n + 2)
+        C = [compute_C(m, ni) for ni ∈ (n, n′[3])]
+        φ1 = (_get(B_plus, m′[1], n′[1]) + _get(B_minus, m′[2], n′[1])) / 2
+        φ2 = (_get(B_plus, m′[1], n′[2]) + _get(B_minus, m′[2], n′[2])) / 2
+        α[i] = C[1] * φ1 - C[2] * φ2
+    end
+    α[1] = 0.0im
+    a = to_real(α, conjugate_indices(n′_max), 1)
+    return a
+end
+
+compute_B(m::Int, n::Int) = compute_B(grad(m, n, Vector)...)
+
+function compute_B(cx::Vector{ComplexF64}, cy::Vector{ComplexF64})
+    B_plus, B_minus = (op(cx, im * cy) for op ∈ (+, -))
+    return B_plus, B_minus
+end
+
+function _get(B::Vector{ComplexF64}, m::Int, n::Int)
+    try
+        B[to_i(m, n)]
+    catch
+        0.0im
+    end
+end
+
+function compute_C(m::Int, n::Int)::ComplexF64
+    μ = abs(m)
+    μ == n ? inv(μ) : inv(2n)
+end
+
+function W(∂x::Vector{Float64}, ∂y::Vector{Float64}; normalize::Bool = true)
+    @assert length(∂x) == length(∂y)
+    _, n_max = validate_length(∂x)
+    order = conjugate_indices(n_max)
+    cx, cy = (to_complex(∂, order, 2) for ∂ in (∂x, ∂y))
+    a = W(compute_B(cx, cy)...)
+    normalize && (a ./= N(collect(0:length(a)-1)))
+    return Wavefront(a)
+end
