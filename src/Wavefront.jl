@@ -234,6 +234,12 @@ getindex(W::Wavefront) = W.v
 
 getindex(W::Wavefront, j) = W.v[j.+1]
 
+getindex(W::Wavefront, m::Int, n::Int) = W[get_j(m, n)]
+
+getindex(W::Wavefront, mn::NTuple{2}{Int}) = W[mn[1], mn[2]]
+
+getindex(W::Wavefront, orders::Vector{NTuple{2}{Int}}) = W[get_j.(orders)]
+
 firstindex(W::Wavefront) = 0
 
 lastindex(W::Wavefront) = lastindex(W.v) - 1
@@ -242,11 +248,17 @@ function setindex!(W::Wavefront, x, j)
     for (i, t) in pairs(W.recap)
         if t.j == j
             W.recap[i] = merge(t, (; a = x))
+            W.a[i] = x
         end
     end
-    W.a[j.+1] = x
     W.v[j.+1] = x
 end
+
+setindex!(W::Wavefront, x, m::Int, n::Int) = setindex!(W, x, get_j(m, n))
+
+setindex!(W::Wavefront, x, mn::NTuple{2}{Int}) = (W[get_j(mn)] = x)
+
+setindex!(W::Wavefront, x, orders::Vector{NTuple{2}{Int}}) = (W[get_j.(orders)] = x)
 
 # reduces precision
 function reduce_wave(W::Wavefront, precision::Int)
