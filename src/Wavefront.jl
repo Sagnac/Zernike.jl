@@ -338,8 +338,8 @@ end
 
 coords(OPD::FloatMat) = coords(polar(size(OPD))...)
 
-# assumes dim(θ) x dim(ρ) matrix polar mapping
-# W(OPD', fit_to, etc.) for dim(ρ) x dim(θ) matrix
+# assumes dim(θ) × dim(ρ) matrix polar mapping
+# W(OPD', fit_to, etc.) for dim(ρ) × dim(θ) matrix
 function wavefront(OPD::FloatMat, fit_to; options...)
     wavefront(coords(OPD)..., vec(OPD), fit_to; options...)
 end
