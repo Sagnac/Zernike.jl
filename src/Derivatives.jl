@@ -249,7 +249,9 @@ function W(∂x::Vector{Float64}, ∂y::Vector{Float64}; normalize::Bool = true)
     return a
 end
 
-W(∂x::Wavefront, ∂y::Wavefront; normalize::Bool = true) = W(∂x[], ∂y[]; normalize)
+function W(∂x::Wavefront, ∂y::Wavefront; normalize::Bool = true)
+    Wavefront(Derivative, ∂x[], ∂y[]; normalize)
+end
 
 function Wavefront(::Type{<:Derivative},
                    ∂x::Vector{Float64}, ∂y::Vector{Float64};
