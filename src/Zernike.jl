@@ -132,16 +132,7 @@ function get_mn(j::Int)
     return m, n
 end
 
-function mnv(v)
-    len = length(v)
-    A = Matrix{Number}(undef, len, 3)
-    for (i, (m, n)) ∈ pairs(get_mn.(0:len-1))
-        A[i,1] = m
-        A[i,2] = n
-    end
-    A[:,3] = v
-    return A
-end
+mnv(v) = hcat(stack(get_mn(j) for j ∈ 0:length(v)-1; dims = 1), Vector{Number}(v))
 
 to_i(m::Int, n::Int) = get_j(m, n) + 1
 
