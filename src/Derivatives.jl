@@ -78,6 +78,8 @@ function complex(g::Gradient)
     end
 end
 
+grad(Z::Polynomial; kw...) = Wavefront(Gradient, Z.inds.m, Z.inds.n; kw...)
+
 function Wavefront(g::Gradient; kw...)
     (; m, n) = g.r.inds
     Wavefront(Gradient, m, n; kw...)
@@ -102,6 +104,10 @@ end
 function Wavefront(::Type{<:Gradient}, j::Int; kw...)
     @domain_check_j
     Wavefront(Gradient, get_mn(j)...; kw...)
+end
+
+function derivatives(W::Wavefront)
+    [mapreduce(*, +, ∂, W.a) for ∂ ∈ eachrow(stack(grad(Z) for Z ∈ W.Z))]
 end
 
 function Wavefront(l::Laplacian; kw...)
