@@ -1,5 +1,5 @@
 # normalization constant for Fringe coefficients
-N(j::Vector{Int}) = broadcast(x -> √N²(x...), get_mn.(j))
+N(j::AbstractVector{Int}) = [√N²(m, n) for (m, n) ∈ get_mn.(j)]
 
 struct Standard
     v::Vector{Float64}

@@ -73,7 +73,7 @@ end
 
 function Wavefront(orders::Vector{NamedTuple{(:m, :n), Tuple{Int, Int}}},
                         a::FloatVec)
-    Wavefront([(mn...,) for mn ∈ orders], a)
+    Wavefront([(m, n) for (m, n) ∈ orders], a)
 end
 
 function Wavefront(orders::Vector{Int}, a::FloatVec)
@@ -113,7 +113,7 @@ end
 
 function reconstruct(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
                      orders::Vector{Tuple{Int, Int}})
-    Zᵢ = Polynomial[Z(mn...) for mn ∈ orders]
+    Zᵢ = Polynomial[Z(m, n) for (m, n) ∈ orders]
     v, ssr = fit(ρ, θ, OPD, Zᵢ)
     return v, ssr, Zᵢ
 end

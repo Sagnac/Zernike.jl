@@ -239,7 +239,7 @@ function W(∂x::Vector{Float64}, ∂y::Vector{Float64}; normalize::Bool = true)
     order = conjugate_indices(n_max)
     cx, cy = (to_complex(∂, order, 2) for ∂ in (∂x, ∂y))
     a = W(compute_B(cx, cy)...)
-    normalize && (a ./= N(collect(0:length(a)-1)))
+    normalize && (a ./= N(0:length(a)-1))
     return a
 end
 
