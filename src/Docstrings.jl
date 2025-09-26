@@ -580,3 +580,12 @@ Laplacian
 Computes the nth order partial derivatives of `Z(ρ, θ)` and returns the two-tuple (`∂Z/∂ρ`, `∂Z/∂θ`).
 """
 derivatives
+
+"""
+    mnv(v)
+
+`Zernike` tool which takes a vector `v` (e.g. a vector of single-index `j` integers or a real or complex floating point coefficient vector) and produces a (length(v) × 3) `Matrix{Number}` with columns corresponding to the indices `m`, `n`, & the vector `v`.
+
+See also: [`get_n`](@ref), [`get_m`](@ref), [`get_mn`](@ref), [`get_j`](@ref).
+"""
+mnv

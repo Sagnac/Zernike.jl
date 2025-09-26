@@ -10,7 +10,7 @@ module Zernike
 export zernike, wavefront, transform, Z, W, Y, Wavefront,
        get_j, get_m, get_n, get_mn, Noll, Fringe, Standard,
        noll_to_j, j_to_noll, fringe_to_j, j_to_fringe, standardize,
-       Observable, plotconfig, zplot, Screen, reduce_wave
+       Observable, plotconfig, zplot, Screen, reduce_wave, mnv
 
 const public_names = "public \
     radial_coefficients, wavefront_coefficients, transform_coefficients, \
@@ -130,6 +130,17 @@ function get_mn(j::Int)
     n = get_n(j)
     m = get_m(j, n)
     return m, n
+end
+
+function mnv(v)
+    len = length(v)
+    A = Matrix{Number}(undef, len, 3)
+    for (i, (m, n)) ∈ pairs(get_mn.(0:len-1))
+        A[i,1] = m
+        A[i,2] = n
+    end
+    A[:,3] = v
+    return A
 end
 
 to_i(m::Int, n::Int) = get_j(m, n) + 1
