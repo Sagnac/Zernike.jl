@@ -99,7 +99,7 @@ end
     @test compare_coefficients(j)
 end
 
-Z62 = Z(2, 6)
+const Z62 = Z(2, 6)
 
 @testset "zernike polynomials" begin
     @test_throws DomainError Z(-1)
@@ -116,13 +116,13 @@ Z62 = Z(2, 6)
     @test R(1.0) ≈ sum(R.γ) ≈ sum(R.λ) ≈ 1.0
 end
 
-ρ = range(0.0, 1.0, 21)
-θ = range(0, 2π, 21)
-z = Z62.(ρ', θ)
-OPD = z + [10sinc(5r) for i = 1:21, r ∈ ρ]
-r, t = coords(OPD)
-OPD_vec = vec(OPD)
-v = reconstruct(r, t, OPD_vec, 8)[1]
+const ρ = range(0.0, 1.0, 21)
+const θ = range(0, 2π, 21)
+const z = Z62.(ρ', θ)
+const OPD = z + [10sinc(5r) for i = 1:21, r ∈ ρ]
+const r, t = coords(OPD)
+const OPD_vec = vec(OPD)
+const v = reconstruct(r, t, OPD_vec, 8)[1]
 
 @testset "wavefront error" begin
     @test_throws "number" validate_length(ones(5))
@@ -343,8 +343,8 @@ end
     @test format_strings(ΔW2) == latexstring(non_abbreviated)
 end
 
-ΔW = W(OPD, 8; precision = max_precision)
-ε = 0.75
+const ΔW = W(OPD, 8; precision = max_precision)
+const ε = 0.75
 
 @testset "scale" begin
     @test_throws DomainError S(v, -1.0)
@@ -359,12 +359,12 @@ end
     @test ΔW_scaled ≈ ΔW_Y(1.0, π/2)
 end
 
-δ = 0.15 + 0.15im
-ρ_t, θ_t = polar(δ)
-θ1 = 0.68π
-φ = π - θ1 + θ_t
-ρ2 = √(ε^2 + ρ_t^2 - 2*ε*ρ_t*cos(φ))
-θ2 = asin(ε * sin(φ) / ρ2) + θ_t
+const δ = 0.15 + 0.15im
+const ρ_t, θ_t = polar(δ)
+const θ1 = 0.68π
+const φ = π - θ1 + θ_t
+const ρ2 = √(ε^2 + ρ_t^2 - 2*ε*ρ_t*cos(φ))
+const θ2 = asin(ε * sin(φ) / ρ2) + θ_t
 
 @testset "translate" begin
     @test_throws DomainError Y(v, 0.8, 0.1 + 0.4im)
@@ -374,17 +374,17 @@ end
     @test ΔW_t(0.0, 0.0) ≈ ΔW(ρ_t, θ_t)
 end
 
-ϕ = 0.64
-θ1 = 0.21
-φ = π - θ1 + θ_t - ϕ
-ρ2 = √(ε^2 + ρ_t^2 - 2*ε*ρ_t*cos(φ))
-θ2 = asin(ε * sin(φ) / ρ2) + θ_t
+const ϕ = 0.64
+const θ3 = 0.21
+const φ2 = π - θ3 + θ_t - ϕ
+const ρ3 = √(ε^2 + ρ_t^2 - 2*ε*ρ_t*cos(φ2))
+const θ4 = asin(ε * sin(φ2) / ρ3) + θ_t
 
 @testset "rotate" begin
     ΔW_r1 = Y(v, 1.0, 0.0im, ϕ; precision = max_precision)
     @test ΔW_r1(1.0, 0.0) ≈ ΔW(1.0, ϕ)
     ΔW_r2 = Y(v, ε, δ, ϕ; precision = max_precision)
-    @test ΔW_r2(1.0, θ1) ≈ ΔW(ρ2, θ2)
+    @test ΔW_r2(1.0, θ3) ≈ ΔW(ρ3, θ4)
 end
 
 @testset "elliptical" begin
