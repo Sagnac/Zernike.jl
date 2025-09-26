@@ -240,5 +240,13 @@ function W(∂x::Vector{Float64}, ∂y::Vector{Float64}; normalize::Bool = true)
     cx, cy = (to_complex(∂, order, 2) for ∂ in (∂x, ∂y))
     a = W(compute_B(cx, cy)...)
     normalize && (a ./= N(collect(0:length(a)-1)))
-    return Wavefront(a)
+    return a
+end
+
+W(∂x::Wavefront, ∂y::Wavefront; normalize::Bool = true) = W(∂x[], ∂y[]; normalize)
+
+function Wavefront(::Type{<:Derivative},
+                   ∂x::Vector{Float64}, ∂y::Vector{Float64};
+                   normalize::Bool = true)
+    Wavefront(W(∂x, ∂y; normalize))
 end
