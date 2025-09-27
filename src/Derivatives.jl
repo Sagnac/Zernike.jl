@@ -92,9 +92,10 @@ function Wavefront(::Type{<:Gradient}, m::Int, n::Int; normalize::Bool = true)
     ax = to_real(cx, order, 1)
     ay = to_real(cy, order, 1)
     if normalize
-        N = √N²(m, n)
-        ax *= N
-        ay *= N
+        N_ = √N²(m, n)
+        N′ = N(0:length(order)-1)
+        ax .*= N_ ./ N′
+        ay .*= N_ ./ N′
     end
     ∂x = Wavefront(ax)
     ∂y = Wavefront(ay)
@@ -117,7 +118,7 @@ end
 
 function Wavefront(::Type{<:Laplacian}, m::Int, n::Int; normalize::Bool = true)
     a = lap(m, n)
-    normalize && (a *= √N²(m, n))
+    normalize && (a .*= √N²(m, n) ./ N(0:length(a)-1))
     return Wavefront(a)
 end
 
@@ -239,22 +240,25 @@ function compute_C(m::Int, n::Int)::ComplexF64
     μ == n ? inv(μ) : inv(2n)
 end
 
-function W(∂x::Vector{Float64}, ∂y::Vector{Float64}; normalize::Bool = true)
+function W(∂x::Vector{Float64}, ∂y::Vector{Float64}; normalized::Bool = true)
     @assert length(∂x) == length(∂y)
     _, n_max = validate_length(∂x)
     order = conjugate_indices(n_max)
+    if normalized
+        ∂x, ∂y = (∂ .* N(0:length(order)-1) for ∂ in (∂x, ∂y))
+    end
     cx, cy = (to_complex(∂, order, 2) for ∂ in (∂x, ∂y))
     a = W(compute_B(cx, cy)...)
-    normalize && (a ./= N(0:length(a)-1))
+    normalized && (a ./= N(0:length(a)-1))
     return a
 end
 
-function W(∂x::Wavefront, ∂y::Wavefront; normalize::Bool = true)
-    Wavefront(Derivative, ∂x[], ∂y[]; normalize)
+function W(∂x::Wavefront, ∂y::Wavefront; normalized::Bool = true)
+    Wavefront(Derivative, ∂x[], ∂y[]; normalized)
 end
 
 function Wavefront(::Type{<:Derivative},
                    ∂x::Vector{Float64}, ∂y::Vector{Float64};
-                   normalize::Bool = true)
-    Wavefront(W(∂x, ∂y; normalize))
+                   normalized::Bool = true)
+    Wavefront(W(∂x, ∂y; normalized))
 end
