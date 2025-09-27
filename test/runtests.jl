@@ -3,7 +3,7 @@ using Zernike
 using Zernike: N², Φ, get_i, canonical, coords, reconstruct, validate_length,
                valid_fringes, map_phase, format_strings, LaTeXString, latexstring, S,
                metrics, polar, max_precision, Superposition, Product, sieve,
-               transform_coefficients, (..)
+               transform_coefficients, derivatives, Gradient, Laplacian, ei, (..)
 using StatsBase: mean, sample
 
 @testset "fringe" begin
@@ -314,7 +314,7 @@ end
 
 @testset "derivatives" begin
     Z75 = Z(5, 7)
-    ∂ρ, ∂θ = Zernike.derivatives(Z75, 3)
+    ∂ρ, ∂θ = derivatives(Z75, 3)
     coeffs = zeros(8)
     coeffs[5] = 1470.0
     coeffs[3] = -360.0
@@ -324,9 +324,30 @@ end
     @test ∂θ.N === 500.0
     @test ∂θ[] == Z75[]
     @test ∂θ.M.m === -5
-    gradient = Zernike.Gradient(Z62)
+    gradient = Gradient(Z62)
     @test gradient.t.N ≈ -sqrt(14.0) * 2.0 ≈ gradient(1.0, π/4)[2]
     @test gradient(1.0, 0.0)[1] ≈ 22 * sqrt(14.0)
+    samples = 3
+    polynomials = 0:35
+    u, v = (rand(samples) for i = 1:2)
+    sqrt_ϵ = sqrt(eps())
+    ρ = sqrt.((1 - sqrt_ϵ) .* u .+ sqrt_ϵ)
+    θ = 2π * v
+    @testset "polynomial expansions" for j ∈ polynomials, (ρ, θ) ∈ zip(ρ, θ)
+        Z_ = Z(j)
+        G1 = Gradient(Z_)
+        G2 = Wavefront(G1)
+        @test G1(ρ * ei(θ))[1] ≈ G2[1](ρ, θ) atol = sqrt_ϵ
+        @test G1(ρ * ei(θ))[2] ≈ G2[2](ρ, θ) atol = sqrt_ϵ
+        L1 = Laplacian(Z_)
+        L2 = Wavefront(L1)
+        @test L1(ρ * ei(θ)) ≈ L2(ρ, θ) atol = sqrt_ϵ
+    end
+    @testset "wavefront expansions" begin
+        w1 = Wavefront([0.0; rand(length(polynomials)-1)])
+        w2 = W(derivatives(w1)...)
+        @test standardize(w1[]) ≈ w2[]
+    end
 end
 
 @testset "format strings" begin
