@@ -3,7 +3,7 @@ using Zernike
 using Zernike: N², Φ, get_i, canonical, coords, reconstruct, validate_length,
                valid_fringes, map_phase, format_strings, LaTeXString, latexstring, S,
                metrics, polar, max_precision, Superposition, Product, sieve,
-               transform_coefficients, (..)
+               transform_coefficients, ei, to_i, (..)
 using StatsBase: mean, sample
 
 @testset "fringe" begin
@@ -314,7 +314,7 @@ end
 
 @testset "derivatives" begin
     Z75 = Z(5, 7)
-    ∂ρ, ∂θ = Zernike.derivatives(Z75, 3)
+    ∂ρ, ∂θ = derivatives(Z75, 3)
     coeffs = zeros(8)
     coeffs[5] = 1470.0
     coeffs[3] = -360.0
@@ -324,9 +324,42 @@ end
     @test ∂θ.N === 500.0
     @test ∂θ[] == Z75[]
     @test ∂θ.M.m === -5
-    gradient = Zernike.Gradient(Z62)
+    gradient = Gradient(Z62)
     @test gradient.t.N ≈ -sqrt(14.0) * 2.0 ≈ gradient(1.0, π/4)[2]
     @test gradient(1.0, 0.0)[1] ≈ 22 * sqrt(14.0)
+    samples = 4
+    polynomials = 0:35
+    u, v = (rand(samples) for i = 1:2)
+    ϵ = sqrt(eps())
+    ρ = sqrt.((1 - ϵ) .* u .+ ϵ)
+    θ = 2π * v
+    c31x = [1.0, 0.0, 0.0, 0.0, 3.0, 3.0]
+    c31y = [0.0, 0.0, 0.0, 3.0, 0.0, 0.0]
+    c60 = zeros(to_i(4, 4))
+    c60[[to_i(m, n) for (m, n) ∈ ((0, 4), (0, 2), (0, 0))]] = [120, 120, 48]
+    c51 = zeros(to_i(3, 3))
+    c51[[to_i(m, n) for (m, n) ∈ ((1, 3), (1, 1))]] = [80, 64]
+    w31 = Wavefront(Gradient, 1, 3; normalize = false)
+    w60 = Wavefront(Laplacian, 0, 6; normalize = false)
+    w51 = Wavefront(Laplacian, 1, 5; normalize = false)
+    @test getindex.(w31) == (c31x, c31y)
+    @test w60[] == c60
+    @test w51[] == c51
+    @testset "polynomial expansions" for j ∈ polynomials, (ρ, θ) ∈ zip(ρ, θ)
+        Z_ = Z(j)
+        G1 = Gradient(Z_)
+        G2 = Wavefront(G1)
+        @test G1(ρ * ei(θ))[1] ≈ G2[1](ρ, θ) atol = ϵ
+        @test G1(ρ * ei(θ))[2] ≈ G2[2](ρ, θ) atol = ϵ
+        L1 = Laplacian(Z_)
+        L2 = Wavefront(L1)
+        @test L1(ρ * ei(θ)) ≈ L2(ρ, θ) atol = ϵ
+    end
+    @testset "wavefront expansion" begin
+        w1 = Wavefront([0.0; 10.0 * rand(length(polynomials)-1)])
+        w2 = W(derivatives(w1)...)
+        @test all(isapprox.(w1[], w2[]; atol = ϵ))
+    end
 end
 
 @testset "format strings" begin
