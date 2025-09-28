@@ -172,7 +172,7 @@ Arithmetic between these types is defined using the usual operators such that wa
 
 In addition, the `Zernike.Superposition(W)` and `Zernike.Product(W)` constructors (where `W` is a `Vector{Wavefront}`) serve as direct methods for creating composite functions which group evaluate a specified expansion set when an updated set of coefficients is not required.
 
-### Derivatives
+## Derivatives
 
 `Zernike.derivatives(Z::Polynomial, order::Int = 1)` computes the nth order partial derivatives of `Z(ρ, θ)` and returns the two-tuple (`∂Z/∂ρ`, `∂Z/∂θ`) containing the `Derivative` types.
 
@@ -188,6 +188,20 @@ julia> ∂ρ(); # plots it over the pupil when not suppressed
 julia> ∂ρ(String)
 "√(10)4ρ³cos(4θ)"
 ```
+
+----
+
+If the expansion coefficients of the derivatives are desired instead there are several methods available:
+
+`Zernike.grad(Z::Polynomial)` and `Zernike.lap(m, n)`.
+
+----
+
+The `W(∂x, ∂y)` method accepts the gradient of a wavefront in a Zernike basis (e.g. the estimated Zernike expansion coefficients of the transverse aberration components from normalized Shack-Hartmann sensor data) and returns the expansion coefficients of the original wavefront error. The inputs must be in the format of 64-bit floating point vectors representing the normalized Zernike polyomial weights.
+
+----
+
+The three algorithms which compute the expansion coefficients of the gradient, the laplacian, and the original wavefront error from the gradient are based on formulas in [Janssen (2014)](https://doi.org/10.1364/JOSAA.31.001604).
 
 ----
 

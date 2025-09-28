@@ -8,6 +8,8 @@ module MakeDocs
 
 const api_links = [
     "Zernike\\.metrics",
+    "Zernike\\.grad",
+    "Zernike\\.lap",
     "plotconfig",
     "zplot",
     "format_strings",

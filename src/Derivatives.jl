@@ -78,11 +78,11 @@ function complex(g::Gradient)
     end
 end
 
-grad(Z::Polynomial; kw...) = Wavefront(Gradient, Z.inds.m, Z.inds.n; kw...)
+grad(Z::Polynomial) = Wavefront(Gradient, Z.inds.m, Z.inds.n)
 
-function Wavefront(g::Gradient; kw...)
+function Wavefront(g::Gradient)
     (; m, n) = g.r.inds
-    Wavefront(Gradient, m, n; kw...)
+    Wavefront(Gradient, m, n)
 end
 
 function Wavefront(::Type{<:Gradient}, m::Int, n::Int; normalize::Bool = true)
@@ -110,6 +110,8 @@ end
 function derivatives(W::Wavefront)
     [mapreduce(*, +, ∂, W.a) for ∂ ∈ eachrow(stack(grad(Z) for Z ∈ W.Z))]
 end
+
+lap(Z::Polynomial) = Wavefront(Laplacian, Z.inds.m, Z.inds.n)
 
 function Wavefront(l::Laplacian; kw...)
     (; m, n) = l.r1.inds
@@ -253,8 +255,8 @@ function W(∂x::Vector{Float64}, ∂y::Vector{Float64}; normalized::Bool = true
     return a
 end
 
-function W(∂x::Wavefront, ∂y::Wavefront; normalized::Bool = true)
-    Wavefront(Derivative, ∂x[], ∂y[]; normalized)
+function W(∂x::Wavefront, ∂y::Wavefront)
+    Wavefront(Derivative, ∂x[], ∂y[])
 end
 
 function Wavefront(::Type{<:Derivative},

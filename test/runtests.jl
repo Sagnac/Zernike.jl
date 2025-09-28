@@ -3,7 +3,8 @@ using Zernike
 using Zernike: N², Φ, get_i, canonical, coords, reconstruct, validate_length,
                valid_fringes, map_phase, format_strings, LaTeXString, latexstring, S,
                metrics, polar, max_precision, Superposition, Product, sieve,
-               transform_coefficients, ei, to_i, (..)
+               transform_coefficients, grad, lap, Derivative, Gradient, Laplacian,
+               ei, to_i, (..)
 using StatsBase: mean, sample
 
 @testset "fringe" begin
@@ -348,11 +349,11 @@ end
     @testset "polynomial expansions" for j ∈ polynomials, (ρ, θ) ∈ zip(ρ, θ)
         Z_ = Z(j)
         G1 = Gradient(Z_)
-        G2 = Wavefront(G1)
+        G2 = grad(Z_)
         @test G1(ρ * ei(θ))[1] ≈ G2[1](ρ, θ) atol = ϵ
         @test G1(ρ * ei(θ))[2] ≈ G2[2](ρ, θ) atol = ϵ
         L1 = Laplacian(Z_)
-        L2 = Wavefront(L1)
+        L2 = lap(Z_)
         @test L1(ρ * ei(θ)) ≈ L2(ρ, θ) atol = ϵ
     end
     @testset "wavefront expansion" begin

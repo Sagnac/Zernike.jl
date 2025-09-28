@@ -115,7 +115,23 @@ wavefront
 
 Return the `Wavefront` function `ΔW(ρ, θ)` corresponding to an `n_max` fit.
 
-See also: [`wavefront`](@ref), [`Z`](@ref), [`Y`](@ref).
+----
+
+    W(∂x::Vector{Float64}, ∂y::Vector{Float64}; [normalized = true])
+
+Compute the original wavefront error given Zernike expansion coefficient vectors of the partial derivatives of the wavefront error.
+
+`normalized` refers to whether the derivatives are associated with unnormalized Zernike polynomials.
+
+Equivalent to the call: `Wavefront(Derivative, ∂x, ∂y; normalized)`.
+
+----
+
+    W(∂x::Wavefront, ∂y::Wavefront)
+
+Equivalent to the above, but for input wavefronts. Useful if the derivative data was fit into a Zernike basis using `W`.
+
+See also: [`Wavefront`](@ref), [`wavefront`](@ref), [`Z`](@ref), [`Y`](@ref).
 """
 W
 
@@ -219,6 +235,20 @@ Fields:
 The `fit_to` field is an empty vector if the default full range up to `n_max` (`0:j_max`) was used with no `orders` specified. Note that these orders could differ from the polynomials determined after the fit; they are simply what was passed to the fitting function and may refer to polynomials not present in the reconstruction if after filtering the corresponding coefficients are zero.
 
 This type can be indexed (zero-based) to return a specific Zernike expansion coefficient corresponding to the Zernike polynomial of index `j`. Calling `getindex` without an explicit index will return the full vector of coefficients.
+
+----
+
+    Wavefront(G::Gradient{Polynomial})
+
+See [`grad`](@ref).
+
+----
+
+    Wavefront(L::Laplacian)
+
+See [`lap`](@ref).
+
+----
 
 See also: [`Zernike.Polynomial`](@ref).
 """
@@ -562,6 +592,8 @@ print_strings
 Returns the gradient `∇Z(ρ, θ)` in a polar basis.
 
 If called with a complex number `x + iy` this function returns the vector `[∂Z/∂x, ∂Z/∂y]` at the point `(x, y)` in Cartesian coordinates instead.
+
+See also: [`grad`](@ref), [`lap`](@ref), [`derivatives`](@ref), [`Laplacian`](@ref).
 """
 Gradient
 
@@ -571,15 +603,73 @@ Gradient
 Returns the Laplacian `ΔZ(ρ, θ)`.
 
 This function can be evaluated in Cartesian coordinates if passed a complex number instead (i.e. `∇²Z(x, y) ≡ ΔZ(xy::Complex)`).
+
+See also: [`grad`](@ref), [`lap`](@ref), [`derivatives`](@ref), [`Gradient`](@ref).
 """
 Laplacian
 
 """
-    Zernike.derivatives(Z::Polynomial, order::Int = 1)
+    derivatives(Z::Polynomial, order::Int = 1)
 
 Computes the nth order partial derivatives of `Z(ρ, θ)` and returns the two-tuple (`∂Z/∂ρ`, `∂Z/∂θ`).
+
+----
+
+    derivatives(W::Wavefront)
+
+Computes the gradient of the wavefront.
+
+See also: [`grad`](@ref), [`lap`](@ref), [`Gradient`](@ref), [`Laplacian`](@ref).
 """
 derivatives
+
+"""
+    grad(Z::Polynomial)
+
+Return the gradient of the Zernike polynomial expressed as a `Wavefront` in Zernike polynomial expansion coefficients.
+
+Equivalent to:
+
+    Wavefront(G::Gradient{Polynomial})
+    Wavefront(::Type{<:Gradient}, m, n; [normalize = true])
+    Wavefront(::Type{<:Gradient}, j; [normalize = true])
+
+with the last two methods allowing unnormalized input. Normalized means the polynomial is expressed as `Z(ρ, θ) = N * R(ρ) * M(θ)` with `N` being the normalization prefactor required so that `π`-normalized integration with respect to the areal measure of `Z²` over the unit disk yields unity .
+
+----
+
+    grad(m, n)
+
+Return a complex matrix encoding the partial derivatives of a complex unnormalized `Zernike` polynomial at indices `m` & `n`.
+
+The first two columns of the matrix refer to the `x` partial derivatives of `Z(|m|, n)` & `Z(-|m|, n)`, respectively. Likewise, the last two columns refer to the `y` partial derivatives of `Z(|m|, n)` & `Z(-|m|, n)`.
+
+----
+
+    grad(m, n, ::Type{Vector})
+
+Convenience method which returns the relevant sign-dependent gradient from the above mentioned `grad(m, n)`.
+
+See also: [`lap`](@ref), [`Gradient`](@ref), [`Laplacian`](@ref), [`derivatives`](@ref).
+"""
+grad
+
+"""
+    lap(Z::Polynomial)
+
+Return the Laplacian of the Zernike polynomial expressed as a `Wavefront` in Zernike polynomial expansion coefficients.
+
+Equivalent to:
+
+    Wavefront(L::Laplacian)
+    Wavefront(::Type{<:Laplacian}, m, n; [normalize = true])
+    Wavefront(::Type{<:Laplacian}, j; [normalize = true])
+
+with the last two methods allowing unnormalized input. Normalized means the polynomial is expressed as `Z(ρ, θ) = N * R(ρ) * M(θ)` with `N` being the normalization prefactor required so that `π`-normalized integration with respect to the areal measure of `Z²` over the unit disk yields unity .
+
+See also: [`grad`](@ref), [`Gradient`](@ref), [`Laplacian`](@ref), [`derivatives`](@ref).
+"""
+lap
 
 """
     mnv(v)
