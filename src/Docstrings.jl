@@ -542,9 +542,9 @@ See also: [`print_strings`](@ref).
 format_strings
 
 """
-    print_strings([io::IO], j1::Int, j2::Int)
+    print_strings([io::IO], j::AbstractVector; [limit = true])
 
-Print the Unicode string representations of select Zernike polynomials from single index `j1` to `j2.`; the output stream defaults to `stdout`.
+Print the Unicode string representations of select Zernike polynomials; `j` here can be a range / vector of `Zernike` single indices; the output stream defaults to `stdout` and the vertical output is limited by your `displaysize` unless you pass the keyword argument `limit = false`.
 
 ----
 

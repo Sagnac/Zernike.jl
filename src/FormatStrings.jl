@@ -106,15 +106,21 @@ end
 
 (Z::AbstractPolynomial)(::Type{String}) = format_strings(Z)[3]
 
-function print_strings(io::IO, j1::Int, j2::Int)
-    @domain(j2 > j1, j1, j2)
-    j_max_digits = ndigits(j2)
-    for j ∈ j1:j2
+function print_strings(io::IO, j::AbstractVector; limit = true)
+    j_begin = j[begin]
+    j_end = j[end]
+    @domain(j_end > j_begin, j)
+    j_max_digits = ndigits(j_end)
+    for (i, j) ∈ enumerate(j)
+        if limit && i > displaysize(io)[1]
+            @info "Results have been truncated; pass limit = false for full output."
+            return
+        end
         println(io, j, ' ' ^ (4 + j_max_digits - ndigits(j)), Z(j)(String))
     end
     return
 end
 
-print_strings(j1::Int, j2::Int) = print_strings(stdout, j1, j2)
+print_strings(j::AbstractVector; kw...) = print_strings(stdout, j; kw...)
 
-print_strings(j_max::Int) = print_strings(0, j_max)
+print_strings(j_max::Int; kw...) = print_strings(0:j_max; kw...)
