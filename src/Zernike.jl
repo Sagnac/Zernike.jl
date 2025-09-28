@@ -10,13 +10,14 @@ module Zernike
 export zernike, wavefront, transform, Z, W, Y, Wavefront,
        get_j, get_m, get_n, get_mn, Noll, Fringe, Standard,
        noll_to_j, j_to_noll, fringe_to_j, j_to_fringe, standardize,
-       Observable, plotconfig, zplot, Screen, reduce_wave, mnv
+       Observable, plotconfig, zplot, Screen, reduce_wave, mnv,
+       derivatives, Derivative, Gradient, Laplacian
 
 const public_names = "public \
     radial_coefficients, wavefront_coefficients, transform_coefficients, \
     metrics, scale, S, Superposition, Product, \
     sieve, format_strings, print_strings, valid_fringes, \
-    derivatives, Derivative, Gradient, resize!, reset!"
+    resize!, reset!"
 
 VERSION >= v"1.11.0-DEV.469" && eval(Meta.parse(public_names))
 
