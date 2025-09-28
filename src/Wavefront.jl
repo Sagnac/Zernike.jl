@@ -36,6 +36,8 @@ function Wavefront(recap, v, n_max, fit_to, a, Z, precision)
 end
 
 function Wavefront(a::FloatVec; precision = max_precision)
+    isempty(a) && (a = [0.0])
+    any(iszero, a) && return Wavefront(sieve(a)...; precision)
     fit_to = []
     v = a
     recap = similar(a, NamedTuple)
@@ -52,9 +54,10 @@ function Wavefront(a::FloatVec; precision = max_precision)
 end
 
 function Wavefront(orders::Vector{Tuple{Int, Int}}, a::FloatVec;
-                        precision = max_precision)
+                   precision = max_precision)
     length(a) != length(orders) && throw(ArgumentError("Lengths must be equal."))
               allunique(orders) || throw(ArgumentError("Orders must be unique."))
+      any(isempty, (orders, a)) && throw(ArgumentError("Vectors must be non-empty."))
     fit_to = []
     recap = similar(a, NamedTuple)
     Zᵢ = similar(a, Polynomial)
@@ -282,6 +285,15 @@ end
 
 function sieve(v::Vector{Float64}, threshold::Float64)
     map(a -> abs(a) < threshold ? 0.0 : a, v)
+end
+
+function sieve(a::FloatVec)
+    i = findall(!iszero, a)
+    if isempty(i)
+        return [(0, 0)], [0.0]
+    else
+        return get_mn.(i .- 1), a[i]
+    end
 end
 
 # pads a subset Zernike expansion coefficient vector to standard length
