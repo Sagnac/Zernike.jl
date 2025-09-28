@@ -112,7 +112,7 @@ function print_strings(io::IO, j::AbstractVector; limit = true)
     @domain(j_end > j_begin, j)
     j_max_digits = ndigits(j_end)
     for (i, j) ∈ enumerate(j)
-        if limit && i > displaysize(io)[1]
+        if limit && i + 4 > displaysize(io)[1]
             @info "Results have been truncated; pass limit = false for full output."
             return
         end
