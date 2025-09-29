@@ -193,7 +193,7 @@ julia> ∂ρ(String)
 
 If the expansion coefficients of the derivatives are desired instead there are several methods available:
 
-`Zernike.grad(Z::Polynomial)` and `Zernike.lap(m, n)`.
+`Zernike.grad(Z::Polynomial)` and `Zernike.lap(Z::Polynomial)`.
 
 ----
 

@@ -86,7 +86,19 @@ function Wavefront(g::Gradient)
 end
 
 function Wavefront(::Type{<:Gradient}, m::Int, n::Int; normalize::Bool = true)
-    c = grad(m, n)
+    ax, ay = grad(m, n, Vector{Real}; normalize)
+    ∂x = Wavefront(ax)
+    ∂y = Wavefront(ay)
+    return ∂x, ∂y
+end
+
+function Wavefront(::Type{<:Gradient}, j::Int; kw...)
+    @domain_check_j
+    Wavefront(Gradient, get_mn(j)...; kw...)
+end
+
+function grad(m::Int, n::Int, ::Type{Vector{Real}}; normalize = true)
+    c = grad(m, n, Matrix{Complex})
     cx, cy = to_complex(c, m)
     order = conjugate_indices(n - 1)
     ax = to_real(cx, order, 1)
@@ -97,14 +109,7 @@ function Wavefront(::Type{<:Gradient}, m::Int, n::Int; normalize::Bool = true)
         ax .*= N_ ./ N′
         ay .*= N_ ./ N′
     end
-    ∂x = Wavefront(ax)
-    ∂y = Wavefront(ay)
-    return ∂x, ∂y
-end
-
-function Wavefront(::Type{<:Gradient}, j::Int; kw...)
-    @domain_check_j
-    Wavefront(Gradient, get_mn(j)...; kw...)
+    return ax, ay
 end
 
 function derivatives(W::Wavefront)
@@ -119,8 +124,7 @@ function Wavefront(l::Laplacian; kw...)
 end
 
 function Wavefront(::Type{<:Laplacian}, m::Int, n::Int; normalize::Bool = true)
-    a = lap(m, n)
-    normalize && (a .*= √N²(m, n) ./ N(0:length(a)-1))
+    a = lap(m, n; normalize)
     return Wavefront(a)
 end
 
@@ -158,7 +162,7 @@ Laplacian can be computed directly.
 
 =#
 
-function grad(m::Int, n::Int)
+function grad(m::Int, n::Int, ::Type{Matrix{Complex}})
     μ = abs(m)
     @domain_check_mn
     len = to_i(n - 1)
@@ -179,8 +183,8 @@ function grad(m::Int, n::Int)
     return c
 end
 
-function grad(m::Int, n::Int, ::Type{Vector})
-    c = grad(m, n)
+function grad(m::Int, n::Int, ::Type{Vector{Complex}})
+    c = grad(m, n, Matrix{Complex})
     m > 0 ? (return c[:,1], c[:,3]) : (return c[:,2], c[:,4])
 end
 
@@ -194,13 +198,14 @@ function to_complex(c::Matrix{ComplexF64}, m::Int)
     return cx, cy
 end
 
-function lap(m::Int, n::Int)
+function lap(m::Int, n::Int; normalize = true)
     μ = abs(m)
     @domain_check_mn
     a = zeros(to_i(n - 2))
     for s = μ:2:n-2
         a[to_i(m, s)] = (s + 1) * (n + s + 2) * (n - s)
     end
+    normalize && (a .*= √N²(m, n) ./ N(0:length(a)-1))
     return a
 end
 
@@ -222,7 +227,7 @@ function W(B_plus::Vector{ComplexF64}, B_minus::Vector{ComplexF64})
     return a
 end
 
-compute_B(m::Int, n::Int) = compute_B(grad(m, n, Vector)...)
+compute_B(m::Int, n::Int) = compute_B(grad(m, n, Vector{Complex})...)
 
 function compute_B(cx::Vector{ComplexF64}, cy::Vector{ComplexF64})
     B_plus, B_minus = (op(cx, im * cy) for op ∈ (+, -))
@@ -255,12 +260,4 @@ function W(∂x::Vector{Float64}, ∂y::Vector{Float64}; normalized::Bool = true
     return a
 end
 
-function W(∂x::Wavefront, ∂y::Wavefront)
-    Wavefront(Derivative, ∂x[], ∂y[])
-end
-
-function Wavefront(::Type{<:Derivative},
-                   ∂x::Vector{Float64}, ∂y::Vector{Float64};
-                   normalized::Bool = true)
-    Wavefront(W(∂x, ∂y; normalized))
-end
+W(∂x::Wavefront, ∂y::Wavefront) = Wavefront(W(∂x[], ∂y[]))
