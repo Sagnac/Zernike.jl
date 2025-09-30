@@ -5,13 +5,13 @@ const max_precision = 17
 # out-of-bounds sentinel used for dynamically setting default values:
 const wavefront_finesse = 101
 
-struct Wavefront{T <: Polynomial} <: Phase
+struct Wavefront{T <: Union{RadialPolynomial, Polynomial}} <: Phase
     recap::Recap
     v::Vector{Float64}
     n_max::Int
     fit_to::Vector{Tuple{Int, Int}}
     a::Vector{Float64}
-    Z::Vector{Polynomial}
+    Z::Vector{T}
     precision::Int
     ssr::Float64
 end
@@ -72,6 +72,31 @@ function Wavefront(orders::Vector{Tuple{Int, Int}}, a::FloatVec;
     n_max = n
     v = standardize(a, orders)
     return Wavefront(recap, v, n_max, fit_to, a, Zᵢ, precision)
+end
+
+function Wavefront(a::FloatVec, m::Int, ::Type{T};
+                   precision = max_precision) where T <: RadialPolynomial
+    isempty(a) && (a = [0.0])
+    fit_to = []
+    μ = abs(m)
+    n_max = μ + 2 * (length(a) - 1)
+    v = a
+    recap = similar(a, NamedTuple)
+    R = similar(a, RadialPolynomial)
+    λ = Φ(μ, n_max)
+    n_range = μ:2:n_max
+    i = get_i.(μ, n_range)
+    λᵢ = λ[i]
+    for (k, n) ∈ pairs(n_range)
+        j = get_j(m, n)
+        aₖ = a[k]
+        recap[k] = (; j, n, m, a = aₖ)
+        λₖ = λ[k]
+        ν = collect(n:-2:μ)
+        γ = Float64[λₖ[νᵢ+1] for νᵢ in ν]
+        R[k] = RadialPolynomial(λₖ, γ, ν)
+    end
+    return Wavefront{RadialPolynomial}(recap, v, n_max, fit_to, a, R, precision, 0.0)
 end
 
 function Wavefront(orders::Vector{NamedTuple{(:m, :n), Tuple{Int, Int}}},
