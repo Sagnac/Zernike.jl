@@ -1,3 +1,5 @@
+const RorZ = Union{RadialPolynomial, Polynomial}
+
 const Recap = Vector{NamedTuple{(:j, :n, :m, :a), Tuple{Int, Int, Int, Float64}}}
 
 const precision = 3
@@ -5,7 +7,7 @@ const max_precision = 17
 # out-of-bounds sentinel used for dynamically setting default values:
 const wavefront_finesse = 101
 
-struct Wavefront{T <: Union{RadialPolynomial, Polynomial}} <: Phase
+struct Wavefront{T <: RorZ} <: Phase
     recap::Recap
     v::Vector{Float64}
     n_max::Int
@@ -108,9 +110,14 @@ function Wavefront(orders::Vector{Int}, a::FloatVec)
     Wavefront([get_mn(j) for j ∈ orders], a)
 end
 
-function (ΔW::Wavefront)(ρ::Real, θ::Real = 0)
+function (ΔW::Wavefront{Polynomial})(ρ::Real, θ::Real = 0)
     (; a, Z) = ΔW
     ∑(aᵢ * Zᵢ(ρ, θ) for (aᵢ, Zᵢ) ∈ zip(a, Z); init = 0.0)
+end
+
+function (ΔW::Wavefront{RadialPolynomial})(ρ::Real)
+    (; a, Z) = ΔW
+    ∑(aᵢ * Rᵢ(ρ) for (aᵢ, Rᵢ) ∈ zip(a, Z); init = 0.0)
 end
 
 (ΔW::Wavefront)(xy::Complex) = ΔW(polar(xy)...)
@@ -231,13 +238,20 @@ end
 # overload show to clean up the output
 show(io::IO, W::T) where {T <: Wavefront} = print(io, T, ": n_max = ", W.n_max)
 
-function show(io::IO, m::MIME"text/plain", W::Wavefront)
+function show(io::IO, m::MIME"text/plain", W::Wavefront{T}) where T <: RorZ
     show(io, W)
     haskey(io, :typeinfo) ? (return) : println(io)
     strip3 = map(-, displaysize(io), (3, 0))
-    println(io, "    ∑aᵢZᵢ(ρ, θ):")
+    if T <: RadialPolynomial
+        f1 = "Rᵢ(ρ)"
+        f2 = "ΔW(ρ)"
+    else
+        f1 = "Zᵢ(ρ, θ)"
+        f2 = "ΔW(ρ, θ)"
+    end
+    println(io, "    ∑aᵢ", f1, ":")
     show(IOContext(io, :limit => true, :displaysize => strip3), m, W.recap)
-    print(io, "\n    --> ΔW(ρ, θ)")
+    print(io, "\n    --> ", f2)
 end
 
 function show(io::IO, W::T) where {T <: WavefrontOutput}
