@@ -19,3 +19,9 @@
 **A. J. E. M. Janssen**, "*Zernike expansion of derivatives and Laplacians of the Zernike circle polynomials*," J. Opt. Soc. Am. A 31, 1604-1613 (2014)
 
 [https://doi.org/10.1364/JOSAA.31.001604](https://doi.org/10.1364/JOSAA.31.001604 "Janssen (2014)")
+
+----
+
+**Cadiot, Matthieu, Jonathan Jaquette, Jean-Philippe Lessard, Akitoshi Takayasu**. "*Validated matrix multiplication transform for orthogonal polynomials with applications to computer-assisted proofs for PDEs*." arXiv preprint arXiv:2411.18361. (2024).
+
+[https://doi.org/10.48550/arXiv.2411.18361](https://doi.org/10.48550/arXiv.2411.18361 "Cadiot et al. (2024)")

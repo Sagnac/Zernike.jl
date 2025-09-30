@@ -79,7 +79,7 @@ function Wavefront(a::FloatVec, m::Int, ::Type{T};
     isempty(a) && (a = [0.0])
     fit_to = []
     μ = abs(m)
-    n_max = μ + 2 * (length(a) - 1)
+    n_max = radial_n_max(μ, a)
     v = a
     recap = similar(a, NamedTuple)
     R = similar(a, RadialPolynomial)

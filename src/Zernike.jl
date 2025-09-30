@@ -11,7 +11,7 @@ export zernike, wavefront, transform, Z, W, Y, Wavefront,
        get_j, get_m, get_n, get_mn, Noll, Fringe, Standard,
        noll_to_j, j_to_noll, fringe_to_j, j_to_fringe, standardize,
        Observable, plotconfig, zplot, Screen, reduce_wave, mnv,
-       derivatives
+       derivatives, star, ⋆
 
 const public_names = "public \
     radial_coefficients, wavefront_coefficients, transform_coefficients, \
@@ -85,6 +85,7 @@ include("ZernikePlot.jl")
 include("ScaleAperture.jl")
 include("TransformAperture.jl")
 include("Derivatives.jl")
+include("MMT.jl")
 include("Docstrings.jl")
 
 function (R::RadialPolynomial)(ρ::Real)
@@ -132,6 +133,8 @@ function get_mn(j::Int)
     m = get_m(j, n)
     return m, n
 end
+
+radial_n_max(μ, a) = μ + 2 * (length(a) - 1)
 
 mnv(v) = hcat(stack(get_mn(j) for j ∈ 0:length(v)-1; dims = 1), Vector{Number}(v))
 
