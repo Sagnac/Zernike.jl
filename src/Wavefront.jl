@@ -93,7 +93,7 @@ function Wavefront(a::FloatVec, m::Int, ::Type{T};
         j = get_j(m, n)
         aₖ = a[k]
         recap[k] = (; j, n, m, a = aₖ)
-        λₖ = λ[k]
+        λₖ = λᵢ[k]
         ν = collect(n:-2:μ)
         γ = Float64[λₖ[νᵢ+1] for νᵢ in ν]
         R[k] = RadialPolynomial(λₖ, γ, ν)
