@@ -10,8 +10,9 @@ https://opg.optica.org/ol/abstract.cfm?uri=ol-38-14-2487
 
 import ShiftedArrays: circshift as shift
 
-get_i(m_max, n_max) = ((n_max + 2)n_max + 1) ÷ 4 + (m_max + iseven(n_max) + 1) ÷ 2
+get_i(m, n) = ((n + 2)n + 1) ÷ 4 + (m + iseven(n) + 1) ÷ 2
 
+# TODO: write a non-allocating version
 function Φ(m_max::Int, n_max::Int, T::Type{<:Number} = Float64)
     @domain(m_max ≥ 0 && n_max ≥ 0 && m_max ≤ n_max && iseven(n_max - m_max),
         """

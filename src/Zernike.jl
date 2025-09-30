@@ -183,7 +183,7 @@ function Z(m::Int, n::Int)
     # normalization constant following the orthogonality relation
     N = √N²(m, n)
     # power (exponent)
-    ν = Int[n - 2s for s = 0:k]
+    ν = collect(n:-2:μ)
     # polynomial coefficients
     if μ == n
         λ = [zeros(n); 1.0]
