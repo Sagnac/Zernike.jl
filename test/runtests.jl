@@ -439,3 +439,17 @@ end
     v2 = [v1; zeros(5)]
     @test transform_coefficients(v1, ε, δ, ϕ) == transform_coefficients(v2, ε, δ, ϕ)
 end
+
+@testset "MMT" begin
+    samples = 9
+    m = rand(0:samples)
+    a = 10.0 * rand(samples)
+    w1 = Wavefront{RadialPolynomial}(m, a)
+    w2 = Wavefront{RadialPolynomial}(m, a)
+    w3 = Wavefront{RadialPolynomial}(0, [0.0, 1.0])
+    @test all((w3 ⋆ w3)[] .≈ [1/3, 0.0, 2/3, 0.0, 0.0])
+    for i = 1:15
+        ρ = rand()
+        @test w1(ρ) * w2(ρ) ≈ (w1 ⋆ w2)(ρ) atol = sqrt(eps())
+    end
+end
