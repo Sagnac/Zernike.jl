@@ -16,6 +16,21 @@ or entering the package mode by pressing `]` and entering:
 add https://github.com/Sagnac/Zernike.jl
 ```
 
+<details>
+
+<summary><i><b>For the base version without plotting and the dependency on Makie</i></b></summary>
+
+```julia
+using Pkg
+Pkg.add(url="https://github.com/Sagnac/Zernike.jl", rev="base")
+```
+or in the package mode:
+```
+add https://github.com/Sagnac/Zernike.jl#base
+```
+
+</details>
+
 It can then be loaded by typing `using Zernike`.
 
 The package provides 3 main functions for modelling Zernike polynomials and wavefront errors:
