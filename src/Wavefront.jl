@@ -378,15 +378,6 @@ function W(x::FloatVec, y::FloatVec, OPD::FloatVec;
     W(ρ, θ, OPD, fit_to; precision)
 end
 
-# extract pupil coordinates
-function coords(ρ::FloatVec, θ::FloatVec)
-    ρ2 = ρ ⊗ ones(length(θ))
-    θ2 = ones(length(ρ)) ⊗ θ
-    return ρ2, θ2
-end
-
-coords(OPD::FloatMat) = coords(polar(size(OPD))...)
-
 # assumes dim(θ) × dim(ρ) matrix polar mapping
 # W(OPD', fit_to, etc.) for dim(ρ) × dim(θ) matrix
 function wavefront(OPD::FloatMat, fit_to; options...)

@@ -77,7 +77,7 @@ end
 include("Domain.jl")
 include("Wavefront.jl")
 include("IndexConversions.jl")
-include("Polar.jl")
+include("Coordinates.jl")
 include("RadialCoefficients.jl")
 include("FormatStrings.jl")
 include("Arithmetic.jl")
@@ -107,38 +107,6 @@ end
 (Z::AbstractPolynomial)(xy::Complex) = Z(polar(xy)...)
 
 (Z::Output)(t...) = Z.Z(t...)
-
-# radial order
-get_n(j::Int) = ceil(Int, (-3 + √(9 + 8j)) / 2)
-
-# azimuthal frequency
-get_m(j::Int, n::Int) = 2j - (n + 2)n
-
-get_m(j::Int) = get_mn(j)[1]
-
-# ISO / ANSI / OSA standard single mode-ordering index
-function get_j(m::Int, n::Int)
-    μ = abs(m)
-    @domain_check_mn
-    return ((n + 2)n + m) ÷ 2
-end
-
-get_j((m, n)) = get_j(m, n)
-
-get_j(n_max::Int) = get_j(n_max, n_max)
-
-function get_mn(j::Int)
-    @domain_check_j
-    n = get_n(j)
-    m = get_m(j, n)
-    return m, n
-end
-
-radial_n_max(μ, a) = μ + 2 * (length(a) - 1)
-
-mnv(v) = hcat(stack(get_mn(j) for j ∈ 0:length(v)-1; dims = 1), Vector{Number}(v))
-
-to_i(m::Int, n::Int) = get_j(m, n) + 1
 
 function validate_length(v::Vector)
     len = length(v)

@@ -34,3 +34,12 @@ function polar_mat(ρ, θ)
     y = @. ρ' * sin(θ)
     return x, y
 end
+
+# extract pupil coordinates
+function coords(ρ::FloatVec, θ::FloatVec)
+    ρ2 = ρ ⊗ ones(length(θ))
+    θ2 = ones(length(ρ)) ⊗ θ
+    return ρ2, θ2
+end
+
+coords(OPD::FloatMat) = coords(polar(size(OPD))...)

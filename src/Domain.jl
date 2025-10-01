@@ -33,3 +33,18 @@ end
 macro domain_check_j()
     esc(:(@domain(j ≥ 0, j)))
 end
+
+macro domain_check_mn_max()
+    quote
+        @domain(m_max ≥ 0 && n_max ≥ 0 && m_max ≤ n_max && iseven(n_max - m_max),
+            """
+            \nDomain:
+            m_max ≥ 0
+            n_max ≥ 0
+            m_max ≤ n_max
+            n_max ≡ m_max (mod 2)
+            """,
+            m_max, n_max
+        )
+    end |> esc
+end
