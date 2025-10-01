@@ -426,6 +426,11 @@ end
     @test_throws DomainError Y(v, ε, δ, ϕ, (2.0, 0.0))
     ΔW_e = Y([0.0, 0.0, 1.0], 1.0, 0.0im, 0.0, (0.148, 0.0))
     @test getfield(ΔW_e, :recap) == [(j = 2, n = 1, m = 1, a = 0.148)]
+    ΔW_e2 = Y([0.0, 0.0, 1.0], 1.0, 0.0im, 0.0, (0.5, -π/4))
+    @test getfield(ΔW_e2, :recap) == [
+        (j = 1, n = 1, m = -1, a = 0.25),
+        (j = 2, n = 1, m =  1, a = 0.75)
+    ]
 end
 
 @testset "precision" begin
