@@ -76,9 +76,7 @@ function Wavefront(orders::Vector{Tuple{Int, Int}}, a::FloatVec;
     return Wavefront(recap, v, n_max, fit_to, a, Zᵢ, precision)
 end
 
-RadialPolynomial(a::FloatVec, m::Int) = Wavefront{RadialPolynomial}(a, m)
-
-function Wavefront{RadialPolynomial}(a::FloatVec, m::Int; precision = max_precision)
+function Wavefront{RadialPolynomial}(m::Int, a::FloatVec; precision = max_precision)
     isempty(a) && (a = [0.0])
     fit_to = []
     μ = abs(m)

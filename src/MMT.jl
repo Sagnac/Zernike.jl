@@ -49,7 +49,7 @@ function star(w1::Wavefront{T}, w2::Wavefront{T}) where T <: RadialPolynomial
     b = w2.v
     c, m_3 = product_expansion(m_1, a, m_2, b)
     c = sieve(c, 1e-15)
-    Wavefront(c, m_3, RadialPolynomial)
+    Wavefront{T}(m_3, c)
 end
 
 ⋆(w1, w2) = star(w1, w2)
