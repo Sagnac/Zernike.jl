@@ -454,5 +454,5 @@ end
     w3 = Wavefront{RadialPolynomial}(0, [0.0, 1.0])
     @test all(isapprox.((w3 ⋆ w3)[], [1/3, 0.0, 2/3, 0.0, 0.0]; atol = 1e-15))
     ρ = rand(15)
-    @test (w1.(ρ) .* w2.(ρ)) ≈ (w1 ⋆ w2).(ρ) atol = 1e-4
+    @test (w1.(ρ) .* w2.(ρ)) ≈ (w1 ⋆ w2).(ρ) atol = 1e-8
 end
