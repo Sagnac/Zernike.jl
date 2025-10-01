@@ -82,7 +82,8 @@ under the aforementioned dimensional ordering assumption.
 `fit_to` can be either `n_max::Int` or `orders::Vector{Tuple{Int, Int}}`.
 
 It is also possible to input normalized Cartesian coordinates using the method with 3 positional arguments and passing `fit_to` as a keyword argument:<br>
-`wavefront(x, y, OPD; fit_to, options...)`.
+`wavefront(x, y, OPD; fit_to, options...)`;<br>
+This accepts vectors and matrices for the phase; in this case, if `OPD` is a matrix the shape of the axes is assumed to be `x`-by-`y`.
 
 The function returns eight values contained within a `WavefrontOutput` type, with fields:
 

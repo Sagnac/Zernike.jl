@@ -42,4 +42,9 @@ function coords(ρ::FloatVec, θ::FloatVec)
     return ρ2, θ2
 end
 
+function cartesian_coords(x::FloatVec, y::FloatVec)
+    y, x = coords(y, x)
+    return x, y
+end
+
 coords(OPD::FloatMat) = coords(polar(size(OPD))...)

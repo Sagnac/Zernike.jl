@@ -98,6 +98,8 @@ Fitting method accepting coordinate vectors and a floating-point matrix of corre
 
 Fitting method accepting normalized Cartesian coordinate data.
 
+If `OPD` is a matrix the shape of the axes is assumed to be `x`-by-`y`.
+
 ----
 
 # Keyword argument options:

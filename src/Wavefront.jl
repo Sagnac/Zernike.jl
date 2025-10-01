@@ -397,6 +397,16 @@ function W(ρ::FloatVec, θ::FloatVec, OPD::FloatMat, fit_to;
     W(coords(ρ, θ)..., vec(OPD), fit_to; precision)
 end
 
+# Cartesian methods
+function wavefront(x::FloatVec, y::FloatVec, OPD::FloatMat; fit_to, options...)
+    wavefront(cartesian_coords(x, y)..., vec(OPD); fit_to, options...)
+end
+
+function W(x::FloatVec, y::FloatVec, OPD::FloatMat;
+           fit_to, precision::Int = precision)
+    W(cartesian_coords(x, y)..., vec(OPD); fit_to, precision)
+end
+
 # reverse transform;
 # for input vectors corresponding to ordered triples over the exit pupil
 # under the assumption of equally spaced uniform and regular sampling
