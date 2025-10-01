@@ -7,7 +7,7 @@ end
 
 ==(Z1::Polynomial, Z2::Polynomial) = Z1.inds.j == Z2.inds.j
 
-function ==(P1::T, P2::T) where T <: Phase
+function ==(P1::T, P2::T) where T <: Union{Phase, RadialPolynomial}
     for name ∈ fieldnames(T)
         getfield(P1, name) ≠ getfield(P2, name) && return false
     end
