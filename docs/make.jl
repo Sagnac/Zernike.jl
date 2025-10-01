@@ -99,6 +99,6 @@ if !isempty(MakeDocs.branch)
         repo = "github.com/Sagnac/Zernike.jl.git",
         devbranch = MakeDocs.branch,
         devurl = MakeDocs.branch,
-        versions = ["stable" => "master", "v^", "dev" => "dev"]
+        versions = ["stable" => "master", "v^", "dev" => "dev", "base" => "base"]
     )
 end
