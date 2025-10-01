@@ -13,6 +13,7 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [compat]
 GLMakie = "0.13.0"
+Jacobi = "0.7.0"
 LinearAlgebra = "1.10"
 Printf = "1.10"
 ShiftedArrays = "2.0.0"
