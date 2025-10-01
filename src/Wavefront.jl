@@ -37,9 +37,9 @@ function Wavefront(recap, v, n_max, fit_to, a, Z, precision)
     Wavefront(recap, v, n_max, fit_to, a, Z, precision, 0.0)
 end
 
-function Wavefront(a::FloatVec; precision = max_precision)
+function Wavefront(a::FloatVec)
     isempty(a) && (a = [0.0])
-    any(iszero, a) && return Wavefront(sieve(a)...; precision)
+    any(iszero, a) && return Wavefront(sieve(a)...)
     fit_to = []
     v = a
     recap = similar(a, NamedTuple)
@@ -52,11 +52,10 @@ function Wavefront(a::FloatVec; precision = max_precision)
         Zᵢ[i] = Z(j)
     end
     n_max = n
-    return Wavefront(recap, v, n_max, fit_to, a, Zᵢ, precision)
+    return Wavefront(recap, v, n_max, fit_to, a, Zᵢ, max_precision)
 end
 
-function Wavefront(orders::Vector{Tuple{Int, Int}}, a::FloatVec;
-                   precision = max_precision)
+function Wavefront(orders::Vector{Tuple{Int, Int}}, a::FloatVec)
     length(a) != length(orders) && throw(ArgumentError("Lengths must be equal."))
               allunique(orders) || throw(ArgumentError("Orders must be unique."))
       any(isempty, (orders, a)) && throw(ArgumentError("Vectors must be non-empty."))
@@ -73,10 +72,10 @@ function Wavefront(orders::Vector{Tuple{Int, Int}}, a::FloatVec;
     end
     n_max = n
     v = standardize(a, orders)
-    return Wavefront(recap, v, n_max, fit_to, a, Zᵢ, precision)
+    return Wavefront(recap, v, n_max, fit_to, a, Zᵢ, max_precision)
 end
 
-function Wavefront{RadialPolynomial}(m::Int, a::FloatVec; precision = max_precision)
+function Wavefront{RadialPolynomial}(m::Int, a::FloatVec)
     isempty(a) && (a = [0.0])
     fit_to = []
     μ = abs(m)
@@ -97,7 +96,7 @@ function Wavefront{RadialPolynomial}(m::Int, a::FloatVec; precision = max_precis
         γ = Float64[λₖ[νᵢ+1] for νᵢ in ν]
         R[k] = RadialPolynomial(λₖ, γ, ν)
     end
-    return Wavefront{RadialPolynomial}(recap, v, n_max, fit_to, a, R, precision, 0.0)
+    Wavefront{RadialPolynomial}(recap, v, n_max, fit_to, a, R, max_precision, 0.0)
 end
 
 function Wavefront(orders::Vector{NamedTuple{(:m, :n), Tuple{Int, Int}}},
