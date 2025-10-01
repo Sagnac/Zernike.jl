@@ -251,6 +251,14 @@ See also: [`grad`](@ref).
 Return the Zernike coefficients of the Laplacian as a `Wavefront`.
 
 See also: [`lap`](@ref).
+
+----
+
+    Wavefront{RadialPolynomial}(m::Int, a::Vector)
+
+Construct a radial series in a Wavefront from an azimuthal index and a coefficient vector associated with a sequence of radial polynomials.
+
+See also [`star`](@ref).
 """
 Wavefront
 
@@ -691,3 +699,15 @@ lap
 See also: [`get_n`](@ref), [`get_m`](@ref), [`get_mn`](@ref), [`get_j`](@ref).
 """
 mnv
+
+"""
+    star(w1::Wavefront{T}, w2::Wavefront{T}) where T <: RadialPolynomial
+    w1 ⋆ w2
+
+Compute the radial product expansion of two `Zernike` radial polynomial sequences.
+
+Returns the coefficients of the new series embedded in a Wavefront. Based on a paper by Cadiot et al. (2024) using Matrix Multiplication Transforms and their inverses to perform quadrature.
+
+See also: [`Wavefront`](@ref).
+"""
+⋆
