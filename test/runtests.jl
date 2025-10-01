@@ -446,13 +446,13 @@ end
 end
 
 @testset "MMT" begin
-    samples = 9
-    m = rand(0:samples)
-    a = rand(samples)
-    w1 = Wavefront{RadialPolynomial}(m, a)
-    w2 = Wavefront{RadialPolynomial}(m, a)
+    samples = 3
+    m = [rand(0:samples) for i = 1:2]
+    a = [rand(samples) for i = 1:2]
+    w1 = Wavefront{RadialPolynomial}(m[1], a[1])
+    w2 = Wavefront{RadialPolynomial}(m[2], a[2])
     w3 = Wavefront{RadialPolynomial}(0, [0.0, 1.0])
     @test all(isapprox.((w3 ⋆ w3)[], [1/3, 0.0, 2/3, 0.0, 0.0]; atol = 1e-15))
     ρ = rand(15)
-    @test (w1.(ρ) .* w2.(ρ)) ≈ (w1 ⋆ w2).(ρ) atol = 0.1
+    @test (w1.(ρ) .* w2.(ρ)) ≈ (w1 ⋆ w2).(ρ) atol = 1e-4
 end
