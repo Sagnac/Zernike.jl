@@ -39,7 +39,7 @@ function product_expansion(m_1::Int, a::Vector, m_2::Int, b::Vector)
     f_1 = MMT_1 * a_padded
     f_2 = MMT_2 * b_padded
     c = iMMT * (f_0 .* f_1 .* f_2)
-    return c, m_3
+    return m_3, c
 end
 
 function star(w1::Wavefront{T}, w2::Wavefront{T}) where T <: RadialPolynomial
@@ -47,8 +47,8 @@ function star(w1::Wavefront{T}, w2::Wavefront{T}) where T <: RadialPolynomial
     m_2 = w2.recap[1].m
     a = w1.a
     b = w2.v
-    c, m_3 = product_expansion(m_1, a, m_2, b)
-    c = sieve(c, 1e-15)
+    m_3, c = product_expansion(m_1, a, m_2, b)
+    # c = sieve(c, 1e-15)
     Wavefront{T}(m_3, c)
 end
 
