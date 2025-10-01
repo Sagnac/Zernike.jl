@@ -713,3 +713,5 @@ Returns the coefficients of the new series embedded in a Wavefront. Based on a p
 See also: [`Wavefront`](@ref).
 """
 ⋆
+
+@doc (@doc ⋆) star
