@@ -4,8 +4,9 @@ using Zernike: N², Φ, get_i, canonical, coords, reconstruct, validate_length,
                valid_fringes, map_phase, format_strings, LaTeXString, latexstring, S,
                metrics, polar, max_precision, Superposition, Product, sieve,
                transform_coefficients, grad, lap, Derivative, Gradient, Laplacian,
-               ei, to_i, (..)
+               ei, to_i
 using StatsBase: mean, sample
+using IntervalSets: (..)
 
 @testset "fringe" begin
     @test_throws DomainError fringe_to_j(38)

@@ -1,28 +1,26 @@
 # Zernike.jl
-# Version 5.6.0
-# 2025-09-04
-# https://github.com/Sagnac/Zernike.jl
+# Base Version 6.0.0
+# 2025-10-01
+# https://github.com/Sagnac/Zernike.jl/tree/base
 
-# Generates Zernike polynomials, models wavefront errors, and plots them using Makie.
+# Generates Zernike polynomials, & models wavefront errors.
 
 module Zernike
 
-export zernike, wavefront, transform, Z, W, Y, Wavefront, RadialPolynomial,
+export Z, W, Y, Wavefront, RadialPolynomial,
        get_j, get_m, get_n, get_mn, Noll, Fringe, Standard,
        noll_to_j, j_to_noll, fringe_to_j, j_to_fringe, standardize,
-       Observable, plotconfig, zplot, Screen, reduce_wave, mnv,
-       derivatives, star, ⋆
+       reduce_wave, mnv, derivatives, star, ⋆
 
 const public_names = "public \
     radial_coefficients, wavefront_coefficients, transform_coefficients, \
     metrics, scale, S, Superposition, Product, \
     sieve, format_strings, print_strings, valid_fringes, \
-    resize!, reset!, grad, lap, Derivative, Gradient, Laplacian"
+    grad, lap, Derivative, Gradient, Laplacian"
 
 VERSION >= v"1.11.0-DEV.469" && eval(Meta.parse(public_names))
 
-using GLMakie
-import .Makie: latexstring, LaTeXString, FigureAxisPlot
+using LaTeXStrings: @L_str, latexstring, LaTeXString
 import Base: show, getindex, setindex!, firstindex, lastindex, getproperty, complex
 
 const ∑ = sum
@@ -39,8 +37,6 @@ const finesse = 100
 # Type aliases
 const FloatVec = AbstractVector{<:AbstractFloat}
 const FloatMat = AbstractMatrix{<:AbstractFloat}
-
-const SurfacePlot = Surface{Tuple{Matrix{Float64}, Matrix{Float64}, Matrix{Float32}}}
 
 abstract type Phase end
 abstract type AbstractPolynomial <: Phase end
@@ -62,18 +58,6 @@ struct Polynomial <: AbstractPolynomial
     M::Harmonic
 end
 
-struct Output
-    Z::Polynomial
-    fig::Makie.Figure
-    axis::Axis3
-    plot::SurfacePlot
-    coeffs::Vector{Float64}
-    latex::LaTeXString
-    unicode::String
-    inds::String
-    high_order::Bool
-end
-
 include("Domain.jl")
 include("Wavefront.jl")
 include("IndexConversions.jl")
@@ -81,7 +65,6 @@ include("Coordinates.jl")
 include("RadialCoefficients.jl")
 include("FormatStrings.jl")
 include("Arithmetic.jl")
-include("ZernikePlot.jl")
 include("ScaleAperture.jl")
 include("TransformAperture.jl")
 include("Derivatives.jl")
@@ -105,8 +88,6 @@ function (Z::AbstractPolynomial)(ρ::Real, θ::Real = 0)
 end
 
 (Z::AbstractPolynomial)(xy::Complex) = Z(polar(xy)...)
-
-(Z::Output)(t...) = Z.Z(t...)
 
 function validate_length(v::Vector)
     len = length(v)
@@ -176,37 +157,8 @@ function Z(m::Int, n::Int)
     return Polynomial(inds, N, R, M)
 end
 
-# main interface function
-function zernike(m::Int, n::Int; finesse = finesse)
-    Z_ = Z(m, n)
-    (; γ) = Z_.R
-    Z_mn, Z_LaTeX, Z_Unicode = format_strings(Z_)
-    inds = chop(string(Z_.inds); head = 1, tail = 1)
-    window_title = "Zernike Polynomial: $inds"
-    high_order = n ≥ 48
-    titles = (; plot_title = Z_.inds.j < 153 ? Z_LaTeX : Z_mn, window_title)
-    fig, axis, plot = zplot(Z_; m, n, finesse, high_order, titles...)
-    Output(Z_, fig, axis, plot, γ, Z_LaTeX, Z_Unicode, inds, high_order)
-end
-
 # overload show to clean up the output
 show(io::IO, Z::T) where {T <: Polynomial} = print(io, T, Z.inds, " --> Z(ρ, θ)")
-
-show(io::IO, output::Output) = print(io, output.inds)
-
-function show(io::IO, ::MIME"text/plain", output::Output)
-    show(io, output)
-    haskey(io, :typeinfo) ? (return) : println(io)
-    if output.high_order
-        println(io)
-        @info "Coefficients are stored in the coeffs field \
-               of the current output." output.coeffs
-    else
-        print(io, "Z = ", output.unicode)
-    end
-    display(output.fig)
-    return
-end
 
 function complex(Z::AbstractPolynomial)
     (; N, R, M) = Z
@@ -225,11 +177,6 @@ getindex(Z::AbstractPolynomial, i) = Z.R.λ[i.+1]
 firstindex(Z::AbstractPolynomial) = 0
 
 lastindex(Z::AbstractPolynomial) = lastindex(Z.R.λ) - 1
-
-# methods
-zernike(; m, n, finesse = finesse) = zernike(m, n; finesse)
-
-zernike(j::Int; finesse = finesse) = zernike(get_mn(j)...; finesse)
 
 Z(j::Int) = Z(get_mn(j)...)
 

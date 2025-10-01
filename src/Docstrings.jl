@@ -1,116 +1,11 @@
 """
-    zernike(m, n)
-    zernike(j)
-
-Plot a Zernike polynomial of azimuthal order `m` and radial degree `n`.
-
-The single index `j` begins at zero and follows the ANSI Z80.28-2004 / ISO 24157:2008 / Optica (OSA) standard.
-
-Returns a `Zernike.Output` type which contains (among other things):
-
-* `Z`: the `Polynomial` function `Z(ρ, θ)`;
-* `fig`: the `Makie` figure;
-* `coeffs`: vector of radial polynomial coefficients;
-* `latex`: `LaTeX` string of the Zernike polynomial;
-* `unicode`: `Unicode` string of the Zernike polynomial.
-
-The coefficients belong to terms with exponent `n - 2(i - 1)` where `i` is the vector's index.
-
-The radial polynomial coefficients are computed using a fast and accurate algorithm suitable for high orders; it is based on a recursive relation presented by Honarvar & Paramesran (2013) doi:10.1364/OL.38.002487.
-
-See also: [`Z`](@ref), [`wavefront`](@ref), [`transform`](@ref), [`radial_coefficients`](@ref).
-
-----
-
-# Keyword argument options:
-
-    zernike(m, n; [finesse::Int = 100])
-
-`finesse`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 1 million.
-"""
-zernike
-
-"""
     Z(m, n)
 
 Return the Zernike `Polynomial` function `Z(ρ, θ)` corresponding to indices `m` and `n`.
 
-See also: [`zernike`](@ref), [`W`](@ref), [`Y`](@ref).
+See also: [`W`](@ref), [`Y`](@ref).
 """
 Z
-
-"""
-    wavefront(ρ, θ, OPD, n_max)
-
-Fit wavefront errors up to order `n_max`.
-
-Estimates wavefront error by expressing optical aberrations as a linear combination of weighted Zernike polynomials using a linear least squares method. The accuracy of this type of wavefront reconstruction represented as an expanded series depends upon a sufficiently sampled phase field and a suitable choice of the fitting order `n_max`.
-
-# Main arguments
-
-`ρ`, `θ`, and `OPD` must be floating-point vectors of equal length; at each specific index the values are elements of an ordered triple over the exit pupil.
-
-* `ρ`: normalized radial exit pupil position variable `{0 ≤ ρ ≤ 1}`;
-* `θ`: angular exit pupil variable in radians `(mod 2π)`, defined positive counter-clockwise from the horizontal x-axis;
-* `OPD`: measured optical path difference in waves;
-* `n_max`: maximum radial degree to fit to.
-
-# Return values
-
-Returns eight values contained within a `WavefrontOutput` type, with fields:
-
-* `recap`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients rounded according to `precision`;
-* `v`: full vector of Zernike wavefront error expansion coefficients;
-* `ssr`: the sum of the squared residuals from the fit;
-* `metrics`: named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio;
-* `W`: the `Wavefront` function `ΔW(ρ, θ)`;
-* `fig`: the plotted `Makie` figure;
-* `axis`: the plot axis;
-* `plot`: the surface plot object.
-
-See also: [`W`](@ref), [`zernike`](@ref), [`transform`](@ref).
-
-----
-
-    wavefront(ρ, θ, OPD, orders::Vector{Tuple{Int, Int}})
-
-Fit wavefront errors to specific Zernike polynomials specified in `orders` containing Zernike `(m, n)` tuples.
-
-----
-
-    wavefront(OPD, fit_to; options...)
-
-Fitting method accepting a floating-point matrix of phase data _uniformly_ produced in a polar coordinate system over the pupil.
-
-The matrix is expected to be a polar grid of regularly spaced periodic samples with the first element referring to the value at the origin and the end points including the boundary of the pupil (i.e. `ρ, θ = 0.0:step:1.0, 0.0:step:2π`). The first axis of the matrix (the rows) must correspond to the angular variable `θ` while the second axis (the columns) must correspond to the radial variable `ρ`.
-
-`fit_to` can be either `n_max::Int` or `orders::Vector{Tuple{Int, Int}}`.
-
-----
-
-    wavefront(ρ::Vector, θ::Vector, OPD::Matrix, fit_to; options...)
-
-Fitting method accepting coordinate vectors and a floating-point matrix of corresponding phase data produced in a polar coordinate system over the pupil under the aforementioned dimensional ordering assumption. This method does not assume equally spaced samples.
-
-----
-
-    wavefront(x, y, OPD; fit_to, options...)
-
-Fitting method accepting normalized Cartesian coordinate data.
-
-If `OPD` is a matrix the shape of the axes is assumed to be `x`-by-`y`.
-
-----
-
-# Keyword argument options:
-
-    wavefront(ρ, θ, OPD, n_max; [precision = 3], [finesse::Int])
-
-* `precision`: number of digits to use after the decimal point in computing the expansion coefficients. Results will be rounded according to this precision and any polynomials with zero-valued coefficients will be ignored when pulling in the Zernike functions while constructing the composite wavefront error; this means lower precision values yield faster results.
-
-* `finesse`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 2^20 (~ 1 million).
-"""
-wavefront
 
 """
     W(ρ, θ, OPD, n_max)
@@ -131,64 +26,16 @@ Compute the original wavefront error coefficients given the Zernike expansion co
 
 Equivalent to the above, but for input wavefronts. Useful if the derivative data was fit into a Zernike basis using `W`. Returns a `Wavefront`.
 
-See also: [`Wavefront`](@ref), [`wavefront`](@ref), [`Z`](@ref), [`Y`](@ref).
+See also: [`Wavefront`](@ref), [`Z`](@ref), [`Y`](@ref).
 """
 W
-
-"""
-    transform(v::Vector{T}, ε::T, [δ::Complex{T}], [ϕ::T], [ω::Tuple{T,T}]) where T <: Float64
-
-Compute a new set of Zernike wavefront error expansion coefficients under a given set of transformation factors and plot the result.
-
-Available transformations are scaling, translation, & rotation for circular and elliptical exit pupils. These are essentially coordinate transformations in the pupil plane over the wavefront map.
-
-# Main arguments
-
-* `v`: vector of full Zernike expansion coefficients ordered in accordance with the ANSI / OSA single index standard. This is the `v` vector returned by `wavefront(ρ, θ, OPD, n_max)`;
-* `ε`: scaling factor `{0 ≤ ε ≤ 1}`;
-* `δ`: translational complex coordinates (displacement of the pupil center in the complex plane);
-* `ϕ`: rotation of the pupil in radians `(mod 2π)`, defined positive counter-clockwise from the horizontal x-axis;
-* `ω`: elliptical pupil transform parameters; 2-tuple where `ω[1]` is the ratio of the minor radius to the major radius of the ellipse and `ω[2]` is the angle defined positive counter-clockwise from the horizontal coordinate axis of the exit pupil to the minor axis of the ellipse.
-
-The order the transformations are applied is:\\
-scaling --> translation --> rotation --> elliptical transform.
-
-See also: [`Y`](@ref), [`zernike`](@ref), [`wavefront`](@ref), [`transform_coefficients`](@ref).
-
-----
-
-# Keyword argument options:
-
-    transform(v, ε, [δ], [ϕ], [ω]; [precision = 3], [finesse::Int])
-
-* `precision`: number of digits to use after the decimal point in computing the expansion coefficients. Results will be rounded according to this precision and any polynomials with zero-valued coefficients will be ignored when pulling in the Zernike functions while constructing the composite wavefront error; this means lower precision values yield faster results.
-
-* `finesse`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 2^20 (~ 1 million).
-
-# Extended help
-
-`ε` = `r₂/r₁` where `r₂` is the new smaller radius, `r₁` the original
-
-In particular the radial variable corresponding to the rescaled exit pupil is normalized such that:\\
-`ρ` = `r/r₂`; `{0 ≤ ρ ≤ 1}`\\
-`r`: radial pupil position, `r₂`: max. radius\\
-`ΔW₂(ρ₂, θ)` = `ΔW₁(ερ₂, θ)`
-
-For translation the shift must be within the bounds of the scaling applied such that:\\
-`0.0 ≤ ε + |δ| ≤ 1.0`.
-
-For elliptical pupils (usually the result of measuring the wavefront off-axis), the major radius is defined such that it equals the radius of the circle and so `ω[1]` is the fraction of the circular pupil covered by the minor radius (this is approximated well by a cosine projection factor for angles up to 40 degrees); `ω[2]` is then the direction of the stretching applied under transformation in converting the ellipse to a circle before fitting the expansion coefficients.
-
-The transformed expansion coefficients are computed using a fast and accurate algorithm suitable for high orders; it is based on a formulation presented by Lundström & Unsbo (2007) doi:10.1364/JOSAA.24.000569.
-"""
-transform
 
 """
     Y(v, ε, [δ], [ϕ], [ω])
 
 Return the `Wavefront` function `ΔW(ρ, θ)` corresponding to the input transform parameters.
 
-See also: [`transform`](@ref), [`Z`](@ref), [`W`](@ref).
+See also: [`Z`](@ref), [`W`](@ref).
 """
 Y
 
@@ -385,96 +232,6 @@ See also: [`standardize`](@ref).
 Standard
 
 """
-`Zernike` plot settings.
-
-# Fields / Options:
-
-* `size`::**Tuple{Float64, Float64}**: window size (DPI scaled resolution);
-* `fontsize`::**Float64**: text size;
-* `colormap`::**Symbol**: Default: `:oslo`;
-* `theme`::**Makie.Attributes**: Default: `theme_black()`;
-* `focus_on_show`::**Bool**: whether the window is focused on generation (default: `true`).
-
-There are two methods which can be used to trigger a settings refresh: [`resize!`](@ref) & [`reset!`](@ref).
-
-!!! tip
-    Setting the `theme` to `Zernike.Attributes()` will use the default `Makie` theme.
-
-!!! note
-
-    The `focus_on_show` attribute of `plotconfig` only controls whether `Zernike` plots will set that option of the screen configuration, but if using `Makie` to create other types of plots this property needs to be set using `activate!` or `set_theme!`. The `Zernike.reset!(plotconfig)` function will appropriately reset these along with the rest of the `plotconfig`.
-
-See also: [`zplot`](@ref).
-"""
-plotconfig
-
-"""
-    resize!(plotconfig::PlotConfig)
-
-Reset only the `size` and `fontsize` settings for [`Zernike.plotconfig`](@ref). This is useful if your primary monitor changes or you want to return to the automatically determined values.
-
-See also: [`zplot`](@ref), [`reset!`](@ref).
-"""
-resize!
-
-"""
-    reset!(plotconfig::PlotConfig; [only_theme = false])
-
-Reset all of the [`Zernike.plotconfig`](@ref) settings to their defaults.
-
-!!! note
-
-    This will also reset the part of the `GLMakie` global / universal theme used by `Zernike`, particularly the window `title` and `focus_on_show` properties, until another `Zernike` plot is crafted. If you only want to reset the theme and keep the `plotconfig` intact then call with the keyword argument `only_theme = true`.
-
-See also: [`zplot`](@ref), [`resize!`](@ref).
-"""
-reset!
-
-"""
-    zplot(φ; kwargs...)
-    zplot(ρ, θ, φ; kwargs...)
-
-Plot `Zernike` phase function types ([`Polynomial`](@ref)s, [`Wavefront`](@ref)s, `Derivative`s, arithmetic types, etc.) as well as quantized phase arrays; for the latter the arguments must be a collection of discretized samples where the polar variable objects refer to either ranges, vectors, or 1-dimensional matrices & the like, and the phase structure `φ` is either an array corresponding to these samples or a callable type in which case the matrix will be constructed for you.
-
-# Keyword arguments:
-
-* `size`::**Tuple{Float64, Float64}**: window size (DPI scaled resolution);
-* `fontsize`::**Float64**: text size;
-* `colormap`::**Symbol**: Default: `:oslo`;
-* `theme`::**Makie.Attributes**: Default: `theme_black()`;
-* `focus_on_show`::**Bool**: whether the window is focused on generation (default: `true`);
-* `window_title`::**String**: window title;
-* `plot_title`::**Union{String, LaTeXString}**: plot title;
-* `m`::**Int**: azimuthal order (used to determine matrix size);
-* `n`::**Int**: radial order (used to determine matrix size);
-* `finesse`::**Int**: `{1 ≤ finesse ≤ 100}`: (used to determine matrix size);
-* `high_order`::**Bool**: whether to apply a logarithmic transform (default: `false`).
-
-Any keyword arguments supported by `Makie`'s `surface` are also supported.
-
-----
-
-Plots can be updated on demand by passing an `Observable` and changing its value.
-
-For example:
-
-```julia
-w = Observable(Wavefront([0.0, -1.0, 1.0]))
-zplot(w)
-
-# update
-w[] = Wavefront([0.0, 1.0, 1.0])
-```
-
-----
-
-As a convenient shortcut any type of phase object can be plotted by simply calling it with no arguments, e.g. as `w()`; similarly, calling it as `w(Screen)` will plot it in a new window; note the first method depends on `display` automatically being called, while the second will explicitly call it.
-
-See also: [`plotconfig`](@ref).
-"""
-zplot
-
-"""
     metrics(ΔW::Wavefront)
 
 Compute wavefront error metrics. Returns a named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio.
@@ -501,7 +258,7 @@ radial_coefficients
 
 Returns a 2-tuple with the full vector of Zernike expansion coefficients obtained through the least squares fit and the corresponding sum of the squared residuals.
 
-See also: [`wavefront`](@ref), [`radial_coefficients`](@ref), [`transform_coefficients`](@ref).
+See also: [`radial_coefficients`](@ref), [`transform_coefficients`](@ref).
 """
 wavefront_coefficients
 
@@ -512,20 +269,9 @@ Directly compute `Zernike` wavefront error expansion coefficients under pupil tr
 
 Returns a 2-tuple with the new coefficient vector and order `n_max`.
 
-See also: [`transform`](@ref), [`radial_coefficients`](@ref), [`wavefront_coefficients`](@ref).
+See also: [`radial_coefficients`](@ref), [`wavefront_coefficients`](@ref).
 """
 transform_coefficients
-
-"""
-    scale(v, ε; precision, finesse)
-
-Scale the pupil over a wavefront using an algorithm based on `Janssen & Dirksen's` formula and plot the result.
-
-`v` is the set of Zernike wavefront error expansion coefficients and `ε` is the scaling factor.
-
-See also: [`transform`](@ref), [`S`](@ref).
-"""
-scale
 
 """
     S(v, ε; precision)
@@ -534,7 +280,7 @@ Scale the pupil over a wavefront using an algorithm based on `Janssen & Dirksen'
 
 `v` is the set of Zernike wavefront error expansion coefficients and `ε` is the scaling factor.
 
-See also: [`Y`](@ref), [`scale`](@ref).
+See also: [`Y`](@ref).
 """
 S
 
@@ -543,7 +289,6 @@ S
 
 Reverse dimensional coordinate transform with respect to the main wavefront error method. Returns the OPD as a matrix along with the corresponding unique coordinate vectors. Assumes uniform sampling.
 
-See also: [`wavefront`](@ref).
 """
 map_phase
 

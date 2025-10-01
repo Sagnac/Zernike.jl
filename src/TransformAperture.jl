@@ -192,18 +192,6 @@ function to_real(c::Vector{Complex{Float64}}, order::Vector{NTuple{3, Int}},
     return v2
 end
 
-function transform(
-    v::Vector{T},
-    ε::T,
-    δ::Complex{T}  = 0.0im,
-    ϕ::T           = 0.0,
-    ω::Tuple{T, T} = (1.0, 0.0);
-    precision::Int = precision, finesse::Int = wavefront_finesse
-) where T <: Float64
-    ΔW = Y(v, ε, δ, ϕ, ω; precision)
-    Λ(ΔW; finesse)
-end
-
 function Y(
     v::Vector{T},
     ε::T,

@@ -10,8 +10,6 @@ const api_links = [
     "Zernike\\.metrics",
     "Zernike\\.grad",
     "Zernike\\.lap",
-    "plotconfig",
-    "zplot",
     "format_strings",
     "print_strings",
     "radial_coefficients",
@@ -26,10 +24,6 @@ const link_paths = Dict(
     api_regex => s"[\1](@ref \2)",
     "(precompile)" => "(https://github.com/Sagnac/Zernike.jl/tree/master/precompile)"
 )
-
-const primaries = ["zernike", "wavefront", "transform"]
-
-const prim_regex = Regex(join(primaries, "|"))
 
 const meta_block = """
 ```@meta
@@ -51,7 +45,6 @@ end
 
 function readme(path)
     pages = Any["Home" => "index.md"]
-    section = []
     file = path * pages[1][2]
     write(file, meta_block)
     io = open(file, "a")
@@ -64,12 +57,7 @@ function readme(path)
             header = m[:header]
             src_page = replace(header, r"[\\/:*?\"<>|]" => ",", "`" => "") * ".md"
             file = path * src_page
-            subsection = check(match(prim_regex, header))
-            push!(subsection ? section : pages, src_page)
-            if length(section) == length(primaries)
-                push!(pages, "Primary functions" => section)
-                empty!(primaries)
-            end
+            push!(pages, src_page)
             write(file, "# " * header * "\n" * meta_block)
             io = open(file, "a")
             continue
@@ -99,6 +87,6 @@ if !isempty(MakeDocs.branch)
         repo = "github.com/Sagnac/Zernike.jl.git",
         devbranch = MakeDocs.branch,
         devurl = MakeDocs.branch,
-        versions = ["stable" => "master", "v^", "dev" => "dev"]
+        versions = ["stable" => "master", "v^", "dev" => "dev", "base" => "base"]
     )
 end
