@@ -466,4 +466,10 @@ end
     @test w4_w5.recap[1].m == 0
     ρ = rand(15)
     @test (w1.(ρ) .* w2.(ρ)) ≈ (w1 ⋆ w2).(ρ) atol = 1e-8
+    samples_2 = 7
+    m2 = [rand(-samples_2:samples_2) for i = 1:2]
+    a2 = [rand(samples_2) for i = 1:2]
+    w6 = Wavefront{RadialPolynomial}(m2[1], a2[1])
+    w7 = Wavefront{RadialPolynomial}(m2[2], a2[2])
+    @test (w6.(ρ) .* w7.(ρ)) ≈ star(w6, w7; threshold = 1e-8).(ρ) atol = 1e-4
 end

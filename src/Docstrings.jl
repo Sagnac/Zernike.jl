@@ -703,12 +703,14 @@ See also: [`get_n`](@ref), [`get_m`](@ref), [`get_mn`](@ref), [`get_j`](@ref).
 mnv
 
 """
-    star(w1::Wavefront{T}, w2::Wavefront{T}) where T <: RadialPolynomial
+    star(w1::Wavefront{T}, w2::Wavefront{T}; [threshold = 5.0E-324]) where T <: RadialPolynomial
     w1 ⋆ w2
 
 Compute the radial product expansion of two `Zernike` radial polynomial sequences.
 
 Returns the coefficients of the new series embedded in a Wavefront. Based on a paper by Cadiot et al. (2024) using Matrix Multiplication Transforms and their inverses to perform quadrature.
+
+The coefficients will be filtered according to `threshold`, with any absolute values less than it being set to zero.
 
 See also: [`Wavefront`](@ref).
 """
