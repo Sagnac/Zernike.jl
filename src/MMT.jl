@@ -42,13 +42,16 @@ function product_expansion(m_1::Int, a::Vector, m_2::Int, b::Vector)
     return m_3, c
 end
 
-function star(w1::Wavefront{T}, w2::Wavefront{T}) where T <: RadialPolynomial
+const threshold = nextfloat(0.0)
+
+function star(w1::Wavefront{T}, w2::Wavefront{T};
+              threshold = threshold) where T <: RadialPolynomial
     m_1 = w1.recap[1].m
     m_2 = w2.recap[1].m
     a = w1.a
     b = w2.v
     m_3, c = product_expansion(m_1, a, m_2, b)
-    # c = sieve(c, 1e-15)
+    c = sieve(c, threshold)
     Wavefront{T}(m_3, c)
 end
 
