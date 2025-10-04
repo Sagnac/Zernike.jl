@@ -146,7 +146,7 @@ end
 function Z(m::Int, n::Int)
     μ = abs(m)
     # validate
-    @domain_check_mn
+    @domain_check(m, n)
     # upper bound for the sum (number of terms - 1 [indexing from zero])
     k = (n - μ) ÷ 2
     # OSA single mode index
@@ -239,7 +239,7 @@ const valid_fringes = fringe_to_j.(1:37)
 
 # API namespace
 function radial_coefficients(m::Int, n::Int, T::Type{<:Number} = Float64)
-    Φ(abs(m), n, T)[end]
+    Φ(m, n, T)[end]
 end
 
 wavefront_coefficients(x...) = reconstruct(x...)[1:2]

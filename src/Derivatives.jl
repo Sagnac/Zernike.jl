@@ -93,7 +93,7 @@ function Wavefront(::Type{<:Gradient}, m::Int, n::Int; normalize::Bool = true)
 end
 
 function Wavefront(::Type{<:Gradient}, j::Int; kw...)
-    @domain_check_j
+    @domain_check(j)
     Wavefront(Gradient, get_mn(j)...; kw...)
 end
 
@@ -129,7 +129,7 @@ function Wavefront(::Type{<:Laplacian}, m::Int, n::Int; normalize::Bool = true)
 end
 
 function Wavefront(::Type{<:Laplacian}, j::Int; kw...)
-    @domain_check_j
+    @domain_check(j)
     Wavefront(Laplacian, get_mn(j)...; kw...)
 end
 
@@ -164,7 +164,7 @@ Laplacian can be computed directly.
 
 function grad(m::Int, n::Int, ::Type{Matrix{Complex}})
     μ = abs(m)
-    @domain_check_mn
+    @domain_check(m, n)
     len = to_i(n - 1)
     c = zeros(ComplexF64, (len, 4))
     # c[:,1:2] ≡ ∂/∂x (Z(±|m|, n)), c[:,3:4] ≡ ∂/∂y (Z(±|m|, n))
@@ -200,7 +200,7 @@ end
 
 function lap(m::Int, n::Int; normalize = true)
     μ = abs(m)
-    @domain_check_mn
+    @domain_check(m, n)
     a = zeros(to_i(n - 2))
     for s = μ:2:n-2
         a[to_i(m, s)] = (s + 1) * (n + s + 2) * (n - s)
