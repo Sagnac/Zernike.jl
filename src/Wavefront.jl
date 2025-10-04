@@ -338,7 +338,7 @@ function standardize(v_sub::FloatVec, j::AbstractVector{Int})
     n_max = get_n(maximum(j))
     j_max = get_j(n_max)
     v_padded = zeros(eltype(v_sub), j_max + 1)
-    v_padded[j.+1] .= v_sub
+    v_padded[j.+1] = v_sub
     return v_padded
 end
 
