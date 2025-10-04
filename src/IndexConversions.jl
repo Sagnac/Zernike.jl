@@ -22,8 +22,7 @@ Fringe(noll::Noll) = (Fringe ∘ Standard ∘ standardize)(noll)
 
 function Noll(s::Standard)
     sv = s.v
-    j = eachindex(sv) .- 1
-    noll = j_to_noll.(j)
+    noll = j_to_noll.(eachindex(sv) .- 1)
     v = zeros(maximum(noll))
     v[noll] = sv
     return Noll(v)
@@ -99,7 +98,7 @@ function standardize(fringe::Fringe)
     n_max = get_n(maximum(j))
     j_max = get_j(n_max)
     a = zeros(eltype(v), j_max + 1)
-    a[j.+1] = v ./ N(j)
+    a[j.+1] .= v ./ N(j)
     return a
 end
 
