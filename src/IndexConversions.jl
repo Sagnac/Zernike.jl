@@ -47,7 +47,7 @@ function noll_to_j(noll::Int)
 end
 
 function j_to_noll(j::Int)
-    @domain_check_j
+    @domain_check(j)
     m, n = get_mn(j)
     i = n % 4 ∈ 0:1
     k = m > 0 && i || m < 0 && !i ? 0 : 1
@@ -68,7 +68,7 @@ function fringe_to_j(fringe::Int)
 end
 
 function j_to_fringe(j::Int)
-    @domain_check_j
+    @domain_check(j)
     mn = get_mn(j)
     mn == (0, 12) && return 37
     m, n = mn
@@ -113,7 +113,7 @@ get_m(j::Int) = get_mn(j)[1]
 # ISO / ANSI / OSA standard single mode-ordering index
 function get_j(m::Int, n::Int)
     μ = abs(m)
-    @domain_check_mn
+    @domain_check(m, n)
     return ((n + 2)n + m) ÷ 2
 end
 
@@ -122,7 +122,7 @@ get_j((m, n)) = get_j(m, n)
 get_j(n_max::Int) = get_j(n_max, n_max)
 
 function get_mn(j::Int)
-    @domain_check_j
+    @domain_check(j)
     n = get_n(j)
     m = get_m(j, n)
     return m, n

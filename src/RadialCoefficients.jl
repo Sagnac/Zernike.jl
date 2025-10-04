@@ -14,7 +14,9 @@ get_i(m, n) = ((n + 2)n + 1) ÷ 4 + (m + iseven(n) + 1) ÷ 2
 
 # TODO: write a non-allocating version
 function Φ(m_max::Int, n_max::Int, T::Type{<:Number} = Float64)
-    @domain_check_mn_max
+    μ = abs(m_max)
+    @domain_check(m_max, n_max)
+    m_max = μ
     i = 0
     λ = Vector{Vector{T}}(undef, get_i(m_max, n_max))
     for n = 0:n_max

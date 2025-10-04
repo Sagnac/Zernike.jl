@@ -16,35 +16,24 @@ macro domain(ex, vals...)
     ))
 end
 
-macro domain_check_mn()
+macro domain_check(ex, m, n)
     quote
-        @domain(n ≥ 0 && μ ≤ n && iseven(n - μ),
-            """
+        @domain($ex,
+            $("""
             \nDomain:
-            n ≥ 0
-            |m| ≤ n
-            n ≡ m (mod 2)
-            """,
-            m, n
+            $n ≥ 0
+            |$m| ≤ $n
+            $n ≡ $m (mod 2)
+            """),
+            $m, $n
         )
     end |> esc
 end
 
-macro domain_check_j()
-    esc(:(@domain(j ≥ 0, j)))
+macro domain_check(m, n)
+    esc(:(@domain_check($n ≥ 0 && μ ≤ $n && iseven($n - μ), $m, $n)))
 end
 
-macro domain_check_mn_max()
-    quote
-        @domain(m_max ≥ 0 && n_max ≥ 0 && m_max ≤ n_max && iseven(n_max - m_max),
-            """
-            \nDomain:
-            m_max ≥ 0
-            n_max ≥ 0
-            m_max ≤ n_max
-            n_max ≡ m_max (mod 2)
-            """,
-            m_max, n_max
-        )
-    end |> esc
+macro domain_check(j)
+    esc(:(@domain($j ≥ 0, $j)))
 end
