@@ -107,6 +107,12 @@ See also: [`lap`](@ref).
 
 Construct a radial series in a Wavefront from an azimuthal index and a coefficient vector associated with a sequence of radial polynomials.
 
+----
+
+    Wavefront{RadialPolynomial}(m::Int, n::Vector{Int}, a::Vector)
+
+Construct a Wavefront radial polynomial series from an azimuthal index, a vector of radial indices, and a coefficient vector associated with them; the indices are subject to the usual restrictions for Zernike polynomials.
+
 See also [`star`](@ref).
 """
 Wavefront

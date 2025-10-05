@@ -24,6 +24,12 @@ function Wavefront(recap, v, n_max, fit_to, a, Z, precision)
     Wavefront(recap, v, n_max, fit_to, a, Z, precision, 0.0)
 end
 
+function validate(orders, a)
+    length(a) != length(orders) && throw(ArgumentError("Lengths must be equal."))
+              allunique(orders) || throw(ArgumentError("Orders must be unique."))
+      any(isempty, (orders, a)) && throw(ArgumentError("Vectors must be non-empty."))
+end
+
 function Wavefront(a::FloatVec)
     isempty(a) && (a = [0.0])
     any(iszero, a) && return Wavefront(sieve(a)...)
@@ -43,9 +49,7 @@ function Wavefront(a::FloatVec)
 end
 
 function Wavefront(orders::Vector{Tuple{Int, Int}}, a::FloatVec)
-    length(a) != length(orders) && throw(ArgumentError("Lengths must be equal."))
-              allunique(orders) || throw(ArgumentError("Orders must be unique."))
-      any(isempty, (orders, a)) && throw(ArgumentError("Vectors must be non-empty."))
+    validate(orders, a)
     fit_to = []
     recap = similar(a, NamedTuple)
     Zᵢ = similar(a, Polynomial)
@@ -84,6 +88,15 @@ function Wavefront{RadialPolynomial}(m::Int, a::FloatVec)
         R[k] = RadialPolynomial(λₖ, γ, ν)
     end
     Wavefront{RadialPolynomial}(recap, v, n_max, fit_to, a, R, max_precision, 0.0)
+end
+
+function Wavefront{RadialPolynomial}(m::Int, n::Vector{Int}, a::FloatVec)
+    validate(n, a)
+    μ = abs(m)
+    @domain_check(all(x -> x ≥ 0 && iseven(x), n .- μ), m, n)
+    v = zeros(radial_n_to_i(μ, n[end]))
+    v[radial_n_to_i.(μ, n)] = a
+    return Wavefront{RadialPolynomial}(m, v)
 end
 
 function Wavefront(orders::Vector{NamedTuple{(:m, :n), Tuple{Int, Int}}},

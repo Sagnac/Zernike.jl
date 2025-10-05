@@ -130,6 +130,8 @@ end
 
 radial_n_max(μ, a) = μ + 2 * (length(a) - 1)
 
+radial_n_to_i(μ, n) = div(n - μ, 2) + 1
+
 mnv(v) = hcat(stack(get_mn(j) for j ∈ 0:length(v)-1; dims = 1), Vector{Number}(v))
 
 to_i(m::Int, n::Int) = get_j(m, n) + 1
