@@ -83,7 +83,7 @@ function compare_coefficients(j_max)
 end
 
 @testset "radial coefficients" begin
-    @test_throws DomainError Φ(-1, 1)
+    @test_throws DomainError Φ(1, -1)
     @test_throws DomainError Φ(4, 0)
     @test_throws DomainError Φ(2, 5)
     @test Z(4, 4).R.γ == [1.0]
