@@ -24,9 +24,7 @@ struct WavefrontOutput
     ssr::Float64
     metrics::NamedTuple{(:pv, :rms, :strehl), NTuple{3, Float64}}
     W::Wavefront{Polynomial}
-    fig::Makie.Figure
-    axis::Axis3
-    plot::SurfacePlot
+    fig::FigureAxisPlot
 end
 
 function Wavefront(recap, v, n_max, fit_to, a, Z, precision, ssr)
@@ -209,8 +207,8 @@ function Λ(ΔW::Wavefront; finesse::Int)
     w = ΔW.(ρ', θ)
     W_LaTeX = format_strings(ΔW)
     titles = (plot_title = W_LaTeX, window_title = "Estimated wavefront error")
-    fig, axis, plot = zplot(ρ, θ, w; titles...)
-    WavefrontOutput(recap, v, ssr, metrics(v, w), ΔW, fig, axis, plot)
+    fig = zplot(ρ, θ, w; titles...)
+    WavefrontOutput(recap, v, ssr, metrics(v, w), ΔW, fig)
 end
 
 function metrics(ΔW::Wavefront)

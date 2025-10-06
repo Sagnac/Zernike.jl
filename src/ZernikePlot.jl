@@ -106,7 +106,7 @@ function _zplot(args...; plot_title = window_title,
     )
     fig = Figure(; size)
     axis3::Axis3 = Axis3(fig[1,1]; axis3attributes...)
-    plot::SurfacePlot = zernikeplot!(axis3, args...; kwargs...)
+    plot = zernikeplot!(axis3, args...; kwargs...)
     on(_ -> reset_limits!(axis3), plot[3])
     # hacky way to produce a top-down heatmap-style view without generating
     # another plot with a different set of data

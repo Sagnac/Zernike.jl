@@ -41,8 +41,6 @@ const finesse = 100
 const FloatVec = AbstractVector{<:AbstractFloat}
 const FloatMat = AbstractMatrix{<:AbstractFloat}
 
-const SurfacePlot = Surface{Tuple{Matrix{Float64}, Matrix{Float64}, Matrix{Float32}}}
-
 abstract type Phase end
 abstract type AbstractPolynomial <: Phase end
 
@@ -65,9 +63,7 @@ end
 
 struct Output
     Z::Polynomial
-    fig::Makie.Figure
-    axis::Axis3
-    plot::SurfacePlot
+    fig::FigureAxisPlot
     coeffs::Vector{Float64}
     latex::LaTeXString
     unicode::String
@@ -186,8 +182,8 @@ function zernike(m::Int, n::Int; finesse = finesse)
     window_title = "Zernike Polynomial: $inds"
     high_order = n ≥ 48
     titles = (; plot_title = Z_.inds.j < 153 ? Z_LaTeX : Z_mn, window_title)
-    fig, axis, plot = zplot(Z_; m, n, finesse, high_order, titles...)
-    Output(Z_, fig, axis, plot, γ, Z_LaTeX, Z_Unicode, inds, high_order)
+    fig = zplot(Z_; m, n, finesse, high_order, titles...)
+    Output(Z_, fig, γ, Z_LaTeX, Z_Unicode, inds, high_order)
 end
 
 # overload show to clean up the output

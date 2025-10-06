@@ -54,7 +54,7 @@ Generates a Zernike polynomial.
 Returns a `Zernike.Output` type which contains (among other things):
 
 * `Z`: the `Polynomial` function `Z(ρ, θ)`;
-* `fig`: the `Makie` figure;
+* `fig`: the `Makie` `FigureAxisPlot`;
 * `coeffs`: vector of radial polynomial coefficients;
 * `latex`: `LaTeX` string of the Zernike polynomial;
 * `unicode`: `Unicode` string of the Zernike polynomial.
@@ -100,16 +100,14 @@ It is also possible to input normalized Cartesian coordinates using the method w
 `wavefront(x, y, OPD; fit_to, options...)`;<br>
 This accepts vectors and matrices for the phase; in this case, if `OPD` is a matrix the shape of the axes is assumed to be `x`-by-`y`.
 
-The function returns eight values contained within a `WavefrontOutput` type, with fields:
+The function returns six values contained within a `WavefrontOutput` type, with fields:
 
 1. `recap`: vector of named tuples containing the Zernike polynomial indices and the corresponding expansion coefficients rounded according to `precision`;
 2. `v`: full vector of Zernike wavefront error expansion coefficients;
 3. `ssr`: the sum of the squared residuals from the fit;
 4. `metrics`: named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio;
 5. `W`: the `Wavefront` function `ΔW(ρ, θ)`;
-6. `fig`: the plotted `Makie` figure;
-7. `axis`: the plot axis;
-8. `plot`: the surface plot object.
+6. `fig`: the `Makie` `FigureAxisPlot`.
 
 ----
 
