@@ -10,7 +10,7 @@ module Zernike
 export Z, W, Y, Wavefront, RadialPolynomial,
        get_j, get_m, get_n, get_mn, Noll, Fringe, Standard,
        noll_to_j, j_to_noll, fringe_to_j, j_to_fringe, standardize,
-       reduce_wave, mnv, derivatives, star, ⋆
+       reduce_wave, mnv, derivatives
 
 const public_names = "public \
     radial_coefficients, wavefront_coefficients, transform_coefficients, \

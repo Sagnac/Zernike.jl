@@ -52,7 +52,7 @@ Arithmetic between these types is defined using the usual operators such that wa
 
 In addition, the `Zernike.Superposition(W)` and `Zernike.Product(W)` constructors (where `W` is a `Vector{Wavefront}`) serve as direct methods for creating composite functions which group evaluate a specified expansion set when an updated set of coefficients is not required.
 
-Product expansion of radial polynomials can be achieved by passing an azimuthal index and a coefficient vector associated with a sequence of radial polynomials `{Rₙ}` to the `Wavefront{RadialPolynomial}` constructor and then multiplying with the ⋆ (`\star`) operator yielding a new series in radial polynomials. This MMT quadrature approach is based on a paper by [Cadiot et al. (2024)](https://arxiv.org/abs/2411.18361).
+Product expansion of radial polynomials can be achieved by passing an azimuthal index and a coefficient vector associated with a sequence of radial polynomials `{Rₙ}` to the `Wavefront{RadialPolynomial}` constructor and then multiplying them to yield a new series in radial polynomials. This MMT quadrature approach is based on a paper by [Cadiot et al. (2024)](https://arxiv.org/abs/2411.18361).
 
 ## Derivatives
 

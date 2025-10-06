@@ -113,7 +113,7 @@ Construct a radial series in a Wavefront from an azimuthal index and a coefficie
 
 Construct a Wavefront radial polynomial series from an azimuthal index, a vector of radial indices, and a coefficient vector associated with them; the indices are subject to the usual restrictions for Zernike polynomials.
 
-See also [`star`](@ref).
+See also [`*`](@ref).
 """
 Wavefront
 
@@ -454,8 +454,8 @@ See also: [`get_n`](@ref), [`get_m`](@ref), [`get_mn`](@ref), [`get_j`](@ref).
 mnv
 
 """
-    star(w1::Wavefront{T}, w2::Wavefront{T}; [threshold = 5.0E-324]) where T <: RadialPolynomial
-    w1 ⋆ w2
+    *(w1::Wavefront{T}, w2::Wavefront{T}; [threshold = 5.0E-324]) where T <: RadialPolynomial
+    w1 * w2
 
 Compute the radial product expansion of two `Zernike` radial polynomial sequences.
 
@@ -465,6 +465,4 @@ The coefficients will be filtered according to `threshold`, with any absolute va
 
 See also: [`Wavefront`](@ref).
 """
-⋆
-
-@doc (@doc ⋆) star
+*
