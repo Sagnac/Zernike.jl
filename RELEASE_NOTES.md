@@ -1,3 +1,11 @@
+# v6.1.0
+
+* The `⋆` (`\star`) operator for radial wavefronts has been changed to the usual multiplication operator;
+* Multiplication of radial wavefronts now accepts a `threshold` keyword argument which zeros out any coefficients less than its value;
+* `Wavefront{RadialPolynomial}`s can now be constructed from an additional input set of radial indices.
+
+----
+
 # v6.0.0
 
 ## Major features
