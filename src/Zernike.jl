@@ -22,7 +22,8 @@ const public_names = "public \
 VERSION >= v"1.11.0-DEV.469" && eval(Meta.parse(public_names))
 
 using GLMakie
-import .Makie: latexstring, LaTeXString, FigureAxisPlot
+import .Makie: FigureAxisPlot
+using LaTeXStrings: @L_str, latexstring, LaTeXString
 import Base: show, getindex, setindex!, firstindex, lastindex,
              getproperty, propertynames, complex
 
