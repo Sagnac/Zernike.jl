@@ -283,6 +283,12 @@ function show(io::IO, m::MIME"text/plain", W::WavefrontOutput)
     return
 end
 
+function getproperty(W::Wavefront{RadialPolynomial}, name::Symbol)
+    name === :m ? W.recap[1].m : getfield(W, name)
+end
+
+propertynames(::T) where T <: Wavefront{RadialPolynomial} = fieldnames(T)..., :m
+
 getindex(W::Wavefront) = W.v
 
 getindex(W::Wavefront, j) = W.v[j.+1]
