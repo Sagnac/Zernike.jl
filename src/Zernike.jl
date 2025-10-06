@@ -21,7 +21,8 @@ const public_names = "public \
 VERSION >= v"1.11.0-DEV.469" && eval(Meta.parse(public_names))
 
 using LaTeXStrings: @L_str, latexstring, LaTeXString
-import Base: show, getindex, setindex!, firstindex, lastindex, getproperty, complex
+import Base: show, getindex, setindex!, firstindex, lastindex,
+             getproperty, propertynames, complex
 
 const ∑ = sum
 const ∏ = prod
@@ -169,6 +170,12 @@ function complex(Z::AbstractPolynomial)
         N * R(ρ) * ei(m * θ)
     end
 end
+
+function getproperty(Z::AbstractPolynomial, name::Symbol)
+    name in (:j, :m, :n) ? getfield(Z.inds, name) : getfield(Z, name)
+end
+
+propertynames(::T) where T <: AbstractPolynomial = fieldnames(T)..., :j, :m, :n
 
 getindex(Z::AbstractPolynomial) = Z.R.λ
 

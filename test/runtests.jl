@@ -460,11 +460,11 @@ end
     w5_w5 = star(w5, w5)
     w4_w5 = star(w4, w5)
     @test all(isapprox.(w4_w4[], [1.0, 0.0, 0.0]; atol = 1e-15))
-    @test w4_w4.recap[1].m == -2
+    @test w4_w4.m == -2
     @test all(isapprox.(w5_w5[], [1.0, 0.0, 0.0]; atol = 1e-15))
-    @test w5_w5.recap[1].m == 2
+    @test w5_w5.m == 2
     @test all(isapprox.(w4_w5[], [0.5, 0.5, 0.0, 0.0]; atol = 1e-15))
-    @test w4_w5.recap[1].m == 0
+    @test w4_w5.m == 0
     ρ = rand(15)
     @test (w1.(ρ) .* w2.(ρ)) ≈ (w1 ⋆ w2).(ρ) atol = 1e-8
     samples_2 = 7

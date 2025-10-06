@@ -46,8 +46,8 @@ const threshold = nextfloat(0.0)
 
 function star(w1::Wavefront{T}, w2::Wavefront{T};
               threshold = threshold) where T <: RadialPolynomial
-    m_1 = w1.recap[1].m
-    m_2 = w2.recap[1].m
+    m_1 = w1.m
+    m_2 = w2.m
     a = w1.a
     b = w2.v
     m_3, c = product_expansion(m_1, a, m_2, b)
