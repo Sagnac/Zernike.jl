@@ -44,7 +44,7 @@ end
 
 const threshold = nextfloat(0.0)
 
-function star(w1::Wavefront{T}, w2::Wavefront{T};
+function *(w1::Wavefront{T}, w2::Wavefront{T};
               threshold = threshold) where T <: RadialPolynomial
     m_1 = w1.m
     m_2 = w2.m
@@ -54,5 +54,3 @@ function star(w1::Wavefront{T}, w2::Wavefront{T};
     c = sieve(c, threshold)
     Wavefront{T}(m_3, c)
 end
-
-⋆(w1, w2) = star(w1, w2)

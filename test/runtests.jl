@@ -454,10 +454,10 @@ end
     w3 = Wavefront{RadialPolynomial}(0, [0.0, 1.0])
     w4 = Wavefront{RadialPolynomial}(-1, [1.0])
     w5 = Wavefront{RadialPolynomial}(1, [1.0])
-    @test all(isapprox.((w3 ⋆ w3)[], [1/3, 0.0, 2/3, 0.0, 0.0]; atol = 1e-15))
-    w4_w4 = star(w4, w4)
-    w5_w5 = star(w5, w5)
-    w4_w5 = star(w4, w5)
+    @test all(isapprox.((w3 * w3)[], [1/3, 0.0, 2/3, 0.0, 0.0]; atol = 1e-15))
+    w4_w4 = w4 * w4
+    w5_w5 = w5 * w5
+    w4_w5 = w4 * w5
     @test all(isapprox.(w4_w4[], [1.0, 0.0, 0.0]; atol = 1e-15))
     @test w4_w4.m == -2
     @test all(isapprox.(w5_w5[], [1.0, 0.0, 0.0]; atol = 1e-15))
@@ -465,11 +465,11 @@ end
     @test all(isapprox.(w4_w5[], [0.5, 0.5, 0.0, 0.0]; atol = 1e-15))
     @test w4_w5.m == 0
     ρ = rand(15)
-    @test (w1.(ρ) .* w2.(ρ)) ≈ (w1 ⋆ w2).(ρ) atol = 1e-8
+    @test (w1.(ρ) .* w2.(ρ)) ≈ (w1 * w2).(ρ) atol = 1e-8
     samples_2 = 7
     m2 = [rand(-samples_2:samples_2) for i = 1:2]
     a2 = [rand(samples_2) for i = 1:2]
     w6 = Wavefront{RadialPolynomial}(m2[1], a2[1])
     w7 = Wavefront{RadialPolynomial}(m2[2], a2[2])
-    @test (w6.(ρ) .* w7.(ρ)) ≈ star(w6, w7; threshold = 1e-8).(ρ) atol = 1e-4
+    @test (w6.(ρ) .* w7.(ρ)) ≈ *(w6, w7; threshold = 1e-8).(ρ) atol = 1e-4
 end
