@@ -14,7 +14,7 @@ export Z, W, Y, Wavefront, RadialPolynomial,
 
 const public_names = "public \
     radial_coefficients, wavefront_coefficients, transform_coefficients, \
-    metrics, scale, S, Superposition, Product, \
+    metrics, S, Superposition, Product, \
     sieve, format_strings, print_strings, valid_fringes, \
     grad, lap, Derivative, Gradient, Laplacian"
 
