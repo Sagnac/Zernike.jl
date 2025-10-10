@@ -121,7 +121,7 @@ Available transformations are scaling, translation, & rotation for circular and 
 * `ε::Float64`: scaling factor `{0 ≤ ε ≤ 1}`;
 * `δ::ComplexF64`: translational complex coordinates (displacement of the pupil center in the complex plane);
 * `ϕ::Float64`: rotation of the pupil in radians `(mod 2π)`, defined positive counter-clockwise from the horizontal x-axis;
-* `ω::NTuple{2, Float64}`: elliptical pupil transform parameters; 2-tuple where `ω[1]` is the ratio of the minor radius to the major radius of the ellipse and `ω[2]` is the angle defined positive counter-clockwise from the horizontal coordinate axis of the exit pupil to the minor axis of the ellipse.
+* `ω::NTuple{2, Float64}`: elliptical pupil transform parameters; 2-tuple where `ω[1]` is the ratio of the length of the semi-minor axis to the length of the semi-major axis of the ellipse and `ω[2]` is the angle defined positive counter-clockwise from the horizontal coordinate axis of the exit pupil to the minor axis of the ellipse.
 
 The order the transformations are applied is:<br>
 scaling --> translation --> rotation --> elliptical transform.
@@ -138,7 +138,7 @@ In particular the radial variable corresponding to the rescaled exit pupil is no
 For translation the shift must be within the bounds of the scaling applied such that:<br>
 `0.0 ≤ ε + |δ| ≤ 1.0`.
 
-For elliptical pupils (usually the result of measuring the wavefront off-axis), the major radius is defined such that it equals the radius of the circle and so `ω[1]` is the fraction of the circular pupil covered by the minor radius (this is approximated well by a cosine projection factor for angles up to 40 degrees); `ω[2]` is then the direction of the stretching applied under transformation in converting the ellipse to a circle before fitting the expansion coefficients.
+For elliptical pupils (usually the result of measuring the wavefront off-axis), the semi-major axis is defined such that it equals the radius of the circle and so `ω[1]` is the fraction of the circular pupil covered by the semi-minor axis (this is approximated well by a cosine projection factor for angles up to 40 degrees); `ω[2]` is then the direction of the stretching applied under transformation in converting the ellipse to a circle before fitting the expansion coefficients.
 
 The transformed expansion coefficients are computed using a fast and accurate algorithm suitable for high orders; it is based on a formulation presented by [Lundström & Unsbo (2007)](https://doi.org/10.1364/JOSAA.24.000569).
 
