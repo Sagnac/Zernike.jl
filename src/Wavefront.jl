@@ -258,9 +258,10 @@ function show(io::IO, m::MIME"text/plain", W::Wavefront{T}) where T <: RorZ
         f1 = "Zᵢ(ρ, θ)"
         f2 = "ΔW(ρ, θ)"
     end
-    println(io, "    ∑aᵢ", f1, ":")
+    spaces = ' ' ^ 4
+    println(io, spaces, "∑aᵢ", f1, ":")
     show(IOContext(io, :limit => true, :displaysize => strip3), m, W.recap)
-    print(io, "\n    --> ", f2)
+    print(io, "\n", spaces, "→ ", f2)
 end
 
 function show(io::IO, W::T) where {T <: WavefrontOutput}

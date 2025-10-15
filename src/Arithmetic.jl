@@ -191,7 +191,7 @@ end
 
 function show(io::IO, m::MIME"text/plain", W::T) where {T <: MixedPhase}
     if haskey(io, :typeinfo)
-        print(summary(W.W))
+        print(io, summary(W.W))
         return
     else
         show(io, W)

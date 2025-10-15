@@ -188,7 +188,7 @@ function zernike(m::Int, n::Int; finesse = finesse)
 end
 
 # overload show to clean up the output
-show(io::IO, Z::T) where {T <: Polynomial} = print(io, T, Z.inds, " --> Z(ρ, θ)")
+show(io::IO, Z::T) where {T <: Polynomial} = print(io, T, ": ", Z.inds, " ↦ Z(ρ, θ)")
 
 show(io::IO, output::Output) = print(io, output.inds)
 
