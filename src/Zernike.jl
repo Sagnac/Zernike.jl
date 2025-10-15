@@ -159,7 +159,7 @@ function Z(m::Int, n::Int)
 end
 
 # overload show to clean up the output
-show(io::IO, Z::T) where {T <: Polynomial} = print(io, T, Z.inds, " --> Z(ρ, θ)")
+show(io::IO, Z::T) where {T <: Polynomial} = print(io, T, ": ", Z.inds, " ↦ Z(ρ, θ)")
 
 function complex(Z::AbstractPolynomial)
     (; N, R, M) = Z
