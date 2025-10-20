@@ -1,3 +1,10 @@
+# v6.2.0
+
+* Seidel aberration conversions have been added through `Wavefront(aberr::Aberration)`;
+* The two output structs now hold the `FigureAxisPlot` rather than the individual plot elements.
+
+----
+
 # v6.1.0
 
 * The `⋆` (`\star`) operator for radial wavefronts has been changed to the usual multiplication operator;
