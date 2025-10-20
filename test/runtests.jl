@@ -4,7 +4,7 @@ using Zernike: N², Φ, get_i, canonical, coords, reconstruct, validate_length,
                valid_fringes, map_phase, format_strings, LaTeXString, latexstring, S,
                metrics, polar, max_precision, Superposition, Product, sieve,
                transform_coefficients, grad, lap, Derivative, Gradient, Laplacian,
-               ei, to_i, (..)
+               ei, to_i, d_fit, aberr_map, Aberration, (..)
 using StatsBase: mean, sample
 
 @testset "fringe" begin
@@ -117,8 +117,8 @@ const Z62 = Z(2, 6)
     @test R(1.0) ≈ sum(R.γ) ≈ sum(R.λ) ≈ 1.0
 end
 
-const ρ = range(0.0, 1.0, 21)
-const θ = range(0, 2π, 21)
+const ρ = range(0.0, 1.0, d_fit)
+const θ = range(0, 2π, d_fit)
 const z = Z62.(ρ', θ)
 const OPD = z + [10sinc(5r) for i = 1:21, r ∈ ρ]
 const r, t = coords(OPD)
@@ -472,4 +472,25 @@ end
     w6 = Wavefront{RadialPolynomial}(m2[1], a2[1])
     w7 = Wavefront{RadialPolynomial}(m2[2], a2[2])
     @test (w6.(ρ) .* w7.(ρ)) ≈ *(w6, w7; threshold = 1e-8).(ρ) atol = 1e-4
+end
+
+@testset "Seidel aberrations" begin
+    w40(ρ, θ) = ρ ^ 4
+    w31(ρ, θ) = ρ ^ 3 * cos(θ)
+    w22(ρ, θ) = ρ ^ 2 * cos(θ) ^ 2
+    w20(ρ, θ) = ρ ^ 2
+    w11(ρ, θ) = ρ * cos(θ)
+    OPD40 = w40.(ρ', θ)
+    OPD31 = w31.(ρ', θ)
+    OPD22 = w22.(ρ', θ)
+    OPD20 = w20.(ρ', θ)
+    OPD11 = w11.(ρ', θ)
+    ϵ = eps()
+    @test all(sieve(W(OPD40, 4)[], ϵ) .≈ aberr_map[:w40])
+    @test all(sieve(W(OPD31, 3)[], ϵ) .≈ @view(aberr_map[:w31][1:10]))
+    @test all(sieve(W(OPD22, 2)[], ϵ) .≈ @view(aberr_map[:w22][1:6]))
+    @test all(sieve(W(OPD20, 2)[], ϵ) .≈ @view(aberr_map[:w20][1:6]))
+    @test all(sieve(W(OPD11, 1)[], ϵ) .≈ @view(aberr_map[:w11][1:3]))
+    a = rand()
+    @test all(Wavefront(Aberration(w40 = a))[] .≈ aberr_map[:w40] * a)
 end

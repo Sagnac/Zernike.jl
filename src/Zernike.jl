@@ -17,7 +17,7 @@ const public_names = "public \
     radial_coefficients, wavefront_coefficients, transform_coefficients, \
     metrics, scale, S, Superposition, Product, \
     sieve, format_strings, print_strings, valid_fringes, \
-    resize!, reset!, grad, lap, Derivative, Gradient, Laplacian"
+    resize!, reset!, grad, lap, Derivative, Gradient, Laplacian, Aberration"
 
 VERSION >= v"1.11.0-DEV.469" && eval(Meta.parse(public_names))
 
@@ -73,8 +73,8 @@ struct Output
 end
 
 include("Domain.jl")
-include("Wavefront.jl")
 include("IndexConversions.jl")
+include("Wavefront.jl")
 include("Coordinates.jl")
 include("RadialCoefficients.jl")
 include("FormatStrings.jl")

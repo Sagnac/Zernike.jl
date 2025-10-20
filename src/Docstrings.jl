@@ -265,6 +265,12 @@ Construct a radial series in a Wavefront from an azimuthal index and a coefficie
 Construct a Wavefront radial polynomial series from an azimuthal index, a vector of radial indices, and a coefficient vector associated with them; the indices are subject to the usual restrictions for Zernike polynomials.
 
 See also [`*`](@ref).
+
+----
+
+    Wavefront(aberr::Aberration)
+
+Convert a set of Seidel aberrations to Zernike polynomials.
 """
 Wavefront
 

@@ -27,6 +27,14 @@ struct WavefrontOutput
     fig::FigureAxisPlot
 end
 
+@kwdef mutable struct Aberration
+    w40::Float64 = 0.0
+    w31::Float64 = 0.0
+    w22::Float64 = 0.0
+    w20::Float64 = 0.0
+    w11::Float64 = 0.0
+end
+
 function Wavefront(recap, v, n_max, fit_to, a, Z, precision, ssr)
     Wavefront{Polynomial}(recap, v, n_max, fit_to, a, Z, precision, ssr)
 end
@@ -117,6 +125,10 @@ end
 
 function Wavefront(orders::Vector{Int}, a::FloatVec)
     Wavefront([get_mn(j) for j ∈ orders], a)
+end
+
+function Wavefront(aberr::T) where T <: Aberration
+    Wavefront(∑(getfield(aberr, i) * aberr_map[i] for i ∈ fieldnames(T)))
 end
 
 function (ΔW::Wavefront{Polynomial})(ρ::Real, θ::Real = 0)
@@ -443,3 +455,12 @@ function map_phase(ρ::FloatVec, θ::FloatVec, OPD::FloatVec)
     θ = union(θ)
     return ρ, θ, reshape(OPD, length.((θ, ρ)))
 end
+
+# Seidel aberration conversions
+const aberr_map = Dict{Symbol, Vector{Float64}}(
+    :w40 => standardize([1/3, 1/2√3, 1/6√5], [(0, 0), (0, 2), (0, 4)], 4),
+    :w31 => standardize([1/3, 1/3√8], [(1, 1), (1, 3)], 4),
+    :w22 => standardize([1/4, 1/4√3, 1/2√6], [(0, 0), (0, 2), (2, 2)], 4),
+    :w20 => standardize([1/2, 1/2√3], [(0, 0), (0, 2)], 4),
+    :w11 => standardize([1/2], [(1, 1)], 4)
+)

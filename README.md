@@ -251,6 +251,8 @@ In addition, the functions `get_j(m, n)` & `get_mn(j)` allow you to convert betw
 
 * `Zernike.print_strings(j_max::Int)` will print the Unicode string representations of the polynomials up to `j_max`;
 
+* Seidel aberrations can be converted to Zernike polynomials by using `Wavefront(aberr::Zernike.Aberration)` where the `Aberration` constructor accepts the standard wavefront error coefficients;
+
 * The `zplot` function can be invoked independently using `Polynomial` and `Wavefront` function types, quantized wavefront errors, and Observables of each; the plot will update each time the `Observable` changes (see the docstring for more info);
 
 * If you resize the plot window, right clicking on the figure will resize / trim the plot automatically so that it fits within the window without extra space;
