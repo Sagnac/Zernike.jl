@@ -16,7 +16,7 @@ const public_names = "public \
     radial_coefficients, wavefront_coefficients, transform_coefficients, \
     metrics, S, Superposition, Product, \
     sieve, format_strings, print_strings, valid_fringes, \
-    grad, lap, Derivative, Gradient, Laplacian"
+    grad, lap, Derivative, Gradient, Laplacian, Aberration"
 
 VERSION >= v"1.11.0-DEV.469" && eval(Meta.parse(public_names))
 
@@ -60,8 +60,8 @@ struct Polynomial <: AbstractPolynomial
 end
 
 include("Domain.jl")
-include("Wavefront.jl")
 include("IndexConversions.jl")
+include("Wavefront.jl")
 include("Coordinates.jl")
 include("RadialCoefficients.jl")
 include("FormatStrings.jl")

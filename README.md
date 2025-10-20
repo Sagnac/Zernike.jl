@@ -115,6 +115,8 @@ In addition, the functions `get_j(m, n)` & `get_mn(j)` allow you to convert betw
 
 * `Zernike.print_strings(j_max::Int)` will print the Unicode string representations of the polynomials up to `j_max`;
 
+* Seidel aberrations can be converted to Zernike polynomials by using `Wavefront(aberr::Zernike.Aberration)` where the `Aberration` constructor accepts the standard wavefront error coefficients;
+
 * `Polynomial` and `Wavefront` types can be indexed (zero-based) to return a specific coefficient; their full vector of coefficients can be conveniently accessed using single-argument `getindex` (e.g. `z[]`, `w[]`);
 
 * Callable types can be called with complex arguments as a convenient method to evaluate them in Cartesian coordinates;
