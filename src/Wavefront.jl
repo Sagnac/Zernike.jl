@@ -294,8 +294,8 @@ function sieve(a::FloatVec)
 end
 
 # pads a subset Zernike expansion coefficient vector to standard length
-function standardize(v_sub::FloatVec, j::AbstractVector{Int})
-    n_max = get_n(maximum(j))
+function standardize(v_sub::FloatVec, j::AbstractVector{Int},
+                     n_max::Int = get_n(maximum(j)))
     j_max = get_j(n_max)
     v_padded = zeros(eltype(v_sub), j_max + 1)
     v_padded[j.+1] = v_sub
@@ -304,8 +304,16 @@ end
 
 standardize(v_sub::FloatVec) = standardize(v_sub, 0:length(v_sub)-1)
 
+function standardize(v_sub::FloatVec, n_max::Int)
+    standardize(v_sub, 0:length(v_sub)-1, n_max)
+end
+
 function standardize(v_sub::FloatVec, orders::Vector{Tuple{Int, Int}})
     standardize(v_sub, get_j.(orders))
+end
+
+function standardize(v_sub::FloatVec, orders::Vector{Tuple{Int, Int}}, n_max::Int)
+    standardize(v_sub, get_j.(orders), n_max)
 end
 
 standardize(W::Wavefront) = standardize(W.a, [(i.m, i.n) for i ∈ W.recap])
