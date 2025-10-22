@@ -1,7 +1,7 @@
 name = "Zernike"
 uuid = "e14b762e-e195-443f-a1b1-09f2ab0cc6c8"
 authors = ["Sagnac"]
-version = "6.1.0-base"
+version = "6.2.0-base"
 
 [deps]
 Jacobi = "83f21c0b-4282-5fbc-9e3f-f6da3d2e584c"
