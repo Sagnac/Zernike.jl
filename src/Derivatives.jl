@@ -78,7 +78,7 @@ function complex(g::Gradient)
     end
 end
 
-grad(Z::Polynomial) = Wavefront(Gradient, Z.inds.m, Z.inds.n)
+∇(Z::Polynomial) = Wavefront(Gradient, Z.inds.m, Z.inds.n)
 
 function Wavefront(g::Gradient)
     (; m, n) = g.r.inds
@@ -86,7 +86,7 @@ function Wavefront(g::Gradient)
 end
 
 function Wavefront(::Type{<:Gradient}, m::Int, n::Int; normalize::Bool = true)
-    ax, ay = grad(m, n, Vector{Real}; normalize)
+    ax, ay = ∇(m, n, Vector{Real}; normalize)
     ∂x = Wavefront(ax)
     ∂y = Wavefront(ay)
     return ∂x, ∂y
@@ -97,8 +97,8 @@ function Wavefront(::Type{<:Gradient}, j::Int; kw...)
     Wavefront(Gradient, get_mn(j)...; kw...)
 end
 
-function grad(m::Int, n::Int, ::Type{Vector{Real}}; normalize = true)
-    c = grad(m, n, Matrix{Complex})
+function ∇(m::Int, n::Int, ::Type{Vector{Real}}; normalize = true)
+    c = ∇(m, n, Matrix{Complex})
     cx, cy = to_complex(c, m)
     order = conjugate_indices(n - 1)
     ax = to_real(cx, order, 1)
@@ -112,9 +112,7 @@ function grad(m::Int, n::Int, ::Type{Vector{Real}}; normalize = true)
     return ax, ay
 end
 
-function derivatives(W::Wavefront)
-    [mapreduce(*, +, ∂, W.a) for ∂ ∈ eachrow(stack(grad(Z) for Z ∈ W.Z))]
-end
+∇(W::Wavefront) = [mapreduce(*, +, ∂, W.a) for ∂ ∈ eachrow(stack(∇(Z) for Z ∈ W.Z))]
 
 lap(Z::Polynomial) = Wavefront(Laplacian, Z.inds.m, Z.inds.n)
 
@@ -144,6 +142,8 @@ end
 
 to_i(n_max::Int) = get_j(max(n_max, 0)) + 1
 
+const grad = ∇
+
 #= The following algorithms compute Cartesian derivatives in terms of Zernike polynomials. It is based on mathematical formulas found in:
 
 https://doi.org/10.1364/JOSAA.31.001604
@@ -162,7 +162,7 @@ Laplacian can be computed directly.
 
 =#
 
-function grad(m::Int, n::Int, ::Type{Matrix{Complex}})
+function ∇(m::Int, n::Int, ::Type{Matrix{Complex}})
     μ = abs(m)
     @domain_check(m, n)
     len = to_i(n - 1)
@@ -183,8 +183,8 @@ function grad(m::Int, n::Int, ::Type{Matrix{Complex}})
     return c
 end
 
-function grad(m::Int, n::Int, ::Type{Vector{Complex}})
-    c = grad(m, n, Matrix{Complex})
+function ∇(m::Int, n::Int, ::Type{Vector{Complex}})
+    c = ∇(m, n, Matrix{Complex})
     m > 0 ? (return c[:,1], c[:,3]) : (return c[:,2], c[:,4])
 end
 
@@ -227,7 +227,7 @@ function W(B_plus::Vector{ComplexF64}, B_minus::Vector{ComplexF64})
     return a
 end
 
-compute_B(m::Int, n::Int) = compute_B(grad(m, n, Vector{Complex})...)
+compute_B(m::Int, n::Int) = compute_B(∇(m, n, Vector{Complex})...)
 
 function compute_B(cx::Vector{ComplexF64}, cy::Vector{ComplexF64})
     B_plus, B_minus = (op(cx, im * cy) for op ∈ (+, -))

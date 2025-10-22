@@ -358,7 +358,7 @@ end
     end
     @testset "wavefront expansion" begin
         w1 = Wavefront([0.0; 10.0 * rand(length(polynomials)-1)])
-        w2 = W(derivatives(w1)...)
+        w2 = W(∇(w1)...)
         @test all(isapprox.(w1[], w2[]; atol = ϵ))
     end
 end
