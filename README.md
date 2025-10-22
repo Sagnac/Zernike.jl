@@ -75,6 +75,8 @@ If the expansion coefficients of the derivatives are desired instead there are s
 
 `Zernike.grad(Z::Polynomial)` and `Zernike.lap(Z::Polynomial)`.
 
+In addition, the gradient of a `Wavefront` can be computed with `∇(W)`; this del operator / nabla symbol is an alias for `grad`.
+
 ----
 
 The `W(∂x, ∂y)` method accepts the gradient of a wavefront in a Zernike basis (e.g. the estimated Zernike expansion coefficients of the transverse aberration components from normalized Shack-Hartmann sensor data) and returns the expansion coefficients of the original wavefront error. The inputs must be in the format of 64-bit floating point vectors representing the normalized Zernike polyomial weights.
