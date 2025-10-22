@@ -380,6 +380,7 @@ Laplacian
 
 Computes the nth order partial derivatives of `Z(ρ, θ)` and returns the two-tuple (`∂Z/∂ρ`, `∂Z/∂θ`).
 
+See also: [`grad`](@ref), [`lap`](@ref), [`Gradient`](@ref), [`Laplacian`](@ref).
 """
 derivatives
 
@@ -423,7 +424,7 @@ Return the gradient of the Zernike polynomial as a tuple of real-valued Zernike 
 
 Computes the gradient of the wavefront.
 
-See also: [`lap`](@ref), [`Gradient`](@ref), [`Laplacian`](@ref), [`derivatives`](@ref).
+See also: [`Zernike.lap`](@ref), [`Zernike.Gradient`](@ref), [`Zernike.Laplacian`](@ref), [`derivatives`](@ref).
 """
 grad
 
