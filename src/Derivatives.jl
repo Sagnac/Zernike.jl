@@ -80,6 +80,8 @@ end
 
 grad(Z::Polynomial) = Wavefront(Gradient, Z.inds.m, Z.inds.n)
 
+const ∇ = grad
+
 function Wavefront(g::Gradient)
     (; m, n) = g.r.inds
     Wavefront(Gradient, m, n)
@@ -112,9 +114,7 @@ function grad(m::Int, n::Int, ::Type{Vector{Real}}; normalize = true)
     return ax, ay
 end
 
-function derivatives(W::Wavefront)
-    [mapreduce(*, +, ∂, W.a) for ∂ ∈ eachrow(stack(grad(Z) for Z ∈ W.Z))]
-end
+∇(W::Wavefront) = [mapreduce(*, +, ∂, W.a) for ∂ ∈ eachrow(stack(∇(Z) for Z ∈ W.Z))]
 
 lap(Z::Polynomial) = Wavefront(Laplacian, Z.inds.m, Z.inds.n)
 

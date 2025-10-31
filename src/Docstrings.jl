@@ -633,17 +633,12 @@ Laplacian
 
 Computes the nth order partial derivatives of `Z(ρ, θ)` and returns the two-tuple (`∂Z/∂ρ`, `∂Z/∂θ`).
 
-----
-
-    derivatives(W::Wavefront)
-
-Computes the gradient of the wavefront.
-
 See also: [`grad`](@ref), [`lap`](@ref), [`Gradient`](@ref), [`Laplacian`](@ref).
 """
 derivatives
 
 """
+    ∇(Z)
     grad(Z::Polynomial)
 
 Return the gradient of the Zernike polynomial expressed as a `Wavefront` in Zernike polynomial expansion coefficients.
@@ -675,6 +670,13 @@ Convenience method which returns the relevant sign-dependent complex gradient fr
     grad(m, n, ::Type{Vector{Real}}; [normalize = true])
 
 Return the gradient of the Zernike polynomial as a tuple of real-valued Zernike coefficient vectors.
+
+----
+
+    ∇(W)
+    grad(W::Wavefront)
+
+Computes the gradient of the wavefront.
 
 See also: [`lap`](@ref), [`Gradient`](@ref), [`Laplacian`](@ref), [`derivatives`](@ref).
 """
@@ -725,3 +727,5 @@ The coefficients will be filtered according to `threshold`, with any absolute va
 See also: [`Wavefront`](@ref).
 """
 *
+
+@doc (@doc grad) ∇
