@@ -1,3 +1,11 @@
+# v6.3.0
+
+* `grad(W)` has replaced `derivatives(W)` for Wavefronts;
+* `∇` is now an alias for `grad`;
+* Type instabilities have been fixed for types with `getproperty` overloaded.
+
+----
+
 # v6.2.0
 
 * Seidel aberration conversions have been added through `Wavefront(aberr::Aberration)`;
