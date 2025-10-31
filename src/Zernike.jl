@@ -217,7 +217,7 @@ function complex(Z::AbstractPolynomial)
 end
 
 function getproperty(Z::AbstractPolynomial, name::Symbol)
-    name in (:j, :m, :n) ? getfield(Z.inds, name) : getfield(Z, name)
+    name in (:j, :m, :n) ? getfield(getfield(Z, :inds), name) : getfield(Z, name)
 end
 
 propertynames(::T) where T <: AbstractPolynomial = fieldnames(T)..., :j, :m, :n
