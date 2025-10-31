@@ -237,7 +237,7 @@ function show(io::IO, m::MIME"text/plain", W::Wavefront{T}) where T <: RorZ
 end
 
 function getproperty(W::Wavefront{RadialPolynomial}, name::Symbol)
-    name === :m ? W.recap[1].m : getfield(W, name)
+    name === :m ? getfield(getfield(W, :recap)[1], :m) : getfield(W, name)
 end
 
 propertynames(::T) where T <: Wavefront{RadialPolynomial} = fieldnames(T)..., :m
