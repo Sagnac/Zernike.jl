@@ -109,6 +109,14 @@ In addition, the functions `get_j(m, n)` & `get_mn(j)` allow you to convert betw
 
 ----
 
+## Seidel Aberrations & Transfer Functions
+
+Third-order Seidel aberrations at a fixed field can be converted to Zernike polynomials by using `Wavefront(aberr::Zernike.Aberration)` where the `Aberration` constructor accepts the standard wavefront error coefficients.
+
+`OTF(ΔW)` & `MTF(ΔW)` yield the Optical & Modulation Transfer Functions as matrices for the input `Wavefront`.
+
+----
+
 ## Additional Notes
 
 * `Zernike.metrics(ΔW::Wavefront)` exists;
@@ -116,8 +124,6 @@ In addition, the functions `get_j(m, n)` & `get_mn(j)` allow you to convert betw
 * `Zernike.format_strings(Z::AbstractPolynomial)` will return both the `Unicode` and `LaTeX` string representations directly;
 
 * `Zernike.print_strings(j_max::Int)` will print the Unicode string representations of the polynomials up to `j_max`;
-
-* Seidel aberrations can be converted to Zernike polynomials by using `Wavefront(aberr::Zernike.Aberration)` where the `Aberration` constructor accepts the standard wavefront error coefficients;
 
 * `Polynomial` and `Wavefront` types can be indexed (zero-based) to return a specific coefficient; their full vector of coefficients can be conveniently accessed using single-argument `getindex` (e.g. `z[]`, `w[]`);
 

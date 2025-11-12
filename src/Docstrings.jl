@@ -244,6 +244,24 @@ See also: [`standardize`](@ref).
 Standard
 
 """
+    OTF(ΔW::Wavefront)
+
+Return the Optical Transfer Function as a complex valued matrix for the input [`Wavefront`](@ref).
+
+See also: [`MTF`](@ref).
+"""
+OTF
+
+"""
+    MTF(ΔW::Wavefront)
+
+Return the Modulation Transfer Function as a real valued matrix for the input [`Wavefront`](@ref).
+
+See also: [`OTF`](@ref).
+"""
+MTF
+
+"""
     metrics(ΔW::Wavefront)
 
 Compute wavefront error metrics. Returns a named 3-tuple with the peak-to-valley error, RMS wavefront error, and Strehl ratio.

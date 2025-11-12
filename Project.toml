@@ -4,6 +4,7 @@ authors = ["Sagnac"]
 version = "6.2.0-base"
 
 [deps]
+FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
 Jacobi = "83f21c0b-4282-5fbc-9e3f-f6da3d2e584c"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
@@ -12,6 +13,7 @@ ShiftedArrays = "1277b4bf-5013-50f5-be3d-901d8477a67a"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [compat]
+FFTW = "1.10.0"
 Jacobi = "0.7.0"
 LaTeXStrings = "1.4.0"
 LinearAlgebra = "1.10"
