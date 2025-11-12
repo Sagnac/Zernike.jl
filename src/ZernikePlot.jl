@@ -79,6 +79,10 @@ function zernikeplot!(axis, ρ, θ, φ::FloatMat; kwargs...)
     surface!(axis, x, y, φ; shading, colormap, kwargs...)
 end
 
+function zernikeplot!(axis, φ::FloatMat; kwargs...)
+    zernikeplot!(axis, polar(size(φ))..., φ; kwargs...)
+end
+
 function zernikeplot!(axis, ρ, θ, φ; kwargs...)
     ρ = vec(ρ)
     θ = vec(θ)
