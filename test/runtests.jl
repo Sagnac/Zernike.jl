@@ -494,3 +494,15 @@ end
     a = rand()
     @test all(Wavefront(Aberration(w40 = a))[] .≈ aberr_map[:w40] * a)
 end
+
+@testset "MTF" begin
+    w0 = Wavefront([0.0])
+    mtf = MTF(w0)
+    s = size(mtf, 1)
+    h = div(s, 2)
+    mtf = @view mtf[h+1:s, h+1]
+    ξ = range(0.0, 1.0, length(mtf))
+    # diffraction limit
+    otf = @. 2 * (acos(ξ) - ξ * √(1 - ξ ^ 2)) / π
+    @test isapprox(mtf, otf; rtol = 1e-3)
+end

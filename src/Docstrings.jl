@@ -419,6 +419,48 @@ See also: [`zplot`](@ref).
 plotconfig
 
 """
+    OTF(ΔW::Wavefront)
+
+Return the Optical Transfer Function as a complex valued matrix for the input [`Wavefront`](@ref).
+
+See also: [`MTF`](@ref), [`mtf_plot`](@ref), [`mtf_plot!`](@ref).
+"""
+OTF
+
+"""
+    MTF(ΔW::Wavefront)
+
+Return the Modulation Transfer Function as a real valued matrix for the input [`Wavefront`](@ref).
+
+See also: [`OTF`](@ref), [`mtf_plot`](@ref), [`mtf_plot!`](@ref).
+"""
+MTF
+
+"""
+    mtf_plot(mtf::Matrix)
+
+Plot the Modulation Transfer Function as a three-dimensional surface plot.
+
+----
+
+    mtf_plot(mtf::Matrix, x_or_y::Symbol)
+
+Plot the MTF along the sagittal or tangential direction in the pupil. The input symbol must be either `:x` or `:y` corresponding to the relevant meridian.
+
+See also: [`mtf_plot!`](@ref), [`MTF`](@ref), [`OTF`](@ref), [`zplot`](@ref), [`plotconfig`](@ref).
+"""
+mtf_plot
+
+"""
+    mtf_plot!(mtf::Matrix, x_or_y::Symbol)
+
+Overlay the MTF on the existing plot. The input symbol must be either `:x` or `:y` corresponding to the relevant meridian.
+
+See also: [`mtf_plot`](@ref), [`MTF`](@ref), [`OTF`](@ref), [`zplot`](@ref), [`plotconfig`](@ref).
+"""
+mtf_plot!
+
+"""
     resize!(plotconfig::PlotConfig)
 
 Reset only the `size` and `fontsize` settings for [`Zernike.plotconfig`](@ref). This is useful if your primary monitor changes or you want to return to the automatically determined values.

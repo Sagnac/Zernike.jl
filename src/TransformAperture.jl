@@ -12,6 +12,7 @@ using LinearAlgebra
 
 const b = binomial
 const ei = cis # ei(x) = exp(im*x)
+ei2pi(x) = cispi(2x)
 const SQRT2 = √2
 
 function Γ(v::Vector{T}, ε::T, δ::Complex{T}, ϕ::T, ω::Tuple{T,T}) where T <: Float64
