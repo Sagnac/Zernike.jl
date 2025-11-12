@@ -16,7 +16,7 @@ Returns a `Zernike.Output` type which contains (among other things):
 
 The coefficients belong to terms with exponent `n - 2(i - 1)` where `i` is the vector's index.
 
-The radial polynomial coefficients are computed using a fast and accurate algorithm suitable for high orders; it is based on a recursive relation presented by Honarvar & Paramesran (2013) doi:10.1364/OL.38.002487.
+>The radial polynomial coefficients are computed using a fast and accurate algorithm suitable for high orders; it is based on a recursive relation presented by Honarvar & Paramesran (2013) doi:10.1364/OL.38.002487.
 
 See also: [`Z`](@ref), [`wavefront`](@ref), [`transform`](@ref), [`radial_coefficients`](@ref).
 
@@ -177,7 +177,7 @@ For translation the shift must be within the bounds of the scaling applied such 
 
 For elliptical pupils (usually the result of measuring the wavefront off-axis), the semi-major axis is defined such that it equals the radius of the circle and so `ω[1]` is the fraction of the circular pupil covered by the semi-minor axis (this is approximated well by a cosine projection factor for angles up to 40 degrees); `ω[2]` is then the direction of the stretching applied under transformation in converting the ellipse to a circle before fitting the expansion coefficients.
 
-The transformed expansion coefficients are computed using a fast and accurate algorithm suitable for high orders; it is based on a formulation presented by Lundström & Unsbo (2007) doi:10.1364/JOSAA.24.000569.
+>The transformed expansion coefficients are computed using a fast and accurate algorithm suitable for high orders; it is based on a formulation presented by Lundström & Unsbo (2007) doi:10.1364/JOSAA.24.000569.
 """
 transform
 
