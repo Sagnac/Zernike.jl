@@ -44,7 +44,8 @@ check(m) = m isa RegexMatch
 function trimlines(file, io)
     close(io)
     text = read(file, String)
-    text = replace(text, r"(\n)\n\n+$" => s"\1", r"(\n\n)\n+" => s"\1")
+    base = r"<details>.*</details>"s => ""
+    text = replace(text, r"(\n)\n\n+$" => s"\1", r"(\n\n)\n+" => s"\1", base)
     write(file, text)
     return
 end
