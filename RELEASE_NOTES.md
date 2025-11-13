@@ -1,3 +1,11 @@
+# v6.4.0
+
+* Several methods for working with the Optical Transfer Function of a Zernike phase have been added;
+* The `finesse` plotting parameter now directly controls the plot matrix size;
+* `zplot` now has a single argument method for input matrices.
+
+----
+
 # v6.3.0
 
 * `grad(W)` has replaced `derivatives(W)` for Wavefronts;
