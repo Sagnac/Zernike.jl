@@ -4,8 +4,6 @@ const Recap = Vector{NamedTuple{(:j, :n, :m, :a), Tuple{Int, Int, Int, Float64}}
 
 const precision = 3
 const max_precision = 17
-# out-of-bounds sentinel used for dynamically setting default values:
-const wavefront_finesse = 101
 
 struct Wavefront{T <: RorZ} <: Phase
     recap::Recap
@@ -211,9 +209,8 @@ function Ψ(v, Zᵢ, n_max, orders = Tuple{Int, Int}[], ssr = 0.0; precision::In
 end
 
 # synthesis function
-function Λ(ΔW::Wavefront; finesse::Int)
+function Λ(ΔW::Wavefront; finesse::Int = finesse)
     (; recap, v, n_max, ssr) = ΔW
-    finesse = finesse ∈ 1:100 ? finesse : ceil(Int, 100 / √ length(recap))
     ρ, θ = polar(n_max, n_max; finesse)
     # construct the estimated wavefront error
     w = ΔW.(ρ', θ)
@@ -244,14 +241,14 @@ end
 
 # main interface function
 function wavefront(ρ::FloatVec, θ::FloatVec, OPD::FloatVec, n_max::Int;
-                   precision::Int = precision, finesse::Int = wavefront_finesse)
+                   precision::Int = precision, finesse::Int = finesse)
     ΔW = W(ρ, θ, OPD, n_max; precision)
     Λ(ΔW; finesse)
 end
 
 function wavefront(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
                    orders::Vector{Tuple{Int, Int}};
-                   precision::Int = precision, finesse::Int = wavefront_finesse)
+                   precision::Int = precision, finesse::Int = finesse)
     ΔW = W(ρ, θ, OPD, orders; precision)
     Λ(ΔW; finesse)
 end

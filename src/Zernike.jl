@@ -36,7 +36,7 @@ const ∏ = prod
 const d_max = 1024
 const d_fit = 21
 
-const finesse = 100
+const finesse = d_max
 
 # Type aliases
 const FloatVec = AbstractVector{<:AbstractFloat}

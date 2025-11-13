@@ -24,9 +24,9 @@ See also: [`Z`](@ref), [`wavefront`](@ref), [`transform`](@ref), [`radial_coeffi
 
 # Keyword argument options:
 
-    zernike(m, n; [finesse::Int = 100])
+    zernike(m, n; [finesse::Int = 1024])
 
-`finesse`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 1 million.
+`finesse`: determines the size of the plot matrix; sets both dimensions to the given value.
 """
 zernike
 
@@ -106,7 +106,7 @@ If `OPD` is a matrix the shape of the axes is assumed to be `x`-by-`y`.
 
 * `precision`: number of digits to use after the decimal point in computing the expansion coefficients. Results will be rounded according to this precision and any polynomials with zero-valued coefficients will be ignored when pulling in the Zernike functions while constructing the composite wavefront error; this means lower precision values yield faster results.
 
-* `finesse`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 2^20 (~ 1 million).
+* `finesse`: determines the size of the plot matrix; sets both dimensions to the given value.
 """
 wavefront
 
@@ -161,7 +161,7 @@ See also: [`Y`](@ref), [`zernike`](@ref), [`wavefront`](@ref), [`transform_coeff
 
 * `precision`: number of digits to use after the decimal point in computing the expansion coefficients. Results will be rounded according to this precision and any polynomials with zero-valued coefficients will be ignored when pulling in the Zernike functions while constructing the composite wavefront error; this means lower precision values yield faster results.
 
-* `finesse`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 2^20 (~ 1 million).
+* `finesse`: determines the size of the plot matrix; sets both dimensions to the given value.
 
 # Extended help
 
@@ -457,7 +457,7 @@ Plot `Zernike` phase function types ([`Polynomial`](@ref)s, [`Wavefront`](@ref)s
 * `plot_title`::**Union{String, LaTeXString}**: plot title;
 * `m`::**Int**: azimuthal order (used to determine matrix size);
 * `n`::**Int**: radial order (used to determine matrix size);
-* `finesse`::**Int**: `{1 ≤ finesse ≤ 100}`: (used to determine matrix size);
+* `finesse`::**Int**: determines the matrix size;
 * `high_order`::**Bool**: whether to apply a logarithmic transform (default: `false`).
 
 Any keyword arguments supported by `Makie`'s `surface` are also supported.

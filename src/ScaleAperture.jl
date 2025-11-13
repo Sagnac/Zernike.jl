@@ -40,7 +40,7 @@ function Π(v::Vector{T}, ε::T) where T <: Float64
 end
 
 function scale(v::Vector{Float64}, ε::Float64;
-           precision::Int = precision, finesse::Int = wavefront_finesse)
+           precision::Int = precision, finesse::Int = finesse)
     ΔW = S(v, ε; precision)
     Λ(ΔW; finesse)
 end

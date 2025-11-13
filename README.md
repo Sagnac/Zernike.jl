@@ -148,11 +148,9 @@ The transformed expansion coefficients are computed using a fast and accurate al
 
 There are 2 options you can vary using keyword arguments. All 3 main functions support:
 
-* `finesse::Int`: `{1 ≤ finesse ≤ 100}`: multiplicative factor determining the size of the plotted matrix; the total number of elements is capped at 2^20 (~ 1 million) which should avoid aliasing up to ~317 radially and ~499 azimuthally.
+* `finesse::Int`: determines the size of the plot matrix; sets both dimensions to the given value.
 
-Default: `100` (for `zernike`, proportionally scaled according to the number of polynomials for the wavefront errors).
-
-In creating the plot matrix the step size / length of the variable ranges is automatically chosen such that aliasing is avoided for reasonable orders. The `finesse` parameter controls how fine the granularity is subsequently at the expense of performance.
+Default: `1024`.
 
 Additionally, the wavefront error functions `wavefront(ρ, θ, OPD, n_max)` and `transform(v, ε, δ, ϕ, ω)` support:
 

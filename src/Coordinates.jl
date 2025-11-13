@@ -15,15 +15,10 @@ function polar(d::Int = d_fit)
     return ρ', θ
 end
 
-function polar(m::Int, n::Int; finesse = finesse)
+function polar(m::Int, n::Int; finesse::Int = finesse)
     m = abs(m)
-    finesse = clamp(finesse, 1, 100)
-    d_n = finesse * (ceil(Int, π * n) + 1)
-    d_n = min(d_n, d_max)
-    d_m = finesse * (2m + 1)
-    d_m = min(d_m, d_max)
-    ρ = range(0.0, 1.0, d_n)
-    θ = range(0.0, 2π, d_m)
+    ρ = range(0.0, 1.0, finesse)
+    θ = range(0.0, 2π, finesse)
     return ρ, θ
 end
 

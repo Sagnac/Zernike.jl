@@ -198,7 +198,7 @@ function transform(
     δ::Complex{T}  = 0.0im,
     ϕ::T           = 0.0,
     ω::Tuple{T, T} = (1.0, 0.0);
-    precision::Int = precision, finesse::Int = wavefront_finesse
+    precision::Int = precision, finesse::Int = finesse
 ) where T <: Float64
     ΔW = Y(v, ε, δ, ϕ, ω; precision)
     Λ(ΔW; finesse)
