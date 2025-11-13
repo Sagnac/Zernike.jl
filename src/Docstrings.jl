@@ -315,6 +315,12 @@ reduce_wave
     sieve(v::Vector{Float64}, threshold::Float64)
 
 Zero out any elements lower than the threshold.
+
+----
+
+    sieve(a::Vector)
+
+Return `Zernike` non-sequential indices and the corresponding wavefront expansion coefficients for any non-zero coefficients in the input vector.
 """
 sieve
 
