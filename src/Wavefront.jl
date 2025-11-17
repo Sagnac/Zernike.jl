@@ -345,12 +345,6 @@ function W(ρ::FloatVec, θ::FloatVec, OPD::FloatVec,
     return Ψ(v, Zᵢ, n_max, orders, ssr; precision)
 end
 
-function W(x::FloatVec, y::FloatVec, OPD::FloatVec;
-           fit_to, precision::Int = precision)
-    ρ, θ = polar(x, y)
-    W(ρ, θ, OPD, fit_to; precision)
-end
-
 # assumes dim(θ) × dim(ρ) matrix polar mapping
 # W(OPD', fit_to, etc.) for dim(ρ) × dim(θ) matrix
 function W(OPD::FloatMat, fit_to; precision::Int = precision)
@@ -363,6 +357,12 @@ function W(ρ::FloatVec, θ::FloatVec, OPD::FloatMat, fit_to;
 end
 
 # Cartesian methods
+function W(x::FloatVec, y::FloatVec, OPD::FloatVec;
+           fit_to, precision::Int = precision)
+    ρ, θ = polar(x, y)
+    W(ρ, θ, OPD, fit_to; precision)
+end
+
 function W(x::FloatVec, y::FloatVec, OPD::FloatMat;
            fit_to, precision::Int = precision)
     W(cartesian_coords(x, y)..., vec(OPD); fit_to, precision)
