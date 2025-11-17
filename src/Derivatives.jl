@@ -32,7 +32,7 @@ end
 struct Laplacian{T <: Polynomial}
     r1::Derivative{RadialPolynomial}
     r2::Derivative{RadialPolynomial}
-    t::Derivative{Harmonic}
+    t2::Derivative{Harmonic}
     function Laplacian{T}(Z::T) where T <: Polynomial
         new(derivatives(Z)[1], derivatives(Z, 2)...)
     end
@@ -41,7 +41,7 @@ end
 Laplacian(Z::T) where T <: Polynomial = Laplacian{T}(Z)
 
 function (l::Laplacian)(ρ::Real, θ::Real = 0)
-    l.r1(ρ, θ) / ρ + l.r2(ρ, θ) + l.t(ρ, θ) / ρ ^ 2
+    l.r1(ρ, θ) / ρ + l.r2(ρ, θ) + l.t2(ρ, θ) / ρ ^ 2
 end
 
 (l::Laplacian)(xy::Complex) = l(polar(xy)...)
