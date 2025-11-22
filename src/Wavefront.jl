@@ -33,8 +33,9 @@ end
     w11::Float64 = 0.0
 end
 
-function Wavefront(recap, v, n_max, fit_to, a, Z, precision, ssr)
-    Wavefront{Polynomial}(recap, v, n_max, fit_to, a, Z, precision, ssr)
+function Wavefront(recap, v, n_max, fit_to, a,
+                   p::Vector{T}, precision, ssr) where T <: RorZ
+    Wavefront{T}(recap, v, n_max, fit_to, a, p, precision, ssr)
 end
 
 function Wavefront(recap, v, n_max, fit_to, a, Z, precision)
@@ -104,7 +105,7 @@ function Wavefront{RadialPolynomial}(m::Int, a::FloatVec)
         γ = Float64[λₖ[νᵢ+1] for νᵢ in ν]
         R[k] = RadialPolynomial(λₖ, γ, ν)
     end
-    Wavefront{RadialPolynomial}(recap, v, n_max, fit_to, a, R, max_precision, 0.0)
+    Wavefront(recap, v, n_max, fit_to, a, R, max_precision)
 end
 
 function Wavefront{RadialPolynomial}(m::Int, n::Vector{Int}, a::FloatVec)
