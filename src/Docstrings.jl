@@ -432,7 +432,7 @@ OTF
 
 Return the Modulation Transfer Function as a real valued matrix for the input [`Wavefront`](@ref).
 
-See also: [`OTF`](@ref), [`mtf_plot`](@ref), [`mtf_plot!`](@ref).
+See also: [`OTF`](@ref), [`mtf_plot`](@ref), [`mtf_plot!`](@ref), [`PSF`](@ref), [`psf_plot`](@ref), [`psf_plot!`](@ref).
 """
 MTF
 
@@ -447,7 +447,7 @@ Plot the Modulation Transfer Function as a three-dimensional surface plot.
 
 Plot the MTF along the sagittal or tangential direction in the pupil. The input symbol must be either `:x` or `:y` corresponding to the relevant meridian.
 
-See also: [`mtf_plot!`](@ref), [`MTF`](@ref), [`OTF`](@ref), [`zplot`](@ref), [`plotconfig`](@ref).
+See also: [`mtf_plot!`](@ref), [`MTF`](@ref), [`OTF`](@ref), [`zplot`](@ref), [`plotconfig`](@ref), [`PSF`](@ref), [`psf_plot`](@ref), [`psf_plot!`](@ref).
 """
 mtf_plot
 
@@ -456,9 +456,46 @@ mtf_plot
 
 Overlay the MTF on the existing plot. The input symbol must be either `:x` or `:y` corresponding to the relevant meridian.
 
-See also: [`mtf_plot`](@ref), [`MTF`](@ref), [`OTF`](@ref), [`zplot`](@ref), [`plotconfig`](@ref).
+See also: [`mtf_plot`](@ref), [`MTF`](@ref), [`OTF`](@ref), [`zplot`](@ref), [`plotconfig`](@ref), [`PSF`](@ref), [`psf_plot`](@ref), [`psf_plot!`](@ref).
 """
 mtf_plot!
+
+"""
+    PSF(ΔW::Wavefront)
+
+Return the incoherent Point Spread Function as a real valued matrix for the input [`Wavefront`](@ref).
+
+The output is normalized by the diffraction limited peak intensity i.e. the maximum is the Strehl ratio.
+
+The keyword argument `s` (default `50.0`) determines the scale, i.e. the Fourier space step size is `0.25 / s`.
+
+See also: See also: [`OTF`](@ref), [`MTF`](@ref), [`psf_plot`](@ref), [`psf_plot!`](@ref), [`mtf_plot`](@ref), [`mtf_plot!`](@ref).
+"""
+PSF
+
+"""
+    psf_plot(psf::Matrix)
+
+Plot the Point Spread Function as a three-dimensional surface plot.
+
+----
+
+    psf_plot(psf::Matrix, x_or_y::Symbol)
+
+Plot the PSF along the sagittal or tangential direction. The input symbol must be either `:x` or `:y` corresponding to the relevant meridian.
+
+See also: [`psf_plot!`](@ref), [`PSF`](@ref), [`mtf_plot`](@ref), [`mtf_plot!`](@ref), [`MTF`](@ref), [`OTF`](@ref), [`zplot`](@ref), [`plotconfig`](@ref).
+"""
+psf_plot
+
+"""
+    psf_plot!(psf::Matrix, x_or_y::Symbol)
+
+Overlay the PSF on the existing plot. The input symbol must be either `:x` or `:y` corresponding to the relevant meridian.
+
+See also: [`psf_plot`](@ref), [`PSF`](@ref), [`mtf_plot`](@ref), [`mtf_plot!`](@ref), [`MTF`](@ref), [`OTF`](@ref), [`zplot`](@ref), [`plotconfig`](@ref).
+"""
+psf_plot!
 
 """
     resize!(plotconfig::PlotConfig)

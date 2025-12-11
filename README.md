@@ -243,13 +243,15 @@ In addition, the functions `get_j(m, n)` & `get_mn(j)` allow you to convert betw
 
 ----
 
-## Seidel Aberrations & Transfer Functions
+## Seidel Aberrations, Point Spread & Transfer Functions
 
 Third-order Seidel aberrations at a fixed field can be converted to Zernike polynomials by using `Wavefront(aberr::Zernike.Aberration)` where the `Aberration` constructor accepts the standard wavefront error coefficients.
 
 `OTF(ΔW)` & `MTF(ΔW)` yield the Optical & Modulation Transfer Functions as matrices for the input `Wavefront`.
 
 The MTF can be plotted using the methods `mtf_plot` & `mtf_plot!` which accept the MTF matrix. `mtf_plot(mtf)` will 3D surface plot it in full, while `mtf_plot(mtf, :x)` & `mtf_plot(mtf, :y)` will plot the radial profile along a sagittal or tangential slice; the mutating version `mtf_plot!(mtf, x_or_y::Symbol)` allows you to superimpose a different MTF on the existing plot.
+
+The `PSF(ΔW)` function yields the incoherent Point Spread Function normalized by the diffraction limited peak intensity; the `psf_plot` & `psf_plot!` analogs behave in the same manner as the MTF plot methods.
 
 ----
 
