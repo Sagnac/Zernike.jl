@@ -109,11 +109,13 @@ In addition, the functions `get_j(m, n)` & `get_mn(j)` allow you to convert betw
 
 ----
 
-## Seidel Aberrations & Transfer Functions
+## Seidel Aberrations, Point Spread & Transfer Functions
 
 Third-order Seidel aberrations at a fixed field can be converted to Zernike polynomials by using `Wavefront(aberr::Zernike.Aberration)` where the `Aberration` constructor accepts the standard wavefront error coefficients.
 
 `OTF(ΔW)` & `MTF(ΔW)` yield the Optical & Modulation Transfer Functions as matrices for the input `Wavefront`.
+
+`PSF(ΔW)` yields the incoherent Point Spread Function as a matrix normalized by the diffraction limited peak intensity.
 
 ----
 

@@ -257,9 +257,22 @@ OTF
 
 Return the Modulation Transfer Function as a real valued matrix for the input [`Wavefront`](@ref).
 
-See also: [`OTF`](@ref).
+See also: [`OTF`](@ref), [`PSF`](@ref).
 """
 MTF
+
+"""
+    PSF(ΔW::Wavefront)
+
+Return the incoherent Point Spread Function as a real valued matrix for the input [`Wavefront`](@ref).
+
+The output is normalized by the diffraction limited peak intensity i.e. the maximum is the Strehl ratio.
+
+The keyword argument `s` (default `50.0`) determines the scale, i.e. the Fourier space step size is `0.25 / s`.
+
+See also: See also: [`OTF`](@ref), [`MTF`](@ref).
+"""
+PSF
 
 """
     metrics(ΔW::Wavefront)
