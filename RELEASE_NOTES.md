@@ -1,3 +1,9 @@
+# v6.5.0
+
+* A Point Spread Function interface has been added.
+
+----
+
 # v6.4.0
 
 * Several methods for working with the Optical Transfer Function of a Zernike phase have been added;
