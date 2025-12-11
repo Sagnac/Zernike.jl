@@ -1,6 +1,6 @@
 # Zernike.jl
-# Base Version 6.2.0
-# 2025-10-22
+# Base Version 6.5.0
+# 2025-12-11
 # https://github.com/Sagnac/Zernike.jl/tree/base
 
 # Generates Zernike polynomials, & models wavefront errors.
